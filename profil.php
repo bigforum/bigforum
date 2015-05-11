@@ -3,22 +3,27 @@
 include("includes/functions.php");
 login();
 page_header();
-include("includes/function_user.php");
+include_once("includes/function_user.php");
+
+//Wichtige MySQL Abfrage, da bei manchen Anbietern ansonsten fehler kommen.
+$user_data = mysql_query("SELECT * FROM users WHERE username LIKE '". USER ."'");
+$ud = mysql_fetch_object($user_data);
+
 $ac = $_GET["action"];
 
   // Start Verwarnungen
   if($ac == "no_warn")
   {
-    if($ud->group_id == "2" OR $ud->group_id == "3")
+    if(GROUP == "2" OR GROUP == "3")
 	{
-      echo "Bist du dir sicher, dass du die Verwarnung zurücknehmen willst? Dieser Schritt ist nicht rückgänigmachbar!<br>
+      echo "Bist du dir sicher, dass du die Verwarnung zurücknehmen willst? Dieser Schritt ist nicht rückgängig machbar!<br>
 	  <br><input type=Button value='Ja, Verwarnung zurücknehmen' onclick=\"window.location.href='?action=back_warn&id=$_GET[id]'\"> <input type=button value='Nein, Verwarnung bestehen lassen' onclick='history.back()><br>";
     }
 	page_footer();
   }
   if($ac == "back_warn")
   {
-    if($ud->group_id == "2" OR $ud->group_id == "3")
+    if(GROUP == "2" OR GROUP == "3")
 	{
       mysql_query("UPDATE user_verwarn SET dauer = '100' WHERE id LIKE '$_GET[id]'");
 	  echo "Die Verwarnung wurde zurückgenommen.<br>
@@ -35,7 +40,7 @@ $ac = $_GET["action"];
   gruppen_aufteilungen($udp->group_id);
   if($ac == "warn")
   {
-    if(($ud->group_id == "2" OR $ud->group_id == "3") AND $ud->adm_recht >= $udp->adm_recht)
+    if((GROUP == "2" OR GROUP == "3") AND $ud->adm_recht >= $udp->adm_recht)
 	{
 	  if($ud->id == $_GET["id"])
 	  {
@@ -54,13 +59,13 @@ $ac = $_GET["action"];
 	  $time = time();
 	  $text = "Hallo $udp->username
 	  
-	  Sie haben im Forum eine Verwarnung erhalten. Ihrem Verwarnkonto wurde(n) $gho->punkte Punkt(e) hinzugefügt.
+	  Sie haben im Forum eine Verwarnung erhalten. Ihrem Verwarn-Konto wurde(n) $gho->punkte Punkt(e) hinzugefügt.
 	  
 	  Grund der Verwarnung:
 	  $_POST[spgr]
 	  
 	  
-	  Bis diese Verwarnung abläuft, könnte es sein, das Sie nichtmehr alle Funktionen des Forum nutzen können.
+	  Bis diese Verwarnung abläuft, könnte es sein, dass Sie nichtmehr alle Funktionen des Forum nutzen können.
 	  
 	  
 	  Mit freundlichen Grüßen
@@ -175,11 +180,11 @@ $ac = $_GET["action"];
     echo"<table style=\"border: 1px solid #000050;\" width=100%><tr><td>$text</td></tr></table>";
   }
 }
-if(($ud->group_id == "2" OR $ud->group_id == "3") AND $ud->adm_recht >= $udp->adm_recht)
+if((GROUP == "2" OR GROUP == "3") AND $ud->adm_recht >= $udp->adm_recht)
 {
 ?><br>
   <table style="border: 1px solid #000050;" width="100%"><tr  background="images/dark_table.png"><td>
-  <table width=100%><tr><td><b><font color="snow">Verwarnungen</font></b></td><td align=right><a href="profil.php?id=<?php echo $_GET["id"];?>&action=warn"><font color=snow>Benutzer Verwarnen</font></a></td></tr></table></td></tr>
+  <table width=100%><tr><td><b><font color="snow">Verwarnungen</font></b></td><td align=right><a href="profil.php?id=<?php echo $_GET["id"];?>&action=warn"><font color=snow>Benutzer verwarnen</font></a></td></tr></table></td></tr>
   <tr><td>
   <table width=100%><tr align=center style=font-weight:bold><td width=30%>Grund</td><td width=30%>Verwarnt von / Datum</td><td width=10%>Punkte</td><td width=20%>Läuft aus</td><td><?php if($_GET["id"] != $ud->id) echo "Aktionen"; ?></td></tr>
   <?php

@@ -430,7 +430,14 @@ switch ($do) {
     $user_admin = mysql_query("SELECT * FROM users WHERE group_id LIKE '3'");
 	while($uac = mysql_fetch_object($user_admin))
 	{
-	  $rechte = $_POST["$uac->username"];
+	  if($uac->adm_recht == "6")
+	  {
+	    $rechte = "6";
+	  }
+	  else
+	  {
+	    $rechte = $_POST["$uac->username"];
+	  }
 	  mysql_query("UPDATE users SET adm_recht = '$rechte' WHERE username LIKE '$uac->username'");
 	}
 	insert_log("Administratoren-Rechte wurden überarbeitet");

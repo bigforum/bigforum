@@ -1,7 +1,7 @@
 <html>
 
 <head>
-<title><?php echo SITENAME; ?> - <?php if($username != "Gast") echo "Eingeloggt als $username"; else echo "Gastzugang"; ?></title>
+<title><?php echo SITENAME;  if($username == "Gast") echo " - Gastzugang"; ?></title>
 <meta name="generator" content="bigforum <?php echo VERSION; ?>" />
 <meta name="description" content="<?php echo SITENAME. " - ". BESCHREIBUNG; 
 $config_datas = mysql_query("SELECT * FROM config WHERE erkennungscode LIKE 'f2laengfs'"); $cd = mysql_fetch_object($config_datas);?>" />

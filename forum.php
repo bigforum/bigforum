@@ -3,8 +3,13 @@
 include("includes/functions.php");
 page_header();
 looking_page("forum-view");
-include("includes/function_forum.php");
-include("includes/function_user.php");
+include_once("includes/function_forum.php");
+include_once("includes/function_user.php");
+
+//Wichtige MySQL Abfrage, da bei manchen Anbietern ansonsten fehler kommen.
+$user_data = mysql_query("SELECT * FROM users WHERE username LIKE '". USER ."'");
+$ud = mysql_fetch_object($user_data);
+
 error();
 $id = $_GET["id"];
 $seite = $_GET["page"];
@@ -26,14 +31,15 @@ if($fd->guest_see == "1")
 {
   if(USER == "")
   {
-    forum_error("Dieses Forum exestiert nicht, oder du hast keine Rechte!");
+    forum_error("Dieses Forum existiert nicht, oder du hast keine Rechte!");
   }
 }
 if($fd->min_posts != "0")
 {
   if($fd->minposts >= $ud->posts)
   {
-    forum_error("Leider hast du nicht genügen Beiträge. Bitte poste erst noch sinnvolle Beiträge, um Zugriff auf das Forum zu bekommen");
+    $how = $fd->minposts - $ud->posts;
+    forum_error("Leider hast du nicht genügend Beiträge. Dir fehlen noch $how Beiträge, um Zugriff auf das Forum zu bekommen.");
   }
 }
 $them_dat = mysql_query("SELECT * FROM thema WHERE where_forum LIKE '$id' ORDER BY import DESC, last_post_time DESC LIMIT $start, $eps ")or die(mysql_error());
@@ -43,7 +49,7 @@ $wieviel_seiten = $menge / $eps;
 
 if($fd->admin_start_thema == "0")
 {
-  if($ud->group_id == "3")
+  if(GROUP == "3")
   {
     echo "<a href=newtopic.php?id=$fd->id><img src=images/newtopic.png border=0 title=\"Neues Thema\" width=105 height=60></a>";
   }
@@ -141,7 +147,7 @@ echo " <a href=?id=$_GET[id]&page=$down>></a></td></tr></table></td></tr></table
 }
 if($fd->admin_start_thema == "0")
 {
-  if($ud->group_id == "3")
+  if(GROUP == "3")
   {
     echo "<a href=newtopic.php?id=$fd->id><img src=images/newtopic.png border=0 title=\"Neues Thema\" width=105 height=60></a>";
   }

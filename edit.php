@@ -2,6 +2,7 @@
 //Wichtige Angaben für jede Datei!
 include("includes/functions.php");
 page_header();
+login();
 looking_page("edit");
 include("includes/function_forum.php");
 if($_GET["id"] == "" OR GROUP < "2")

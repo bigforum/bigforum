@@ -5,6 +5,11 @@ login();
 looking_page("main");
 page_header();
 include_once("includes/function_user.php");
+
+//Wichtige MySQL Abfrage, da bei manchen Anbietern ansonsten fehler kommen.
+$user_data = mysql_query("SELECT * FROM users WHERE username LIKE '". USER ."'");
+$ud = mysql_fetch_object($user_data);
+
 $do = $_GET["do"];
 $ac = $_GET["aktion"];
 $config_datas = mysql_query("SELECT * FROM config WHERE erkennungscode LIKE 'f2pnsignfs'");
@@ -69,9 +74,15 @@ mysql_query("UPDATE users SET sign = '$_POST[feld]' WHERE username LIKE '".USER.
 echo "Danke, deine Signatur wurde geändert.";
 page_close_table();
 }
+
+$user_data = mysql_query("SELECT * FROM users WHERE username LIKE '". USER ."'");
+$ud = mysql_fetch_object($user_data);
+
 echo "<fieldset><legend>Signatur ändern</legend>";
 editor("sign", $ud->sign, "?do=sign");
 echo "</fieldset><br>";
+
+
 if($ud->sign != "")
 {
   $text = $ud->sign;
@@ -148,7 +159,7 @@ if($do == "set")
 	  speicherung($eintrag, "Deine Einstellungen wurden überarbeitet.", "<b>Fehler:</b> Es gab einen Fehler bei der Speicherung der Einstellungen <a href=history.back()>Zurück</a>");
       page_close_table();
 	}
-    include("includes/function_user.php");
+    include_once("includes/function_user.php");
     $checked = "";
     if($ud->pn_weiter == "1")
 	{
@@ -319,7 +330,7 @@ Bitte gebe zuerst dein aktuelles Passwort ein.<br>
 <legend>Passwort ändern</legend>
 Bitte gebe in den folgenden Feldern dein neues Passwort und die Wiederholung davon ein.<br>
 <br>
-<table><tr><td>Neues Passwort</td><td>Neues Passwort (wiederholung)</td></tr>
+<table><tr><td>Neues Passwort</td><td>Neues Passwort (Wiederholung)</td></tr>
 <tr><td><input type=password name=pw1></td><td><input type=password name=pw2></td></tr></table>
 </fieldset>
 <input type=submit value=Bestätigen>
@@ -330,7 +341,7 @@ page_close_table();
 if($ac == "change")
 {
   //Wegen Benutzer-Datenbankabfragen noch die wichtige Datei dafür herhohlen:
-  include("includes/function_user.php");
+  include_once("includes/function_user.php");
   $old_pw = md5($_POST["old_pw"]);
   $pw1 = md5($_POST["pw1"]);
   $pw2 = md5($_POST["pw2"]);
@@ -348,7 +359,7 @@ if($do == "profil")
   echo "<table width=100%><tr bgcolor=#397BC6><td><big><b>Profil » Mein Profil » </b> ".USER." </big></td></tr></table><br>";
   if($ac == "")
   {
-    include("includes/function_user.php");
+    include_once("includes/function_user.php");
     echo "<form action=?do=profil&aktion=change method=post>
 	<fieldset><legend>Profil bearbeiten</legend>
 	Hier kannst du deine Website, sowie deine Hobbys angeben. Diese werden dann im Profil zu finden sein.<br>

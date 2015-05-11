@@ -4,7 +4,13 @@ include("includes/functions.php");
 page_header();
 looking_page("readthema");
 include("includes/function_forum.php");
-include("includes/function_user.php");
+include_once("includes/function_user.php");
+
+//Wichtige MySQL Abfrage, da bei manchen Anbietern ansonsten fehler kommen.
+$user_data = mysql_query("SELECT * FROM users WHERE username LIKE '". USER ."'");
+$ud = mysql_fetch_object($user_data);
+
+
 $id = $_GET["id"];
 $seite = $_GET["page"];
 if(!isset($seite) OR $seite == "0")
@@ -37,7 +43,7 @@ xmlhttp = new XMLHttpRequest();
  
  
 function del(id) {
-d = confirm("Mˆchtest du diesen Beitrag wirklich lˆschen? Dieser Schritt ist nichtmehr r¸ckg‰nigmachbar!");
+d = confirm("Mˆchtest du diesen Beitrag wirklich lˆschen? Dieser Schritt ist nichtmehr r¸ckg‰ngig machbar!");
 if(d == true)
 {
   xmlhttp.open("GET", 'thread.php?do=del&bid='+id);
@@ -84,11 +90,11 @@ if($id != "")
 	  if($td->close == "0")
 	  {
 	    mysql_query("UPDATE thema SET close = '1' WHERE id LIKE '$id'");
-        echo "<script>alert('Thema ist geschloﬂen')</script>";
+        echo "<script>alert('Thema ist geschlossen')</script>";
 	  }
 	  else
 	  {
-	    echo "<script>alert('Thema ist bereits geschloﬂen')</script>";
+	    echo "<script>alert('Thema ist bereits geschlossen')</script>";
 	  }
     }
 	if($_POST["fu"] == "open")
@@ -105,7 +111,7 @@ if($id != "")
 	}
 	if($_POST["fu"] == "delete")
 	{
-	  if($ud->group_id == "3")
+	  if(GROUP == "3")
 	  {
 	    mysql_query("DELETE FROM thema WHERE id LIKE '$id'");
 	  	echo "<script>alert('Das Thema wurde gelˆscht! Du wirst zur Foren¸bersicht weitergeleitet...'); location.href='forum.php?id=$td->where_forum';</script>";
@@ -130,7 +136,7 @@ if($id != "")
   }
   
 echo "Du bist hier: <a href=index.php>". SITENAME ."</a> > <a href=forum.php?id=$fd->id>$fd->name</a> > <a href=thread.php?id=$_GET[id]>$td->tit</a><br><br>";
-answer_button($fd->user_posts, $ud->group_id, $id, $td->close);
+answer_button($fd->user_posts, GROUP, $id, $td->close);
 if($td->edit_from != "")
 {
   $now = date("d.m.Y", time());
@@ -153,7 +159,7 @@ if($seite <= "1")
   text_ausgabe($td->text, $td->tit, $td->verfas);
 }
 
-$bei_dat = mysql_query("SELECT * FROM beitrag WHERE where_forum LIKE '$id' LIMIT $start, $eps");
+$bei_dat = mysql_query("SELECT * FROM beitrag WHERE where_forum LIKE '$id' ORDER BY post_dat LIMIT $start, $eps");
 $cou = mysql_query("SELECT * FROM beitrag WHERE where_forum LIKE '$id'");
 $menge = mysql_num_rows($cou);
 while($bd = mysql_fetch_object($bei_dat))
@@ -214,13 +220,13 @@ echo " <a href=?id=$_GET[id]&page=$down>></a></td></tr></table></td></tr></table
 }
 
 
-answer_button($fd->user_posts, $ud->group_id, $id, $td->close);
+answer_button($fd->user_posts, GROUP, $id, $td->close);
 
 
 }
 else
 {
-  forum_error("Dieses Thema exestiert nicht");
+  forum_error("Dieses Thema existiert nicht");
 }
 page_footer();
 ?>

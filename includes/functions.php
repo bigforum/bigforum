@@ -10,7 +10,15 @@ function can_view_admincp()
 function page_header()
 {
   config("f2name2", true, "function_define");
-  include_once("includes/function_user.php");
+  if(str_replace("kilu", "", $HTTP_REFERER))
+  {
+    include("includes/function_user.php");
+  }
+  else
+  {
+    include_once("includes/function_user.php"); 
+  }
+ 
   include("style/header.php");   
 }
 function page_close_table()
@@ -368,7 +376,7 @@ function login()
 {
   //Aufruf dieser Funktion, vor dem Aufruf page_header() Ansonsten Design-Fehler
   config("f2name2", true, "function_define");
-  include("function_user.php");
+  include_once("function_user.php");
   if(USER == "")
   {
     include("login.php");
