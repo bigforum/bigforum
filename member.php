@@ -44,6 +44,7 @@ looking_page("list_member");
 $time = time();
 $users = mysql_query("SELECT * FROM users WHERE sptime < '$time' ORDER BY id");
 $number = "0";
+$num = "0";
 while($ur = mysql_fetch_object($users))
 {
   $datum = date("d.m.Y",$ur->reg_dat);
@@ -53,8 +54,16 @@ while($ur = mysql_fetch_object($users))
   {
     $website = "<a href=http://$ur->website target=_blank><img src=images/hp.png border=0 width=60px height=35px></a>";
   }
-  echo "<tr><td> $number </td><td><a href=profil.php?id=$ur->id>$ur->username</a><br><small>$ur->rang</small></td><td>$ur->posts</td><td>$datum</td><td>$website <a href=main.php?do=make_pn&to=$ur->username><img src=images/pn.png border=0 width=60px height=32px alt=\"$ur->username eine Private Nachricht schreiben\"></a></td></tr>
+  $bg;
+  if($num == "1")
+  {
+    $num = "-1";
+	$bg = "bgcolor='#F4F4F4'";
+  }
+  echo "<tr $bg><td> $number </td><td><a href=profil.php?id=$ur->id>$ur->username</a><br><small>$ur->rang</small></td><td>$ur->posts</td><td>$datum</td><td>$website <a href=main.php?do=make_pn&to=$ur->username><img src=images/pn.png border=0 width=60px height=32px alt=\"$ur->username eine Private Nachricht schreiben\"></a></td></tr>
 ";
+  $bg = "";
+  $num++;
 }
 ?>
 </table>

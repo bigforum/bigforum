@@ -33,6 +33,8 @@ while($fr = mysql_fetch_object($foren_data))
 	}
 	$config_datas = mysql_query("SELECT * FROM config WHERE erkennungscode LIKE 'f2imgadfs'");
     $cd = mysql_fetch_object($config_datas);
+	if($cd->wert1 == "") { $cd->wert1 = "images/old_1.png"; }
+    if($cd->wert2 == "") { $cd->wert2 = "images/new_1.png"; }
 	if($look_see == "0")
 	{
 	  $forum_stat = "<img src='$cd->wert1' title='Keine neuen Beiträge' width=50 height=50>";
@@ -57,7 +59,7 @@ while($fr = mysql_fetch_object($foren_data))
     {
 	  $stat_them = $stat_them + $zahl_themen;
 	  $stat_bei = $stat_bei + $beit;
-      echo "<table width=100% bgcolor=#F2F2E5><tr><td width=70%><table><tr><td> $forum_stat &nbsp; </td><td><a href=forum.php?id=$fd->id><b>$fd->name</b></a><br><font size=2px>$fd->besch</font></td></tr></table></td><td>$zahl_themen</td><td>$beit</td></tr></table>";
+      echo "<table width=100% bgcolor=#F2F2E5><tr><td width=70%><table><tr><td> $forum_stat &nbsp; </td><td><a href=forum.php?id=$fd->id><b>$fd->name</b></a><br><font size=2px>$fd->besch</font></td></tr></table></td><td width=15%>$zahl_themen</td><td width=15%>$beit</td></tr></table>";
 	}
 	else
 	{
@@ -65,7 +67,7 @@ while($fr = mysql_fetch_object($foren_data))
 	  {
 	  	$stat_them = $stat_them + $zahl_themen;
 		$stat_bei = $stat_bei + $beit;
-        echo "<table width=100% bgcolor=#F2F2E5><tr><td width=70%><table><tr><td> $forum_stat &nbsp; </td><td><a href=forum.php?id=$fd->id><b>$fd->name</b></a></b><br><font size=2px>$fd->besch</font></td></tr></table></td><td>$zahl_themen</td><td>$beit</td></tr></table>";
+        echo "<table width=100% bgcolor=#F2F2E5><tr><td width=70%><table><tr><td> $forum_stat &nbsp; </td><td><a href=forum.php?id=$fd->id><b>$fd->name</b></a></b><br><font size=2px>$fd->besch</font></td></tr></table></td><td width=15%>$zahl_themen</td><td width=15%>$beit</td></tr></table>";
 	  }
 	}
   }
@@ -86,6 +88,9 @@ $last_use = mysql_fetch_object($last_use);
 
 $config_datas = mysql_query("SELECT * FROM config WHERE erkennungscode LIKE 'f2imgadfs'");
 $cd = mysql_fetch_object($config_datas);
+
+if($cd->wert1 == "") { $cd->wert1 = "images/old_1.png"; }
+if($cd->wert2 == "") { $cd->wert2 = "images/new_1.png"; }
 	
 echo "<table width=100% bgcolor=#397BC6 color=snow><tr><td><b>Statistiken.</td></tr></table>";
 echo "<table width=100% bgcolor=#F2F2E5><tr><td><b>Themen:</b> $stat_them <b>Beitäge:</b> $stat_bei <b>Benutzer:</b> $stat_use<br>Wir begrüßen unser neustes Mitglied: <a href=profil.php?id=$last_use->id>$last_use->username</a></td></tr></table><br>

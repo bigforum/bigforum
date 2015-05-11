@@ -1,5 +1,6 @@
 body {
 background: #909090;
+font-family: Arial;
 
 }
 .bgt{
@@ -22,6 +23,7 @@ a:hover, a:active
 {
   background: #397BC6;
   border: 1px solid #000050;
+  font-size: 15px;
 }
 .navi a:link
 {
@@ -42,6 +44,7 @@ a:hover, a:active
 {
 	background: #E1E4F2;
 	color: #000000;
+        font-size: 15px;
 }
 .tab
 {

@@ -163,7 +163,9 @@ $ac = $_GET["action"];
     $text = preg_replace('/\[u\](.*?)\[\/u\]/', '<u>$1</u>', $text);  
 	$text = eregi_replace("\[url\]([^\[]+)\[/url\]","<a href=\"\\1\" target=\"_blank\">\\1</a>",$text);
     $text = str_replace("\n", "<br />", $text);
-    $smilie_data = mysql_query("SELECT * FROM smilie WHERE packet = '1'");
+	$config_wert = mysql_query("SELECT * FROM config WHERE erkennungscode LIKE 'f2laengfs'");
+    $con = mysql_fetch_object($config_wert); 
+    $smilie_data = mysql_query("SELECT * FROM smilie WHERE packet = $con->zahl2");
     while($sd = mysql_fetch_object($smilie_data))
     {
       $text = str_replace($sd->abk1,"<img src=images/$sd->images_path width=25 height=25>", $text);

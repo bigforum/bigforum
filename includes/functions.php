@@ -44,24 +44,26 @@ if($di == "ant" OR $di == "sign")
   }
   </script>
 <form action=$extra&aktion=send method=post name=feld>";
-if($di =="ant")
+if($di == "ant")
 {
-echo "Betreff:<br>
-<input type=text name=bet><br><br>
-Nachricht:";
+  echo "Betreff:<br>
+  <input type=text name=bet><br><br>
+  Nachricht:";
 }
 echo "<table bgcolor=silver><tr><td>
 <input type=button style='background-color:silver;font-weight:bold' value=b onclick=\"document.feld.feld.value += '[b][/b]'\"><input type=button style=\"background-color:silver;text-decoration:underline\" value=u onclick=\"document.feld.feld.value += '[u][/u]'\"><input type=button style=\"background-color:silver;font-style:italic\" value=k onclick=\"document.feld.feld.value += '[k][/k]'\">
-<input type=button style='background-color:silver;' value=Link onclick=\"document.feld.feld.value += '[url][/url]'\"><br>
+<input type=button style='background-color:silver;' value=Link onclick=\"document.feld.feld.value += '[url][/url]'\"><input type=button style='background-color:silver;' value=Code onclick=\"document.feld.feld.value += '[code][/code]'\"><input type=button style='background-color:silver;' value=Bild onclick=\"document.feld.feld.value += '[img][/img]'\"><br>
 <textarea cols=70 rows=7 name=feld>";
 if($di == "sign")
 {
   echo $value;
 }
 echo "</textarea><br>
-<input type=submit value=Absenden style=background-color:silver;></Td><td valign=top><br>";
+<input type=submit value=Absenden style=background-color:silver;></td><td valign=top><br>";
 $drei = "0";
-$smilie_data = mysql_query("SELECT * FROM smilie WHERE packet = '1'");
+$config_wert = mysql_query("SELECT * FROM config WHERE erkennungscode LIKE 'f2laengfs'");
+$con = mysql_fetch_object($config_wert); 
+$smilie_data = mysql_query("SELECT * FROM smilie WHERE packet = '$con->zahl2'");
 while($sd = mysql_fetch_object($smilie_data))
 {
   $drei++;
@@ -364,15 +366,18 @@ function text_ausgabe($text, $betreff, $from)
   $from_data = mysql_query("SELECT * FROM users WHERE username LIKE '$from'");
   $fd = mysql_fetch_object($from_data);
   $datum = date("d.m.Y",$fd->reg_dat);
-  $text = strip_tags($text);
+  $text = htmlspecialchars($text);
   $text = preg_replace('/\[b\](.*?)\[\/b\]/', '<b>$1</b>', $text);  
   $text = preg_replace('/\[k\](.*?)\[\/k\]/', '<i>$1</i>', $text);  
   $text = preg_replace('/\[u\](.*?)\[\/u\]/', '<u>$1</u>', $text);  
+  $text = preg_replace('/\[code\](.*?)\[\/code\]/', "<small>Code:</small><table width=80% bgcolor=snow><tr><td>$1</td></tr></table>", $text);  
   $text = eregi_replace("\[url\]([^\[]+)\[/url\]","<a href=\"\\1\" target=\"_blank\">\\1</a>",$text);
+  $text = eregi_replace("\[img\]([^\[]+)\[/img\]","<img src=\"\\1\" border=0>",$text);
   $text = str_replace("\n", "<br />", $text);
   $betreff = strip_tags($betreff);
-  
-  $smilie_data = mysql_query("SELECT * FROM smilie WHERE packet = '1'");
+  $config_wert = mysql_query("SELECT * FROM config WHERE erkennungscode LIKE 'f2laengfs'");
+  $con = mysql_fetch_object($config_wert); 
+  $smilie_data = mysql_query("SELECT * FROM smilie WHERE packet = '$con->zahl2'");
   while($sd = mysql_fetch_object($smilie_data))
   {
     $text = str_replace($sd->abk1,"<img src=images/$sd->images_path width=25 height=25>", $text);
@@ -410,7 +415,9 @@ if($fd->sign != "" AND $cd->zahl1 == "1")
   $text = preg_replace('/\[u\](.*?)\[\/u\]/', '<u>$1</u>', $text);  
   $text = eregi_replace("\[url\]([^\[]+)\[/url\]","<a href=\"\\1\" target=\"_blank\">\\1</a>",$text);
   $text = str_replace("\n", "<br />", $text);
-  $smilie_data = mysql_query("SELECT * FROM smilie WHERE packet = '1'");
+  $config_wert = mysql_query("SELECT * FROM config WHERE erkennungscode LIKE 'f2laengfs'");
+  $con = mysql_fetch_object($config_wert); 
+  $smilie_data = mysql_query("SELECT * FROM smilie WHERE packet = '$con->zahl2'");
   while($sd = mysql_fetch_object($smilie_data))
   {
     $text = str_replace($sd->abk1,"<img src=images/$sd->images_path width=25 height=25>", $text);
@@ -430,6 +437,6 @@ function today($datum)
   }
 }
 // Ende der Funktionen, Abrufe wichtiger Arrays!
-$warn_dauer = Array("86400","172800","432000","604800","1209600","2678400","5097600","15638400","31536000","63072000");
-$warn_text = Array("1 Tag","2 Tage","5 Tage","1 Woche","2 Wochen","1 Monat","2 Monate","6 Monate","1 Jahr","2 Jahre");
+$warn_dauer = Array("86400","172800","432000","604800","864000","1209600","2678400","5097600","15638400","31536000","63072000");
+$warn_text = Array("1 Tag","2 Tage","5 Tage","7 Tage","10 Tage","2 Wochen","1 Monat","2 Monate","6 Monate","1 Jahr","2 Jahre");
 ?>

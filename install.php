@@ -19,7 +19,7 @@ function schr(s)
   document.getElementById("schritt").innerHTML = s;
 }
 </script>
-<table width="100%"><tr><td width="90%"><b>Bigforum - Installationsassistent Schritt <span id=schritt></span>/6</b></td><td><b>Version: 1.1</b></td></tr></table>
+<table width="100%"><tr><td width="90%"><b>Bigforum - Installationsassistent Schritt <span id=schritt></span>/6</b></td><td><b>Version: 1.2</b></td></tr></table>
 <hr><br><br>
 <?php
 $do = $_GET["do"];
@@ -42,8 +42,14 @@ switch($do){
     mysql_connect($HOST,$USER,$PW)or die(mysql_error());
     mysql_select_db($DB)or die(mysql_error());
 	//MySQL - Datenbank änderungen	
-    //mysql_query("ALTER TABLE `users` ADD `notice` varchar(500) NOT NULL ;");
-	mysql_query("UPDATE config SET wert1 = 'images/new_1.png', wert2 = 'images/old_1.png', zahl1 = '3' WHERE erkennungscode LIKE 'f2imgadfs'");
+	  mysql_query("INSERT INTO config (erkennungscode, wert1, wert2, zahl1, zahl2) VALUES ('f2laengfs', '', '', '10', '1')");
+	  mysql_query("INSERT INTO smilie (packet, images_path, abk1, abk2) VALUES ('2', 'cool.png', '8-)', '8)')");
+	  mysql_query("INSERT INTO smilie (packet, images_path, abk1, abk2) VALUES ('2', 'grins.png', ':)', ':-)')");
+	  mysql_query("INSERT INTO smilie (packet, images_path, abk1, abk2) VALUES ('2', 'lach.png', ':D', ':-D')");
+	  mysql_query("INSERT INTO smilie (packet, images_path, abk1, abk2) VALUES ('2', 'say-not-klein.png', ':|', ':-|')");
+	  mysql_query("INSERT INTO smilie (packet, images_path, abk1, abk2) VALUES ('2', 'staun.png', ':-o', ':o')");
+	  mysql_query("INSERT INTO smilie (packet, images_path, abk1, abk2) VALUES ('2', 'iws.png', '8O', '8-O')");
+	  mysql_query("INSERT INTO smilie (packet, images_path, abk1, abk2) VALUES ('2', 'hmmm.png', ':-(', ':(')");
 	//Ende
     echo "Danke, das Forum wurde nun auf den neusten Stand gebracht.<br>Bitte lösche diese Datei, ansonsten kann jeder dieses Forum beschädigen!";
   break;
@@ -283,7 +289,8 @@ switch($do){
 	  mysql_query("INSERT INTO config (erkennungscode, wert1, wert2, zahl1, zahl2) VALUES ('f2name2', 'Bigforum', 'Das Forum', '0', '0')");
 	  mysql_query("INSERT INTO config (erkennungscode, wert1, wert2, zahl1, zahl2) VALUES ('f2pnsignfs', '', '', '1', '1')");
 	  mysql_query("INSERT INTO config (erkennungscode, wert1, wert2, zahl1, zahl2) VALUES ('f2closefs', 'Allgemeine Arbeiten', '', '1', '0')");
-	  mysql_query("INSERT INTO config (erkennungscode, wert1, wert2, zahl1, zahl2) VALUES ('f2imgadfs', 'images/old_post.png', 'images/new_post.png', '0', '0')");
+	  mysql_query("INSERT INTO config (erkennungscode, wert1, wert2, zahl1, zahl2) VALUES ('f2imgadfs', 'images/old_post.png', 'images/new_post.png', '3', '0')");
+	  mysql_query("INSERT INTO config (erkennungscode, wert1, wert2, zahl1, zahl2) VALUES ('f2laengfs', '', '', '10', '0')");
 	  mysql_query("INSERT INTO smilie (packet, images_path, abk1, abk2) VALUES ('1', 'brille.png', '8-)', '8)')");
 	  mysql_query("INSERT INTO smilie (packet, images_path, abk1, abk2) VALUES ('1', 'grine.png', ':)', ':-)')");
 	  mysql_query("INSERT INTO smilie (packet, images_path, abk1, abk2) VALUES ('1', 'lache.png', ':D', ':-D')");
@@ -291,6 +298,14 @@ switch($do){
 	  mysql_query("INSERT INTO smilie (packet, images_path, abk1, abk2) VALUES ('1', 'muede.png', ':-o', ':o')");
 	  mysql_query("INSERT INTO smilie (packet, images_path, abk1, abk2) VALUES ('1', 'schock.png', '8O', '8-O')");
 	  mysql_query("INSERT INTO smilie (packet, images_path, abk1, abk2) VALUES ('1', 'traurig.png', ':-(', ':(')");
+	  //Neues Smilie-Packet
+	  mysql_query("INSERT INTO smilie (packet, images_path, abk1, abk2) VALUES ('2', 'cool.png', '8-)', '8)')");
+	  mysql_query("INSERT INTO smilie (packet, images_path, abk1, abk2) VALUES ('2', 'grins.png', ':)', ':-)')");
+	  mysql_query("INSERT INTO smilie (packet, images_path, abk1, abk2) VALUES ('2', 'lach.png', ':D', ':-D')");
+	  mysql_query("INSERT INTO smilie (packet, images_path, abk1, abk2) VALUES ('2', 'say-not-klein.png', ':|', ':-|')");
+	  mysql_query("INSERT INTO smilie (packet, images_path, abk1, abk2) VALUES ('2', 'staun.png', ':-o', ':o')");
+	  mysql_query("INSERT INTO smilie (packet, images_path, abk1, abk2) VALUES ('2', 'iws.png', '8O', '8-O')");
+	  mysql_query("INSERT INTO smilie (packet, images_path, abk1, abk2) VALUES ('2', 'hmmm.png', ':-(', ':(')");
 	  
 	  echo "<br><br>Erfolgreich installiert!<br><br><br>Sollte im oberem Teil keine Fehlermeldung kommen, so geht es nun weiter zum nächstem Schritt.<br><a href=?do=install&s=4>Zum nächsten Schritt</a>";
 	break;

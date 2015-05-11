@@ -11,6 +11,8 @@ if($ac == "send")
   $data_beit = mysql_query("SELECT * FROM beitrag WHERE where_forum LIKE '$_GET[id]' ORDER BY id DESC LIMIT 1");
   $db = mysql_fetch_object($data_beit);
   $rech = $time - $db->post_when;
+
+
   if($db->verfas == USER)
   {
     mysql_query("UPDATE beitrag SET text = '$db->text \n \n [b]UPDATE:[/b]\n $_POST[feld]', last_edit_dat = '$time', edit_by = '". USER ."' WHERE id LIKE '$db->id'");

@@ -120,7 +120,7 @@ if($id != "")
 	}
   }
   
-  
+echo "Du bist hier: <a href=index.php>". SITENAME ."</a> > <a href=forum.php?id=$fd->id>$fd->name</a> > <a href=thread.php?id=$_GET[id]>$td->tit</a><br><br>";
 answer_button($fd->user_posts, $ud->group_id, $id, $td->close);
 if($td->edit_from != "")
 {

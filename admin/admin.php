@@ -193,8 +193,8 @@ switch ($do) {
 	   <table>
 	   <tr><td>
 	   <form action=?do=save_userdatas method=post>
-	   <b>Benutzername:</b> </td><td> <input type=text name=username value=$uds->username></td></tr><tr><td>
-	   <b>Rang-Titel:</b> </td><td> <input type=text name=rang value=$uds->rang></td></tr><tr><td>
+	   <b>Benutzername:</b> </td><td> <input type=text name=username value='$uds->username'></td></tr><tr><td>
+	   <b>Rang-Titel:</b> </td><td> <input type=text name=rang value='$uds->rang'></td></tr><tr><td>
 	   &nbsp; </td></tr><tr><td>
 	   <b>Beiträge:</b> </td><td> <input type=text name=bei value=$uds->posts></td></tr><tr><td>
 	   <b>Registriert seit (UNIX!):</b> </td><td> <input type=text name=reg value=$uds->reg_dat> (". date("d.m.Y", $uds->reg_dat).")</td></tr><tr><td>
@@ -203,6 +203,7 @@ switch ($do) {
 	   &nbsp; </td></tr><tr><td>	
        <b>Gruppenzugehörigkeit</b> </td><td> Moderator: <input type=checkbox name=grup value=2 $mod_check><br>
 											Administrator: <input type=checkbox name=grup value=3 $adm_check></td></tr><tr><td>
+	   <b>Signatur</b></td><td><textarea name=sign rows=6 cols=60>$uds->sign</textarea></td></tr><tr><td>
 	   <input type=hidden value=$uds->id name=id>
 	   <input type=submit value=Speichern>
 	   </form>
@@ -234,6 +235,7 @@ switch ($do) {
 			reg_dat   = '$_POST[reg]',
 			group_id  = '$_POST[grup]',
 			notice    = '$_POST[unot]',
+			sign      = '$_POST[sign]',
 			adm_recht = '$uds->adm_recht' WHERE id LIKE '$_POST[id]'");
 	insert_log("Profil von $_POST[username] wurde geändert.");
   echo "Danke,<br> das Profil von $_POST[username] wurde erfolgreich überarbeitet.<br><br><a href=admin.php>Zurück zur Administratorern-Übersicht</a>";
@@ -328,7 +330,8 @@ switch ($do) {
     mysql_query("UPDATE config SET zahl1 = '$_POST[sign]', zahl2 = '$_POST[pn]' WHERE erkennungscode LIKE 'f2pnsignfs'");
     mysql_query("UPDATE config SET wert1 = '$gpack', wert2 = '$gpackt', zahl1 = '$number' WHERE erkennungscode LIKE 'f2imgadfs'");   
     mysql_query("UPDATE config SET wert1 = '$_POST[clos_text]', zahl1 = '$_POST[close]' WHERE erkennungscode LIKE 'f2closefs'");   
-   echo "Danke, die Foreneinstellungen wurden geändert!";
+    mysql_query("UPDATE config SET zahl1 = '7', zahl2 = '$_POST[smilie]' WHERE erkennungscode LIKE 'f2laengfs'");   
+  echo "Danke, die Foreneinstellungen wurden geändert!";
 	insert_log("Die Foreneinstellungen wurden überarbeitet.");
 	exit;
   }
@@ -371,8 +374,20 @@ switch ($do) {
   echo" ></td></tr>
   <tr><td>Information:</td><td> <span id=info></span> </td></tr>
   <tr><td> &nbsp; </td><td> &nbsp; </td></tr>
-  <tr><td> Grafik-Packet auf der Startseite </td><td><select name=grafp>$pack</select></td></tr> 
-  <tr><td> &nbsp; </td><td> &nbsp; </td></tr>  ";
+  <tr><td> Grafik-Packet auf der Startseite </td><td><select name=grafp>$pack</select></td></tr> ";
+  $config_wert = mysql_query("SELECT * FROM config WHERE erkennungscode LIKE 'f2laengfs'");
+  $con = mysql_fetch_object($config_wert); 
+  $sp = $con->zahl2;
+  if($sp == "1")
+  {
+    $packt = "<option value=1>Altes Packet</option><option value=2>Neues Packet</option>";
+  }
+  if($sp == "2")
+  {
+    $packt = "<option value=2>Neues Packet</option><option value=1>Altes Packet</option>";
+  }
+  echo "<tr><td>Smilie-Pack</td><td><select name=smilie>$packt</select>";
+  echo "<tr><td> &nbsp; </td><td> &nbsp; </td></tr>  ";
   
   $config_wert = mysql_query("SELECT * FROM config WHERE erkennungscode LIKE 'f2closefs'");
   $con = mysql_fetch_object($config_wert); 
