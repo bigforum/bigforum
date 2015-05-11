@@ -7,11 +7,19 @@ include("includes/function_forum.php");
 include("includes/function_user.php");
 error();
 $id = $_GET["id"];
+$seite = $_GET["page"];
+if(!isset($seite) OR $seite == "0")
+{
+ $seite = 1;
+} 
 $topics = "0";
+$eps = "10";
+$start = $seite * $eps - $eps;  
 if($id == "")
 {
   forum_error("Dieses Forum exestiert nicht.");
 }
+
 $for_dat = mysql_query("SELECT * FROM foren WHERE id LIKE '$id'");
 $fd = mysql_fetch_object($for_dat);
 if($fd->guest_see == "1")
@@ -28,7 +36,10 @@ if($fd->min_posts != "0")
     forum_error("Leider hast du nicht genügen Beiträge. Bitte poste erst noch sinnvolle Beiträge, um Zugriff auf das Forum zu bekommen");
   }
 }
-$them_dat = mysql_query("SELECT * FROM thema WHERE where_forum LIKE '$id' ORDER BY import DESC, last_post_time DESC");
+$them_dat = mysql_query("SELECT * FROM thema WHERE where_forum LIKE '$id' ORDER BY import DESC, last_post_time DESC LIMIT $start, $eps ")or die(mysql_error());
+$them_meng = mysql_query("SELECT id FROM thema WHERE where_forum LIKE '$id'");
+$menge = mysql_num_rows($them_meng); 
+$wieviel_seiten = $menge / $eps; 
 
 if($fd->admin_start_thema == "0")
 {
@@ -92,7 +103,32 @@ if($topics == "0")
 {
   echo "<br><br><br><br><br><br><table><tr><td></td><td><b>Information:</b> In diesem Forum gibt es noch keine Themen. Du kannst der erste sein!</td></tr></table><br><br><br><br><br><br>";
 }
+$ws = ceil($wieviel_seiten);
+if($ws > "1")
+{
+$up = $seite - 1;
+$down = $seite + 1;
+if($ws == $seite)
+{
+  $down--;
+}
+echo "<table width=73%><tr><td align=right valign=right><table class=navi><tr><td>";
+echo "<font color=snow>Seite $seite von $ws &nbsp <a href=?id=$_GET[id]&page=$up><</a>";
 
+for($a=0; $a < $wieviel_seiten; $a++)
+{
+  $b = $a + 1;
+  if($seite == $b)
+  {
+    echo "  <b>$b</b> </font>";
+  }
+  else
+  {
+    echo "  <a href=\"?id=$_GET[id]&page=$b\">$b</a> ";
+  }
+}
+echo " <a href=?id=$_GET[id]&page=$down>></a></td></tr></table></td></tr></table>"; 
+}
 if($fd->admin_start_thema == "0")
 {
   if($ud->group_id == "3")

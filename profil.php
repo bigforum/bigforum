@@ -143,7 +143,8 @@ $ac = $_GET["action"];
   {
     echo "<font color=red>Offline</font>";
   }
-  ?><br>
+  ?><br><br>
+  <b>Suche nach:</b> <a href="search.php?do=send&us=<?php echo $udp->username; ?>&action=beitrag">Allen Beiträgen</a> | <a href="search.php?do=send&us=<?php echo $udp->username; ?>&action=thema">Allen Themen</a>
   </td><td valign=top>
   <b>Website:</b> <a href="<? if(str_replace("http://www.", "www.", $udp->website))echo "http://$udp->website";  else echo $udp->website;?>" target="_blank"><? echo $udp->website; ?></a><br>
   <b>Hobbys:</b> <? echo $udp->hob; ?><br><br>

@@ -6,21 +6,41 @@ page_header();
 looking_page("search");
 if($_GET["do"] == "send")
 {
-  if($_POST["auth"] == "" AND $_POST["schlu"] == "")
+  $f;
+  if($_GET["us"] != "" AND $_GET["action"] != "")
+  {
+    $f = "3";
+	$aut = $_GET["us"];
+	$sea = $_GET["action"];
+	$lim = "50";
+	if($sea == "thema")
+      $search_res = mysql_query("SELECT * FROM thema WHERE verfas LIKE '$aut' ORDER BY id LIMIT $lim")or die(mysql_error());
+    else
+      $search_res = mysql_query("SELECT * FROM beitrag WHERE verfas LIKE '$aut' ORDER BY id LIMIT $lim")or die(mysql_error());
+  }
+  if(($_POST["auth"] == "" AND $_POST["schlu"] == "") AND $f != "3")
   {
     erzeuge_error("Du musst schon etwas eingeben!");
   }
   $lim = $_POST["number"];
   $fi = $_POST["first"];
-  if($_POST["search"] == "thema")
-    $search_res = mysql_query("SELECT * FROM thema WHERE verfas LIKE '%$_POST[auth]%' AND text LIKE '%$_POST[schlu]%' ORDER BY id $fi LIMIT $lim")or die(mysql_error());
-  else
-    $search_res = mysql_query("SELECT * FROM beitrag WHERE verfas LIKE '%$_POST[auth]%' AND text LIKE '%$_POST[schlu]%' ORDER BY id $fi LIMIT $lim")or die(mysql_error());
-echo "<table><tr bgcolor=#397bc6 style='font-weight:bold;'><td width=3%></td><td width=50% valign=center>Title</td><td width=20% valign=center>Autor</td></tr>";
+  if($f != "3")
+  {
+    $sea = $_POST["search"];
+	$aut = $_POST["auth"];
+  }
+  if($f != "3")
+  {
+    if($sea == "thema")
+      $search_res = mysql_query("SELECT * FROM thema WHERE verfas LIKE '%$aut%' AND text LIKE '%$_POST[schlu]%' ORDER BY id $fi LIMIT $lim")or die(mysql_error());
+    else
+      $search_res = mysql_query("SELECT * FROM beitrag WHERE verfas LIKE '%$aut%' AND text LIKE '%$_POST[schlu]%' ORDER BY id $fi LIMIT $lim")or die(mysql_error());
+  }
+  echo "<table><tr bgcolor=#397bc6 style='font-weight:bold;'><td width=3%></td><td width=50% valign=center>Title</td><td width=20% valign=center>Autor</td></tr>";
  
   while($sr = mysql_fetch_object($search_res))
   {
-    if($_POST["search"] == "beitrag")
+    if($sea == "beitrag")
 	{
 	  $th_da = mysql_query("SELECT * FROM thema WHERE id LIKE '$sr->where_forum'");
 	  $td = mysql_fetch_object($th_da);

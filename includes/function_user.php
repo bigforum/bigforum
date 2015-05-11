@@ -3,8 +3,8 @@ if(USER == "")
 {
   $username = "Gast";
 }
-else {
-  $user_data = mysql_query("SELECT * FROM eins_users WHERE username LIKE '$_COOKIE[username]'");
+else{
+  $user_data = mysql_query("SELECT * FROM users WHERE username LIKE '$_COOKIE[username]'");
   $ud = mysql_fetch_object($user_data);
   $username = $_COOKIE["username"];
   gruppen_aufteilungen($ud->group_id);
@@ -18,7 +18,7 @@ function pn_zahl($where)
   {
     $zahl = "0";
 	$gele = "0";
-    $pn_zahl = mysql_query("SELECT * FROM eins_prna WHERE abse LIKE '". USER . "'");
+    $pn_zahl = mysql_query("SELECT * FROM prna WHERE abse LIKE '". USER . "'");
 	while($zahle = mysql_fetch_object($pn_zahl))
 	{
 	  if($zahle->emp != USER)
@@ -26,7 +26,7 @@ function pn_zahl($where)
 	    $zahl++;	  
 	  }
 	}
-	$pn_zahls = mysql_query("SELECT * FROM eins_prna WHERE emp LIKE '". USER . "'");
+	$pn_zahls = mysql_query("SELECT * FROM prna WHERE emp LIKE '". USER . "'");
 	while($zahles = mysql_fetch_object($pn_zahls))
 	{
 	  $zahl++;	
@@ -38,7 +38,7 @@ function pn_zahl($where)
 	if($where == "header")
 	{
 	  //Nochmal eine MySQL - Abfrage, um sicherzugehen, das der Benutzer auch wirklich eine Nachricht hat
-	  $user_data = mysql_query("SELECT * FROM eins_users WHERE username LIKE '$_COOKIE[username]'");
+	  $user_data = mysql_query("SELECT * FROM users WHERE username LIKE '$_COOKIE[username]'");
       $ud = mysql_fetch_object($user_data);
 	  
 	  $zeichen = "";
@@ -49,11 +49,16 @@ function pn_zahl($where)
 	    $zeichen = "<span onmouseover=location.href='main.php?do=pn_ein'>";
 		$zeichen2 = "</span>";
 	  }
+	  else
+	  {
+	    $zeichen = "<span style='cursor: pointer;' onclick=\"window.location.href='main.php?do=pn_ein'\">";
+		$zeichen2 = "</span>";
+	  }
 	  
 	  if($gele == "0")
-	    { echo "<br><br><small>Du hast $zahl($gele) Nachrichten.</small>";
-	  } else {
-	    echo "<br><br><blink><font color=red>$zeichen Du hast $zahl($gele) Nachrichten.$zeichen2</font></blink>"; }
+	    echo "<br><br><small><span style='cursor: pointer;' onclick=\"window.location.href='main.php?do=pn_ein'\">Du hast $zahl($gele) Nachrichten.</span></small>";
+	  else
+	    echo "<br><br><blink><font color=red>$zeichen Du hast $zahl($gele) Nachrichten.$zeichen2</font></blink>";
 	}
   }
 }

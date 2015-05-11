@@ -10,7 +10,7 @@
   define("MYSQLDB", $DB);
   define("SITENAME", $daten["wert1"]);
   define("BESCHREIBUNG", $daten['wert2']);
-  define("VERSION", "1.2");
+  define("VERSION", "1.3");
   
   //Ersetzte manche in Variablen
   $root = HAUPT;

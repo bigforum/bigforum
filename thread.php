@@ -6,6 +6,15 @@ looking_page("readthema");
 include("includes/function_forum.php");
 include("includes/function_user.php");
 $id = $_GET["id"];
+$seite = $_GET["page"];
+if(!isset($seite) OR $seite == "0")
+{
+  $seite = 1;
+} 
+$eps = "10";
+
+$start = $seite * $eps - $eps;
+
 if(GROUP == "2" OR GROUP == "3")
 {
 ?>
@@ -138,10 +147,15 @@ if($td->edit_from != "")
 }
     $datum = date("d.m.Y",$td->post_when);
     $uhrzeit = date("H:i",$td->post_when);
-echo "<table width=80%><tr background='images/dark_table.png'><td><font color=snow><b>$datum, $uhrzeit</b> $edit</font></td></tr></table>";
-text_ausgabe($td->text, $td->tit, $td->verfas);
+if($seite <= "1")
+{
+  echo "<table width=80%><tr background='images/dark_table.png'><td><font color=snow><b>$datum, $uhrzeit</b> $edit</font></td></tr></table>";
+  text_ausgabe($td->text, $td->tit, $td->verfas);
+}
 
-$bei_dat = mysql_query("SELECT * FROM beitrag WHERE where_forum LIKE '$id'");
+$bei_dat = mysql_query("SELECT * FROM beitrag WHERE where_forum LIKE '$id' LIMIT $start, $eps");
+$cou = mysql_query("SELECT * FROM beitrag WHERE where_forum LIKE '$id'");
+$menge = mysql_num_rows($cou);
 while($bd = mysql_fetch_object($bei_dat))
 {
   $edit = "";
@@ -171,6 +185,34 @@ echo "<a name=$bd->id>";
 text_ausgabe($bd->text, $td->tit, $bd->verfas);
 echo "</span></a>";
 }
+$wieviel = $menge / $eps;
+$ws = ceil($wieviel);
+if($ws > "1")
+{
+$up = $seite - 1;
+$down = $seite + 1;
+if($ws == $seite)
+{
+  $down--;
+}
+echo "<table width=80%><tr><td align=right valign=right><table class=navi><tr><td>";
+echo "<font color=snow>Seite $seite von $ws &nbsp <a href=?id=$_GET[id]&page=$up><</a>";
+
+for($a=0; $a < $wieviel; $a++)
+{
+  $b = $a + 1;
+  if($seite == $b)
+  {
+    echo "  <b>$b</b> </font>";
+  }
+  else
+  {
+    echo "  <a href=\"?id=$_GET[id]&page=$b\">$b</a> ";
+  }
+}
+echo " <a href=?id=$_GET[id]&page=$down>></a></td></tr></table></td></tr></table>"; 
+}
+
 
 answer_button($fd->user_posts, $ud->group_id, $id, $td->close);
 

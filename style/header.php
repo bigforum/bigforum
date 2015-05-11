@@ -3,8 +3,9 @@
 <head>
 <title><?php echo SITENAME; ?> - Eingeloggt als <?php echo $username; ?></title>
 <meta name="generator" content="bigforum <?php echo VERSION; ?>" />
-<meta name="description" content="<?php echo SITENAME. " - ". BESCHREIBUNG; ?>" />
-<link rel="shortcut icon" href="images/bfav.ico" type="image/x-icon">
+<meta name="description" content="<?php echo SITENAME. " - ". BESCHREIBUNG; 
+$config_datas = mysql_query("SELECT * FROM config WHERE erkennungscode LIKE 'f2laengfs'"); $cd = mysql_fetch_object($config_datas);?>" />
+<link rel="shortcut icon" href="<?php echo $cd->wert1;?>" type="image/x-icon">
 <link rel="stylesheet" type="text/css" href="style/style.css" />
 <script type="text/javascript" src="style/script.js"></script>
 </head>

@@ -82,6 +82,17 @@ if(d == true)
 xmlhttp.send(null);
 }
 
+
+function delkat(id) {
+x = confirm("Möchtest du diese Kategorie wirklich löschen? Beachte das dieses nur geht, wenn diese Kategorie keine Foren enthält.!");
+if(x == true)
+{
+  xmlhttp.open("GET", 'admin.php?do=ver_foren&action=del_kat&id='+id);
+  alert("Sollte die Kategorie keine Foren mehr enthalten haben, wurde sie nun gelöscht.");
+}
+xmlhttp.send(null);
+}
+
 </script>
 <?
 echo "<a href=?do=log_out>Aus Admin-Bereich ausloggen</a> | <a href=../index.php target=_blank>Foren-Übersicht</a>
@@ -330,7 +341,7 @@ switch ($do) {
     mysql_query("UPDATE config SET zahl1 = '$_POST[sign]', zahl2 = '$_POST[pn]' WHERE erkennungscode LIKE 'f2pnsignfs'");
     mysql_query("UPDATE config SET wert1 = '$gpack', wert2 = '$gpackt', zahl1 = '$number' WHERE erkennungscode LIKE 'f2imgadfs'");   
     mysql_query("UPDATE config SET wert1 = '$_POST[clos_text]', zahl1 = '$_POST[close]' WHERE erkennungscode LIKE 'f2closefs'");   
-    mysql_query("UPDATE config SET zahl1 = '7', zahl2 = '$_POST[smilie]' WHERE erkennungscode LIKE 'f2laengfs'");   
+    mysql_query("UPDATE config SET wert1 = '$_POST[bfav]', zahl1 = '7', zahl2 = '$_POST[smilie]' WHERE erkennungscode LIKE 'f2laengfs'");   
   echo "Danke, die Foreneinstellungen wurden geändert!";
 	insert_log("Die Foreneinstellungen wurden überarbeitet.");
 	exit;
@@ -387,7 +398,9 @@ switch ($do) {
     $packt = "<option value=2>Neues Packet</option><option value=1>Altes Packet</option>";
   }
   echo "<tr><td>Smilie-Pack</td><td><select name=smilie>$packt</select>";
-  echo "<tr><td> &nbsp; </td><td> &nbsp; </td></tr>  ";
+  echo "<tr><td> &nbsp; </td><td> &nbsp; </td></tr>  
+  <tr><td> Bild-Adresse für Forum-Favicon </td><td> <input type=text name=bfav value=$con->wert1> </td></tr>  
+  <tr><td> &nbsp; </td><td> &nbsp; </td></tr>  ";
   
   $config_wert = mysql_query("SELECT * FROM config WHERE erkennungscode LIKE 'f2closefs'");
   $con = mysql_fetch_object($config_wert); 
@@ -644,7 +657,18 @@ switch ($do) {
   }
   if($ac == "del")
   {
+    insert_log("Ein Forum wurde gelöscht.");
     mysql_query("DELETE FROM foren WHERE id LIKE '$_GET[id]'");
+  }
+  if($ac == "del_kat")
+  {
+    $no_for = mysql_query("SELECT * FROM foren WHERE kate LIKE '$_GET[id]'");
+	$me = mysql_num_rows($no_for);
+	if($me == "0")
+	{
+	  insert_log("Eine Kategorie wurde gelöscht.");
+      mysql_query("DELETE FROM kate WHERE id LIKE '$_GET[id]'");
+	}
   }
   if($ac == "for")
   {
@@ -670,7 +694,7 @@ switch ($do) {
   $foren_data = mysql_query("SELECT * FROM kate");
   while($fr = mysql_fetch_object($foren_data))
   {
-    echo "<b>$fr->name</b> <a href=?do=ver_foren&action=kate&id=$fr->id>[ bearbeiten ]</a><br>";
+    echo "<b>$fr->name</b> <a href=?do=ver_foren&action=kate&id=$fr->id>[ bearbeiten ]</a> <a href=javascript:delkat($fr->id)>[ löschen ]</a><br>";
 	$for_date = mysql_query("SELECT * FROM foren WHERE kate = '$fr->id'");
     while($fd = mysql_fetch_object($for_date))
     {
