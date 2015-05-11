@@ -95,7 +95,7 @@ xmlhttp.send(null);
 
 </script>
 <?
-echo "<a href=?do=log_out>Aus Admin-Bereich ausloggen</a> | <a href=../index.php target=_blank>Foren-Übersicht</a>
+echo "<a href=?do=log_out>Aus Admin-Bereich ausloggen</a> | <a href='../index.php' target='_blank'>Foren-Übersicht</a>
 <center><b>Einstellung:</b>
 <select onChange=window.location.href=options[selectedIndex].value;>
 <option></option><option value=admin.php>Start</option><option value=?do=recht>Benutzer: Administratoren-Rechte</option><option value=?do=ver_user>Benutzer: Benutzer suchen</option>
@@ -124,7 +124,7 @@ switch ($do) {
 	echo "<table class=braun width=50%><tr class=besch><td><b>Benutzer Statistik / Benutzer die online sind</b></td></tr><tr><td>";
     user_online(true);
 	echo "</td></tr></table></td></tr></table><br><br>
-	<table class=braun width=50%><tr class=besch><td><b>Detailsbeschreibung</b></td></tr><tr><td> <table><tr><td><b>Foren-Version:</b></td><td>". VERSION ."</td></tr><tr><td><b>Forenentwickler:</b></td><td><a href=potterfreaks.de>Potterfans</a></td></tr></table> </td></tr></table>";
+	<table class=braun width=50%><tr class=besch><td><b>Detailsbeschreibung</b></td></tr><tr><td> <table><tr><td><b>Foren-Version:</b></td><td>". VERSION ."</td></tr><tr><td><b>Forenentwickler:</b></td><td><a href=http://www.potterfreaks.de>Potterfans</a></td></tr></table> </td></tr></table>";
   break;
   
   
@@ -451,11 +451,16 @@ switch ($do) {
 	  else
 	  {
 	    $checked = "";
+		$dis     = "";
 	    if($ua->adm_recht == $i)
 	    {
 	      $checked = "checked";
 	    }
-	    echo "<td><input type=radio name=$ua->username value=$i $checked></td>";
+		if($ua->adm_recht == "6")
+		{
+		  $dis = "disabled";
+		}
+	    echo "<td><input type=radio name=$ua->username value=$i $checked $dis></td>";
 	  }
 	}
     echo "</tr>";

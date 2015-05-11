@@ -91,6 +91,16 @@ while($thd = mysql_fetch_object($them_dat))
   {
     $close = "<img src=images/th_open.png title='Thema ist geöffnet' width=80% height=80%>";
   }
+  if(GROUP > 2 AND GROUP != "4")
+  {
+    $span = "<span id='$thd->id' ondblclick=\"now('$thd->tit')\">";
+	$spane = "</span>";
+  }  
+  else
+  {
+    $span = "";
+	$spane = ""; 
+  }
   if($da->when_look < $thd->last_post_time AND $das->when_look < $thd->last_post_time)
   {
     echo "<tr><td width=3%>$close</td><td width=50%><b>$wich <a href=thread.php?id=$thd->id>$thd->tit</a></b></td><td width=20%>$thd->verfas<td width=10%>$zahl</td></tr>";

@@ -1,10 +1,10 @@
 <?php
 //Wichtige Angaben für jede Datei!
-include("includes/functions.php");
+include_once("includes/functions.php");
 login();
 looking_page("main");
 page_header();
-include("includes/function_user.php");
+include_once("includes/function_user.php");
 $do = $_GET["do"];
 $ac = $_GET["aktion"];
 $config_datas = mysql_query("SELECT * FROM config WHERE erkennungscode LIKE 'f2pnsignfs'");

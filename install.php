@@ -19,7 +19,7 @@ function schr(s)
   document.getElementById("schritt").innerHTML = s;
 }
 </script>
-<table width="100%"><tr><td width="90%"><b>Bigforum - Installationsassistent Schritt <span id=schritt></span>/6</b></td><td><b>Version: 1.3</b></td></tr></table>
+<table width="100%"><tr><td width="90%"><b>Bigforum - Installationsassistent Schritt <span id=schritt></span>/6</b></td><td><b>Version: 1.4</b></td></tr></table>
 <hr><br><br>
 <?php
 $do = $_GET["do"];
@@ -42,7 +42,6 @@ switch($do){
     mysql_connect($HOST,$USER,$PW)or die(mysql_error());
     mysql_select_db($DB)or die(mysql_error());
 	//MySQL - Datenbank änderungen	
-	  mysql_query("UPDATE config SET wert1 = 'images/bfav.ico' WHERE erkennungscode LIKE 'f2laengfs'");
 	//Ende
     echo "Danke, das Forum wurde nun auf den neusten Stand gebracht.<br>Bitte lösche diese Datei, ansonsten kann jeder dieses Forum beschädigen!";
   break;

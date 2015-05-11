@@ -10,7 +10,7 @@ function can_view_admincp()
 function page_header()
 {
   config("f2name2", true, "function_define");
-  include("includes/function_user.php");
+  include_once("includes/function_user.php");
   include("style/header.php");   
 }
 function page_close_table()
@@ -52,14 +52,22 @@ if($di == "ant")
 }
 echo "<table bgcolor=silver><tr><td>
 <input type=button style='background-color:silver;font-weight:bold' value=b onclick=\"document.feld.feld.value += '[b][/b]'\"><input type=button style=\"background-color:silver;text-decoration:underline\" value=u onclick=\"document.feld.feld.value += '[u][/u]'\"><input type=button style=\"background-color:silver;font-style:italic\" value=k onclick=\"document.feld.feld.value += '[k][/k]'\">
-<input type=button style='background-color:silver;' value=Link onclick=\"document.feld.feld.value += '[url][/url]'\"><input type=button style='background-color:silver;' value=Code onclick=\"document.feld.feld.value += '[code][/code]'\"><input type=button style='background-color:silver;' value=Bild onclick=\"document.feld.feld.value += '[img][/img]'\"><br>
+<input type=button style='background-color:silver;' value=Link onclick=\"document.feld.feld.value += '[url][/url]'\"><input type=button style='background-color:silver;' value=Code onclick=\"document.feld.feld.value += '[code][/code]'\"><input type=button style='background-color:silver;' value=Bild onclick=\"document.feld.feld.value += '[img][/img]'\"><input type=button style='background-color:silver;' value=Zitat onclick=\"u = prompt('Welchen Benutzer möchtest du zitieren?'); document.feld.feld.value += '[zitat='+u+'][/zitat]'\"><br>
 <textarea cols=70 rows=7 name=feld>";
 if($di == "sign")
 {
   echo $value;
 }
 echo "</textarea><br>
-<input type=submit value=Absenden style=background-color:silver;></td><td valign=top><br>";
+<input type=submit value=Absenden style=background-color:silver;>";
+if((GROUP > "1" AND GROUP != "4") AND $di == "ant")
+{
+  echo "<br><br><fieldset><legend>Moderator-Optionen</legend>
+  <input type=checkbox value=1 name=close> Thema nach abschicken, schließen<br>
+  <input type=checkbox value=1 name=import> Thema nach abschicken, als wichtig makieren</fieldset>
+";
+}
+echo "</td><td valign=top><br>";
 $drei = "0";
 $config_wert = mysql_query("SELECT * FROM config WHERE erkennungscode LIKE 'f2laengfs'");
 $con = mysql_fetch_object($config_wert); 
@@ -119,8 +127,17 @@ $time_as_useris_online = "900";
 $dtime = time() - $time_as_useris_online;
 $x = "0";
 $anzahl = "0";
+$mos_dat = mysql_query("SELECT * FROM config WHERE erkennungscode LIKE 'f2name2'");
+$md = mysql_fetch_object($mos_dat);
 $online_data = mysql_query("SELECT * FROM users WHERE last_log > '$dtime' ORDER BY username");
+$meno = mysql_num_rows($online_data);
+if($meno > $md->zahl1)
+{
+  $time = time();
+  mysql_query("UPDATE config SET zahl1 = '$meno', zahl2 = '$time' WHERE erkennungscode LIKE 'f2name2'");
+}
 echo "<table width=100% bgcolor=#F2F2E5><tr><td>";
+echo "<small>Der Besucherrekord liegt bei $md->zahl1 Besuchern, die Gleichzeitig am ". date("d.m.Y", $md->zahl2) ." um ". date("H:i", $md->zahl2) ." online waren.</small><br>";
 while($ond = mysql_fetch_object($online_data))
 {
  $link = "profil.php?id=$ond->id";
@@ -150,7 +167,7 @@ function looking_page($wo)
   if($wo == "index")
   {
     $page = "index.php";
-	$text = "Betrachtet die Forenübersicht";
+	$text = "Betrachtet die Startseite";
   }
   if($wo == "profil")
   {
@@ -165,7 +182,7 @@ function looking_page($wo)
   if($wo == "list_member")
   {
     $page = "member.php";
-	$text = "Betrachtet die Liste der Benutzer";
+	$text = "Betrachtet die Benutzerliste";
   }
     if($wo == "create_pn")
   {
@@ -200,7 +217,7 @@ function looking_page($wo)
   if($wo == "newreply")
   {
     $page = "newreply.php";
-	$text = "Erstellt einen Beitrag";
+	$text = "Antwortet auf ein Thema";
   }
   if($wo == "foren_helfer")
   {
@@ -212,7 +229,7 @@ function looking_page($wo)
     $page = "admin/";
 	$text = "Meldet sich im Administrator-Kontrollzentrum an";
   }
-  if($wo == "admin_mel")
+  if($wo == "search")
   {
     $page = "search.php";
 	$text = "Durchsucht die Foren";
@@ -231,6 +248,11 @@ function looking_page($wo)
   {
     $page = "modcp.php";
 	$text = "Moderatoren-Kontrollzentrum";
+  }
+  if($wo == "edit")
+  {
+    $page = "edit.php";
+	$text = "Bearbeitet einen Beitrag";
   }
   if(USER != "")
   {
@@ -371,8 +393,12 @@ function text_ausgabe($text, $betreff, $from)
   $text = preg_replace('/\[k\](.*?)\[\/k\]/', '<i>$1</i>', $text);  
   $text = preg_replace('/\[u\](.*?)\[\/u\]/', '<u>$1</u>', $text);  
   $text = preg_replace('/\[code\](.*?)\[\/code\]/', "<small>Code:</small><table width=80% bgcolor=snow><tr><td>$1</td></tr></table>", $text);  
-  $text = eregi_replace("\[url\]([^\[]+)\[/url\]","<a href=\"\\1\" target=\"_blank\">\\1</a>",$text);
+  $text = eregi_replace("\[url\]([^\[]+)\[/url\]","<a href=\"http://\\1\" target=\"_blank\">\\1</a>",$text);
   $text = eregi_replace("\[img\]([^\[]+)\[/img\]","<img src=\"\\1\" border=0>",$text);
+  $text = preg_replace("/\[color=(.*)\](.*)\[\/color\]/Usi", "<font color=\"\\1\">\\2</font>", $text); 
+  $text = preg_replace("/\[size=(.*)\](.*)\[\/size\]/Usi", "<font size=\"\\1\">\\2</font>", $text); 
+  $text = preg_replace("/\[zitat=(.*)\](.*)\[\/zitat\]/Usi", "<small>Zitat von \\1:</small><table width=80% bgcolor=snow><tr><td>\\2</td></tr></table>", $text);
+  $text = str_replace("http://http://" ,"http://", $text);
   $text = str_replace("\n", "<br />", $text);
   $betreff = strip_tags($betreff);
   $config_wert = mysql_query("SELECT * FROM config WHERE erkennungscode LIKE 'f2laengfs'");

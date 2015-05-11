@@ -178,9 +178,9 @@ $uhrzeit = date("H:i",$bd->post_dat);
 $mod_funk = "";
 if(GROUP == "2" OR GROUP == "3")
 {
-  $mod_funk = "<td align=right valign=right><a href=javascript:del($bd->id)><img src=images/del.png width=15% height=0% border=0></a></td>";
+  $mod_funk = "<td align=right valign=right><a href=edit.php?id=$bd->id><img src=images/edit.png width=30% height=0% border=0></a><a href=javascript:del($bd->id)><img src=images/del.png width=30% height=0% border=0></a></td>";
 }
-echo "<br><span id='$bd->id'><table background='images/dark_table.png' width=80%><tr><td><table width=100%><tr><td><font color=snow><b>$datum, $uhrzeit</b> $edit</font></td>$mod_funk</tr></table></td></tr></table>";
+echo "<br><span id='$bd->id'><table background='images/dark_table.png' width=80% height=10%><tr><td><table width=100% height=100%><tr><td width=80%><font color=snow><b>$datum, $uhrzeit</b> $edit</font></td>$mod_funk</tr></table></td></tr></table>";
 echo "<a name=$bd->id>";
 text_ausgabe($bd->text, $td->tit, $bd->verfas);
 echo "</span></a>";

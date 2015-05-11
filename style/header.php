@@ -1,7 +1,7 @@
 <html>
 
 <head>
-<title><?php echo SITENAME; ?> - Eingeloggt als <?php echo $username; ?></title>
+<title><?php echo SITENAME; ?> - <?php if($username != "Gast") echo "Eingeloggt als $username"; else echo "Gastzugang"; ?></title>
 <meta name="generator" content="bigforum <?php echo VERSION; ?>" />
 <meta name="description" content="<?php echo SITENAME. " - ". BESCHREIBUNG; 
 $config_datas = mysql_query("SELECT * FROM config WHERE erkennungscode LIKE 'f2laengfs'"); $cd = mysql_fetch_object($config_datas);?>" />
@@ -42,7 +42,11 @@ if($cd->zahl1 == "0" AND $ud->adm_recht <= "5")
 <big><b>&nbsp;<?php echo SITENAME; ?></b><br>&nbsp;<?php echo BESCHREIBUNG; ?></big></td>
 <td class="tab1" width="30%" valign="top">
 
-Willkommen, <span style="cursor: pointer;" onclick="window.location.href='profil.php?id=<?php echo $ud->id; ?>'"><?php echo $username; ?></span><?php if($username == "Gast"){?><br><br><br><br><br>Du bist nicht angemeldet!<? } else {
+Willkommen, <span style="cursor: pointer;" onclick="window.location.href='profil.php?id=<?php echo $ud->id; ?>'"><?php echo $username; ?></span><?php if($username == "Gast"){?>
+<p></p><form action="login.php?do=login" method="post"><table>
+<tr><td>Benutzername:</td><td><input type="text" name="user"></td></tr>
+<tr><td>Passwort:</td><td><input type="password" name="pw"></td></tr>
+</table><input type=submit value="Login"></form><? } else {
 $config_datas = mysql_query("SELECT * FROM config WHERE erkennungscode LIKE 'f2pnsignfs'");
 $cd = mysql_fetch_object($config_datas);
 pn_zahl("header"); }
