@@ -4,10 +4,10 @@ include("includes/functions.php");
 login();
 looking_page("main");
 page_header();
-include_once("includes/function_user.php");
+include("includes/function_user.php");
 $do = $_GET["do"];
 $ac = $_GET["aktion"];
-$config_datas = mysql_query("SELECT * FROM eins_config WHERE erkennungscode LIKE 'f2pnsignfs'");
+$config_datas = mysql_query("SELECT * FROM config WHERE erkennungscode LIKE 'f2pnsignfs'");
 $cd = mysql_fetch_object($config_datas);
 if($cd->zahl2 == "1")
 {
@@ -81,7 +81,7 @@ if($ud->sign != "")
   $text = preg_replace('/\[u\](.*?)\[\/u\]/', '<u>$1</u>', $text);  
   $text = eregi_replace("\[url\]([^\[]+)\[/url\]","<a href=\"\\1\" target=\"_blank\">\\1</a>",$text);
   $text = str_replace("\n", "<br />", $text);
-  $smilie_data = mysql_query("SELECT * FROM eins_smilie WHERE packet = '1'");
+  $smilie_data = mysql_query("SELECT * FROM smilie WHERE packet = '1'");
   while($sd = mysql_fetch_object($smilie_data))
   {
     $text = str_replace($sd->abk1,"<img src=images/$sd->images_path width=25 height=25>", $text);
@@ -137,16 +137,16 @@ if($do == "set")
 	{
 	  if($_POST["pn_weiter"] == "1")
 	  {
-	    $eintrag = mysql_query("UPDATE eins_users SET pn_weiter = '1' WHERE username LIKE '". USER ."'");
+	    $eintrag = mysql_query("UPDATE users SET pn_weiter = '1' WHERE username LIKE '". USER ."'");
 	  }
 	  else
 	  {
-	    $eintrag = mysql_query("UPDATE eins_users SET pn_weiter = '0' WHERE username LIKE '". USER ."'");
+	    $eintrag = mysql_query("UPDATE users SET pn_weiter = '0' WHERE username LIKE '". USER ."'");
 	  }
 	  speicherung($eintrag, "Deine Einstellungen wurden überarbeitet.", "<b>Fehler:</b> Es gab einen Fehler bei der Speicherung der Einstellungen <a href=history.back()>Zurück</a>");
       page_close_table();
 	}
-    include_once("includes/function_user.php");
+    include("includes/function_user.php");
     $checked = "";
     if($ud->pn_weiter == "1")
 	{
@@ -158,10 +158,53 @@ if($do == "set")
 	<table>
 	<tr><td>Automatische Weiterleitung zu dem Posteingang, beim Mauskontakt, des blinkenden Textes \"Neue Nachrichten\" oben über deiner Navigationsliste.</td><td width=40%>
 	<input type=checkbox name=pn_weiter value=1 $checked></td></tr></table>
-	</fieldset><br><input type=submit value=Speichern>";
+	</fieldset><br>";
+	if($ud->notice != "" AND $ud->notice != "0")
+	{
+	  ?>
+	  <script>
+      try {
+         xmlhttp = new ActiveXObject("Msxml2.XMLHTTP");
+      } catch(e) {
+      try {
+        xmlhttp = new ActiveXObject("Microsoft.XMLHTTP");
+      } catch(e) {
+        xmlhttp=false;
+      }
+      }
+
+      if(!xmlhttp && typeof XMLHttpRequest != 'undefined') {
+        xmlhttp = new XMLHttpRequest();
+      }
+
+ 
+ 
+ 
+      function delnotice() {
+        d = confirm("Wurde die Notiz zur Kentniss genommen, und kann nun gelöscht werden?");
+        if(d == true)
+        {
+          xmlhttp.open("GET", 'main.php?do=del_notice');
+          alert("Die Notiz wurde gelöscht.");
+		  document.getElementById("notice").innerHTML = "";
+        }
+        xmlhttp.send(null);
+      }
+
+
+     </script>
+<span id="notice"><fieldset><legend>Sonstige Einstellungen</legend>
+	  <a href="javascript:delnotice();">Notiz, die im Header angezeigt wird, ausbleden</a></fieldset><br></span>
+<?php
+	}
+	echo "<input type=submit value=Speichern>";
 	page_close_table();
 
 
+}
+if($do == "del_notice")
+{
+  mysql_query("UPDATE users SET notice = '' WHERE username LIKE '". USER ."'");
 }
 if($do == "pn_ein")
 {
@@ -172,7 +215,7 @@ if($do == "pn_ein")
   }
   looking_page("look_pn");
     echo "<table width=100%><tr bgcolor=#397BC6><td><big><b>Private Nachrichten » Eingang » </b> ".USER." </big></td></tr></table><br>";
-  $pn_data = mysql_query("SELECT * FROM eins_prna WHERE emp LIKE '". USER ."' ORDER BY dat DESC");
+  $pn_data = mysql_query("SELECT * FROM prna WHERE emp LIKE '". USER ."' ORDER BY dat DESC");
   echo "<table width=100%><tr style=font-weight:bold;  bgcolor=#e1e4f9><td width=70%>Betreff / Absenden</td><td>Datum</td></tr>";
   while($pr = mysql_fetch_object($pn_data))
   {
@@ -198,7 +241,7 @@ if($do == "read_pn" AND $ac != "")
     page_close_table();
   }
   looking_page("read_pn");
-  $pn_aus = mysql_query("SELECT * FROM eins_prna WHERE id LIKE '$ac'");
+  $pn_aus = mysql_query("SELECT * FROM prna WHERE id LIKE '$ac'");
   $pr = mysql_fetch_object($pn_aus);
   if($pr->mes == "" OR ($pr->abse != USER AND $pr->emp != USER))
   {
@@ -206,14 +249,14 @@ if($do == "read_pn" AND $ac != "")
   }
   if($pr->emp == USER)
   {
-    mysql_query("UPDATE eins_prna SET gel = '1' WHERE id LIKE '$ac'");
+    mysql_query("UPDATE prna SET gel = '1' WHERE id LIKE '$ac'");
   }
   $text = $pr->mes;
   $betreff = strip_tags($pr->betreff);
   $from = $pr->abse;
   $datum = date("d.m.Y",$pr->dat);
   $uhrzeit = date("H:i",$pr->dat);
-  echo "<table width=81%><tr bgcolor=#000050><td><font color=snow>$datum, $uhrzeit</font></td></tr></table>";
+  echo "<table width=81%><tr background='images/dark_table.png'><td><font color=snow>$datum, $uhrzeit</font></td></tr></table>";
   text_ausgabe($text, $betreff, $from);
   $betreff = str_replace(" ", "_", $betreff);
   echo "<table width=81%><tr><td align=right><a href=main.php?do=make_pn&to=$from&bet=$betreff><img src=images/answer.png border=0 width=95 height=50></a>";
@@ -227,7 +270,7 @@ if($do == "pn_aus")
   }
   looking_page("look_pn");
     echo "<table width=100%><tr bgcolor=#397BC6><td><big><b>Private Nachrichten » Eingang » </b> ".USER." </big></td></tr></table><br>";
-  $pn_data = mysql_query("SELECT * FROM eins_prna WHERE abse LIKE '". USER ."' ORDER BY dat DESC");
+  $pn_data = mysql_query("SELECT * FROM prna WHERE abse LIKE '". USER ."' ORDER BY dat DESC");
   echo "<table width=100%><tr style=font-weight:bold;  bgcolor=#e1e4f9><td width=70%>Betreff / Empfänger</td><td>Datum</td></tr>";
   while($pr = mysql_fetch_object($pn_data))
   {
@@ -285,7 +328,7 @@ page_close_table();
 if($ac == "change")
 {
   //Wegen Benutzer-Datenbankabfragen noch die wichtige Datei dafür herhohlen:
-  include_once("includes/function_user.php");
+  include("includes/function_user.php");
   $old_pw = md5($_POST["old_pw"]);
   $pw1 = md5($_POST["pw1"]);
   $pw2 = md5($_POST["pw2"]);
@@ -303,7 +346,7 @@ if($do == "profil")
   echo "<table width=100%><tr bgcolor=#397BC6><td><big><b>Profil » Mein Profil » </b> ".USER." </big></td></tr></table><br>";
   if($ac == "")
   {
-    include_once("includes/function_user.php");
+    include("includes/function_user.php");
     echo "<form action=?do=profil&aktion=change method=post>
 	<fieldset><legend>Profil bearbeiten</legend>
 	Hier kannst du deine Website, sowie deine Hobbys angeben. Diese werden dann im Profil zu finden sein.<br>
@@ -316,7 +359,7 @@ if($do == "profil")
   {
     $web = $_POST["website"];
 	$web = str_replace("http://","",$web);
-    $eintrag = mysql_query("UPDATE eins_users SET hob = '$_POST[hob]', website = '$web' WHERE username LIKE '". USER ."'");
+    $eintrag = mysql_query("UPDATE users SET hob = '$_POST[hob]', website = '$web' WHERE username LIKE '". USER ."'");
 	speicherung($eintrag, "Danke, dein Profil wurde erfolgreich übernommen", "<b>Fehler:</b> Es gab einen Fehler bei der Speicherung des Profils.<br>Versuche es nochmal! <a href=history.back()>Zurück</a>");
     page_close_table();
   }

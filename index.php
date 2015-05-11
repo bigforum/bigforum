@@ -4,22 +4,22 @@ include("includes/functions.php");
 page_header();
 $stat_them = "0";
 $stat_bei = "0";
-$foren_data = mysql_query("SELECT * FROM eins_kate");
-  echo "<table width=100% bgcolor=#000050 color=snow><tr font-weight:bold;><td width=70%><font color=snow>Name</font></td><td><font color=snow>Themen</font></td><td><font color=snow>Beiträge</font></td></tr></table>";
+$foren_data = mysql_query("SELECT * FROM kate");
+  echo "<table width=100% background='images/dark_table.png' color=snow><tr font-weight:bold;><td width=70%><font color=snow>Name</font></td><td><font color=snow>Themen</font></td><td><font color=snow>Beiträge</font></td></tr></table>";
 while($fr = mysql_fetch_object($foren_data))
 {
-  echo "<table width=100% bgcolor=#397BC6 color=snow><tr><td><b>$fr->name</b><br>$fr->besch</td></tr></table>";
-  $for_date = mysql_query("SELECT * FROM eins_foren WHERE kate = '$fr->id'");
+  echo "<table width=100% background='images/blue_table.png' color=snow><tr><td><b>$fr->name</b><br>$fr->besch</td></tr></table>";
+  $for_date = mysql_query("SELECT * FROM foren WHERE kate = '$fr->id'");
   while($fd = mysql_fetch_object($for_date))
   {
     $look_see = "0";
-    $them_dat = mysql_query("SELECT * FROM eins_thema WHERE where_forum LIKE '$fd->id'");
+    $them_dat = mysql_query("SELECT * FROM thema WHERE where_forum LIKE '$fd->id'");
 	while($tda = mysql_fetch_object($them_dat))
 	{
-	  $data = mysql_query("SELECT * FROM eins_read_all WHERE uname LIKE '". USER ."' AND thema_id LIKE '$tda->id'");
+	  $data = mysql_query("SELECT * FROM read_all WHERE uname LIKE '". USER ."' AND thema_id LIKE '$tda->id'");
       $da = mysql_fetch_object($data);
 	  
-	  $datas = mysql_query("SELECT * FROM eins_read_all WHERE uname LIKE '". USER ."' AND thema_id LIKE '0' ORDER BY id DESC LIMIT 1");
+	  $datas = mysql_query("SELECT * FROM read_all WHERE uname LIKE '". USER ."' AND thema_id LIKE '0' ORDER BY id DESC LIMIT 1");
       $das = mysql_fetch_object($datas);
 	  
 	  if($da->when_look == "")
@@ -31,7 +31,7 @@ while($fr = mysql_fetch_object($foren_data))
         $look_see++;
 	  }
 	}
-	$config_datas = mysql_query("SELECT * FROM eins_config WHERE erkennungscode LIKE 'f2imgadfs'");
+	$config_datas = mysql_query("SELECT * FROM config WHERE erkennungscode LIKE 'f2imgadfs'");
     $cd = mysql_fetch_object($config_datas);
 	if($look_see == "0")
 	{
@@ -43,11 +43,11 @@ while($fr = mysql_fetch_object($foren_data))
 	}
     $beit = "0";
 	$zahl_themen = "0";
-    $th_dat = mysql_query("SELECT * FROM eins_thema WHERE where_forum LIKE '$fd->id'");
+    $th_dat = mysql_query("SELECT * FROM thema WHERE where_forum LIKE '$fd->id'");
 	while($tda = mysql_fetch_object($th_dat))
 	{
 	  $zahl_themen++;
-	  $bei_dat = mysql_query("SELECT * FROM eins_beitrag WHERE where_forum LIKE '$tda->id'");
+	  $bei_dat = mysql_query("SELECT * FROM beitrag WHERE where_forum LIKE '$tda->id'");
 	  while($bed = mysql_fetch_object($bei_dat))
 	  {
 	    $beit++;
@@ -57,7 +57,7 @@ while($fr = mysql_fetch_object($foren_data))
     {
 	  $stat_them = $stat_them + $zahl_themen;
 	  $stat_bei = $stat_bei + $beit;
-      echo "<table width=100% bgcolor=#F2F2E5><tr><td width=70%><table><tr><td> $forum_stat &nbsp; </td><td><a href=forum.php?id=$fd->id><b>$fd->name</b></a><br>$fd->besch</td></tr></table></td><td>$zahl_themen</td><td>$beit</td></tr></table>";
+      echo "<table width=100% bgcolor=#F2F2E5><tr><td width=70%><table><tr><td> $forum_stat &nbsp; </td><td><a href=forum.php?id=$fd->id><b>$fd->name</b></a><br><font size=2px>$fd->besch</font></td></tr></table></td><td>$zahl_themen</td><td>$beit</td></tr></table>";
 	}
 	else
 	{
@@ -65,7 +65,7 @@ while($fr = mysql_fetch_object($foren_data))
 	  {
 	  	$stat_them = $stat_them + $zahl_themen;
 		$stat_bei = $stat_bei + $beit;
-        echo "<table width=100% bgcolor=#F2F2E5><tr><td width=70%><table><tr><td> $forum_stat &nbsp; </td><td><a href=forum.php?id=$fd->id><b>$fd->name</b></a></b><br>$fd->besch</td></tr></table></td><td>$zahl_themen</td><td>$beit</td></tr></table>";
+        echo "<table width=100% bgcolor=#F2F2E5><tr><td width=70%><table><tr><td> $forum_stat &nbsp; </td><td><a href=forum.php?id=$fd->id><b>$fd->name</b></a></b><br><font size=2px>$fd->besch</font></td></tr></table></td><td>$zahl_themen</td><td>$beit</td></tr></table>";
 	  }
 	}
   }
@@ -78,12 +78,15 @@ user_online(false);
 echo "</td></tr></table><br>";
 
 //Abfragen für die Statistik
-$user_dat = mysql_query("SELECT * FROM eins_users WHERE gesperrt = '0'");
+$user_dat = mysql_query("SELECT * FROM users WHERE gesperrt = '0'");
 $stat_use = mysql_num_rows($user_dat);
 
-$last_use = mysql_query("SELECT * FROM eins_users WHERE gesperrt = '0' ORDER BY id DESC LIMIT 1");
+$last_use = mysql_query("SELECT * FROM users WHERE gesperrt = '0' ORDER BY id DESC LIMIT 1");
 $last_use = mysql_fetch_object($last_use);
 
+$config_datas = mysql_query("SELECT * FROM config WHERE erkennungscode LIKE 'f2imgadfs'");
+$cd = mysql_fetch_object($config_datas);
+	
 echo "<table width=100% bgcolor=#397BC6 color=snow><tr><td><b>Statistiken.</td></tr></table>";
 echo "<table width=100% bgcolor=#F2F2E5><tr><td><b>Themen:</b> $stat_them <b>Beitäge:</b> $stat_bei <b>Benutzer:</b> $stat_use<br>Wir begrüßen unser neustes Mitglied: <a href=profil.php?id=$last_use->id>$last_use->username</a></td></tr></table><br>
 <center><img src=$cd->wert1 width=40 height=40> <small>Keine neuen Beiträge</small>  &nbsp; &nbsp; <img src=$cd->wert2 width=40 height=40> <small>Neue Beiträge</small></center><br>";
@@ -92,7 +95,7 @@ if($_GET["do"] == "marks")
   if(USER != "")
   {
     $time = time();
-	mysql_query("INSERT INTO eins_read_all (uname, thema_id, when_look) VALUES ('". USER ."', '0', '$time')")or die(mysql_error());
+	mysql_query("INSERT INTO read_all (uname, thema_id, when_look) VALUES ('". USER ."', '0', '$time')")or die(mysql_error());
  
   }
   else

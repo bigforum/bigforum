@@ -102,7 +102,13 @@ switch ($do) {
     echo "<table class=braun width=50%><tr class=besch><td><b>Willkommen im Administrator-Kontrollzentrum</b></td></tr><tr><td>
 	Hallo ". USER .",<br>
 	hier im bigforum Admin-Panel kannst du alles mögliche verwalten. <br>Solltest du Hilfe mit dem Suchen bestimmter Funktionen haben,besuche doch mal die <a href=?do=help>kleine Administratoren Hilfe</a>.</td></tr></table><br><br>";
-		echo "</td></tr></table></td></tr></table><br><br>
+	if(file_exists("./install.php") OR file_exists("../install.php"))
+	{
+	echo "<table class=braun width=50%><tr class=besch><td><b>Warnung</b></td></tr><tr><td>
+	Die Datei install.php exestiert noch. Bitte lösche diese Datei.<br> Ansonsten kann jeder andere dieses Forum manipulieren!</tr></table><br><br>";
+
+	}
+	echo "</td></tr></table></td></tr></table><br><br>
 	<table class=braun width=50%><tr class=besch><td><b>Administratoren-Notizen (<a href=?do=change_notice>verändern)</b></td></tr><tr><td>$adm_notice</td></tr></table><br><br>";
 	echo "<table class=braun width=50%><tr class=besch><td><b>Benutzer Statistik / Benutzer die online sind</b></td></tr><tr><td>";
     user_online(true);
@@ -157,7 +163,7 @@ switch ($do) {
   
   case "pro_user":
     admin_recht("5");
-     $user_datas = mysql_query("SELECT * FROM eins_users WHERE username LIKE '$_POST[username]'");
+     $user_datas = mysql_query("SELECT * FROM users WHERE username LIKE '$_POST[username]'");
 	 $uds = mysql_fetch_object($user_datas);
 	 if($uds->id == "")
 	 {
@@ -193,6 +199,7 @@ switch ($do) {
 	   <b>Beiträge:</b> </td><td> <input type=text name=bei value=$uds->posts></td></tr><tr><td>
 	   <b>Registriert seit (UNIX!):</b> </td><td> <input type=text name=reg value=$uds->reg_dat> (". date("d.m.Y", $uds->reg_dat).")</td></tr><tr><td>
 	   <b>Benutzergruppe(nid):</b> </td><td> $uds->group_id ( $gruppe )</td></tr><tr><td>
+	   <b>Notiz, die dem Benutzer im Header angezeigt wird:</b></td><td> <input type=text name=unot value='$uds->notice' </td></tr>
 	   &nbsp; </td></tr><tr><td>	
        <b>Gruppenzugehörigkeit</b> </td><td> Moderator: <input type=checkbox name=grup value=2 $mod_check><br>
 											Administrator: <input type=checkbox name=grup value=3 $adm_check></td></tr><tr><td>
@@ -208,6 +215,8 @@ switch ($do) {
   
   
   case "save_userdatas":
+       $user_datas = mysql_query("SELECT * FROM users WHERE id LIKE '$_POST[id]'");
+	 $uds = mysql_fetch_object($user_datas);
   admin_recht("5");
   check_data($_POST["username"], "", "Bitte fühle alle Felder aus (Benutzername!)", "leer");
   check_data($_POST["rang"], "", "Bitte fühle alle Felder aus (Benutzerrang!)", "leer");
@@ -224,7 +233,8 @@ switch ($do) {
 			posts	  = '$_POST[bei]',
 			reg_dat   = '$_POST[reg]',
 			group_id  = '$_POST[grup]',
-			adm_recht = '$_POST[grup]' WHERE id LIKE '$_POST[id]'");
+			notice    = '$_POST[unot]',
+			adm_recht = '$uds->adm_recht' WHERE id LIKE '$_POST[id]'");
 	insert_log("Profil von $_POST[username] wurde geändert.");
   echo "Danke,<br> das Profil von $_POST[username] wurde erfolgreich überarbeitet.<br><br><a href=admin.php>Zurück zur Administratorern-Übersicht</a>";
   break;
@@ -238,7 +248,7 @@ switch ($do) {
   } 
   $eintraege_pro_seite = "30";
   $start = $seite * $eintraege_pro_seite - $eintraege_pro_seite;
-  $eintraege = mysql_query("SELECT id FROM eins_admin_logs");
+  $eintraege = mysql_query("SELECT id FROM admin_logs");
   $menge = mysql_num_rows($eintraege); 
   $wieviel_seiten = $menge / $eintraege_pro_seite;
 
@@ -258,7 +268,7 @@ switch ($do) {
 
    } 
   echo ")</b></td></tr><tr><td>";
-  $logs_hole = mysql_query("SELECT * FROM eins_admin_logs ORDER BY id DESC LIMIT $start, $eintraege_pro_seite");
+  $logs_hole = mysql_query("SELECT * FROM admin_logs ORDER BY id DESC LIMIT $start, $eintraege_pro_seite");
   echo "<table>
   <tr style=font-weight:bold><td>Benutzername</td><td>Zeitpunkt</td><td>Aktion</td><td>IP-Adresse</td></tr>";
   while($lh = mysql_fetch_object($logs_hole))
@@ -294,12 +304,30 @@ switch ($do) {
   admin_recht("3");
   if($_GET["aktion"] == "change")
   {
+    if($_POST["grafp"] == "pack1")
+	{
+	  $gpack = "images/no_posts.gif";
+	  $gpackt = "images/posts.gif";
+	  $number = "1";
+	}
+	if($_POST["grafp"] == "pack2")
+	{
+	  $gpack = "images/old_post.png";
+	  $gpackt = "images/new_post.png";
+	  $number = "2";
+	}
+	if($_POST["grafp"] == "pack3")
+	{
+	  $gpack = "images/old_1.png";
+	  $gpackt = "images/new_1.png";
+	  $number = "3";
+	}
     check_data($_POST["fn"], "", "Bitte gebe einen Forum-Name ein.", "leer");
 	check_data($_POST["besch"], "", "Bitte gebe einen Foren-Beschreibung ein.", "leer");
-    mysql_query("UPDATE eins_config SET wert1 = '$_POST[fn]', wert2 = '$_POST[besch]' WHERE erkennungscode LIKE 'f2name2'");
-    mysql_query("UPDATE eins_config SET zahl1 = '$_POST[sign]', zahl2 = '$_POST[pn]' WHERE erkennungscode LIKE 'f2pnsignfs'");
-    mysql_query("UPDATE eins_config SET wert1 = '$_POST[newo]', wert2 = '$_POST[newt]' WHERE erkennungscode LIKE 'f2imgadfs'");   
-    mysql_query("UPDATE eins_config SET wert1 = '$_POST[clos_text]', zahl1 = '$_POST[close]' WHERE erkennungscode LIKE 'f2closefs'");   
+    mysql_query("UPDATE config SET wert1 = '$_POST[fn]', wert2 = '$_POST[besch]' WHERE erkennungscode LIKE 'f2name2'");
+    mysql_query("UPDATE config SET zahl1 = '$_POST[sign]', zahl2 = '$_POST[pn]' WHERE erkennungscode LIKE 'f2pnsignfs'");
+    mysql_query("UPDATE config SET wert1 = '$gpack', wert2 = '$gpackt', zahl1 = '$number' WHERE erkennungscode LIKE 'f2imgadfs'");   
+    mysql_query("UPDATE config SET wert1 = '$_POST[clos_text]', zahl1 = '$_POST[close]' WHERE erkennungscode LIKE 'f2closefs'");   
    echo "Danke, die Foreneinstellungen wurden geändert!";
 	insert_log("Die Foreneinstellungen wurden überarbeitet.");
 	exit;
@@ -326,17 +354,27 @@ switch ($do) {
     echo "checked";
   }  
 
-  $config_wert = mysql_query("SELECT * FROM eins_config WHERE erkennungscode LIKE 'f2imgadfs'");
+  $config_wert = mysql_query("SELECT * FROM config WHERE erkennungscode LIKE 'f2imgadfs'");
   $con = mysql_fetch_object($config_wert);
-  
+  if($con->zahl1 == "1")
+  {
+    $pack = "<option value=pack1 >Packet 1 - Buchstaben</option><option value=pack2>Packet 2 - Runde Buttons</option><option value=pack3 >Packet 3 - Eckige Farbige Buttons</option>";
+  }
+  if($con->zahl1 == "2")
+  {
+    $pack = "<option value=pack2 >Packet 2 - Runde Buttons</option><option value=pack1 >Packet 1 - Buchstaben</option><option value=pack3 >Packet 3 - Eckige Farbige Buttons</option>";
+  }
+  if($con->zahl1 == "3")
+  {
+    $pack = "<option value=pack3 >Packet 3 - Eckige Farbige Buttons</option><option value=pack1 >Packet 1 - Buchstaben</option><option value=pack2 >Packet 2 - Runde Buttons</option>";
+  }
   echo" ></td></tr>
   <tr><td>Information:</td><td> <span id=info></span> </td></tr>
   <tr><td> &nbsp; </td><td> &nbsp; </td></tr>
-  <tr><td> Bild - Adresse für Bild bei keinen neuem Beitrag </td><td><input type=text name=newo size=40 value='$con->wert1'></td></tr> 
-  <tr><td> Bild - Adresse für Bild bei neuem Beitrag </td><td><input type=text name=newt size=40 value='$con->wert2'></td></tr> 
+  <tr><td> Grafik-Packet auf der Startseite </td><td><select name=grafp>$pack</select></td></tr> 
   <tr><td> &nbsp; </td><td> &nbsp; </td></tr>  ";
   
-  $config_wert = mysql_query("SELECT * FROM eins_config WHERE erkennungscode LIKE 'f2closefs'");
+  $config_wert = mysql_query("SELECT * FROM config WHERE erkennungscode LIKE 'f2closefs'");
   $con = mysql_fetch_object($config_wert); 
   echo"
   <tr><td> Forum geschloßen </td><td> ";
@@ -361,7 +399,7 @@ switch ($do) {
   admin_recht("6");
   if($_GET["aktion"] == "do")
   {
-    $user_admin = mysql_query("SELECT * FROM eins_users WHERE group_id LIKE '3'");
+    $user_admin = mysql_query("SELECT * FROM users WHERE group_id LIKE '3'");
 	while($uac = mysql_fetch_object($user_admin))
 	{
 	  $rechte = $_POST["$uac->username"];
@@ -372,7 +410,7 @@ switch ($do) {
   echo "<table class=braun width=80%><tr class=besch><td><b>Administratoren-Rechte festlegen</b></td></tr><tr><td>
   <form action=?do=recht&aktion=do method=post><table>
   <tr style=font-weight:bold><td>Benutzername</td><td>Darf Startseite sehen</td><td>... darf Log-Einträge sehen</td><td>...darf Foreneinstellungen ändern</td><td>... darf Foren verwalten</td><td>...darf Benutzer verwalten</td><td>Ist Gründer</td></tr>";
-  $user_admin = mysql_query("SELECT * FROM eins_users WHERE group_id LIKE '3'");
+  $user_admin = mysql_query("SELECT * FROM users WHERE group_id LIKE '3'");
   while ($ua = mysql_fetch_object($user_admin))
   {
     echo "<tr>";
@@ -415,13 +453,13 @@ switch ($do) {
 	{
 	  if($_POST["foka"] == "kate")
 	  {
-	    mysql_query("INSERT INTO eins_kate (name, besch) VALUES ('$_POST[fname]', '$_POST[besch]')");
+	    mysql_query("INSERT INTO kate (name, besch) VALUES ('$_POST[fname]', '$_POST[besch]')");
 		echo "Die Kategorie wurde hinzugefügt.";
 		insert_log("Es wurde eine neue Kategorie hinzugefügt");
 	  }
 	  else
 	  {
-	    mysql_query("INSERT INTO eins_foren (name, besch, kate, guest_see, min_posts, admin_start_thema, user_posts) VALUES ('$_POST[fname]', '$_POST[besch]', '$_POST[kat]', '$_POST[guest]', '$_POST[min_post]', '$_POST[admin]', '$_POST[ansus]')");
+	    mysql_query("INSERT INTO foren (name, besch, kate, guest_see, min_posts, admin_start_thema, user_posts) VALUES ('$_POST[fname]', '$_POST[besch]', '$_POST[kat]', '$_POST[guest]', '$_POST[min_post]', '$_POST[admin]', '$_POST[ansus]')");
 	    echo "Das Forum wurde hinzugefügt.";
 		insert_log("Es wurde ein neues Forum hinzugefügt");
 	  }
@@ -437,7 +475,7 @@ switch ($do) {
 	<br><b>Nachfolgende Eingaben werden nur bei einer Foren-Erstellung benötigt.</b><br><br>
 	<table width=100%>
 	<tr><td>In welcher Kategorie?</td><td><select name=kat>";
-	$kate_data = mysql_query("SELECT * FROM eins_kate");
+	$kate_data = mysql_query("SELECT * FROM kate");
 	while($kd = mysql_fetch_object($kate_data))
 	{
 	  echo "<option value=$kd->id>$kd->name</option>";
@@ -467,7 +505,7 @@ switch ($do) {
   }
   if($_GET["action"] == "del")
   {
-    mysql_query("DELETE FROM eins_verwarn_gruend WHERE id LIKE '$_GET[id]'");
+    mysql_query("DELETE FROM verwarn_gruend WHERE id LIKE '$_GET[id]'");
   }
   echo "<table class=braun width=80%><tr class=besch><td><b>Bestehende Gründe</b></td></tr><tr><td><table>
   <tr style=font-weight:bold><td>Grund</td><td>Punkte</td><td>Dauer</td><td>Aktion</td></tr>";
@@ -518,7 +556,7 @@ switch ($do) {
   }
   if($_GET["action"] == "new")
   {
-    $u_da = mysql_query("SELECT * FROM eins_users WHERE username LIKE '$_POST[ben]'");
+    $u_da = mysql_query("SELECT * FROM users WHERE username LIKE '$_POST[ben]'");
 	$ua = mysql_fetch_object($u_da);
 	if($ua->group_id == "3")
 	{
@@ -537,7 +575,7 @@ switch ($do) {
 	exit;
   }
 
-  $sperr_data = mysql_query("SELECT * FROM eins_users WHERE gesperrt != '0' OR sptime > '$time'");
+  $sperr_data = mysql_query("SELECT * FROM users WHERE gesperrt != '0' OR sptime > '$time'");
   $sp = "0";
   echo "<form action=?do=sper_user&action=new method=post><table>
   <tr><td>Benutzername: </td><td><input type=text name=ben></td></tr>
@@ -576,7 +614,7 @@ switch ($do) {
 	  echo "Die Kategorie wurde nun geändert.<br><a href=?do=ver_foren>Zurück zur Foren-Verwaltung</a>";
 	  exit;
 	}
-    $kat_dat = mysql_query("SELECT * FROM eins_kate WHERE id LIKE '$_GET[id]'");
+    $kat_dat = mysql_query("SELECT * FROM kate WHERE id LIKE '$_GET[id]'");
 	$kd = mysql_fetch_object($kat_dat);
     echo "<table class=braun width=80%><tr class=besch><td><b>Kategorie verwalten - $kd->name</b></td></tr><tr><td>
 	<form action=?do=ver_foren&action=kate&done=save&id=$_GET[id] method=post>
@@ -591,17 +629,17 @@ switch ($do) {
   }
   if($ac == "del")
   {
-    mysql_query("DELETE FROM eins_foren WHERE id LIKE '$_GET[id]'");
+    mysql_query("DELETE FROM foren WHERE id LIKE '$_GET[id]'");
   }
   if($ac == "for")
   {
     if($_GET["done"] == "save")
 	{
-	  mysql_query("UPDATE eins_foren SET name = '$_POST[name]', besch = '$_POST[besch]' WHERE id LIKE '$_GET[id]'");
+	  mysql_query("UPDATE foren SET name = '$_POST[name]', besch = '$_POST[besch]' WHERE id LIKE '$_GET[id]'");
 	  echo "Die Kategorie wurde nun geändert.<br><a href=?do=ver_foren>Zurück zur Foren-Verwaltung</a>";
 	  exit;
 	}
-    $for_dat = mysql_query("SELECT * FROM eins_foren WHERE id LIKE '$_GET[id]'");
+    $for_dat = mysql_query("SELECT * FROM foren WHERE id LIKE '$_GET[id]'");
 	$fd = mysql_fetch_object($for_dat);
     echo "<table class=braun width=80%><tr class=besch><td><b>Forum verwalten - $fd->name</b></td></tr><tr><td>
 	<form action=?do=ver_foren&action=for&done=save&id=$_GET[id] method=post>
@@ -614,11 +652,11 @@ switch ($do) {
 	</td></tr></table>";
 	exit;
   }
-  $foren_data = mysql_query("SELECT * FROM eins_kate");
+  $foren_data = mysql_query("SELECT * FROM kate");
   while($fr = mysql_fetch_object($foren_data))
   {
     echo "<b>$fr->name</b> <a href=?do=ver_foren&action=kate&id=$fr->id>[ bearbeiten ]</a><br>";
-	$for_date = mysql_query("SELECT * FROM eins_foren WHERE kate = '$fr->id'");
+	$for_date = mysql_query("SELECT * FROM foren WHERE kate = '$fr->id'");
     while($fd = mysql_fetch_object($for_date))
     {
 	  echo "$fd->name  <a href=?do=ver_foren&action=for&id=$fd->id>[ bearbeiten ]</a> <a href=javascript:del($fd->id)>[ löschen ]</a><br>$fd->besch<br><br>";

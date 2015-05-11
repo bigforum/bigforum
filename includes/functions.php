@@ -10,7 +10,7 @@ function can_view_admincp()
 function page_header()
 {
   config("f2name2", true, "function_define");
-  include_once("includes/function_user.php");
+  include("includes/function_user.php");
   include("style/header.php");   
 }
 function page_close_table()
@@ -61,7 +61,7 @@ if($di == "sign")
 echo "</textarea><br>
 <input type=submit value=Absenden style=background-color:silver;></Td><td valign=top><br>";
 $drei = "0";
-$smilie_data = mysql_query("SELECT * FROM eins_smilie WHERE packet = '1'");
+$smilie_data = mysql_query("SELECT * FROM smilie WHERE packet = '1'");
 while($sd = mysql_fetch_object($smilie_data))
 {
   $drei++;
@@ -117,7 +117,7 @@ $time_as_useris_online = "900";
 $dtime = time() - $time_as_useris_online;
 $x = "0";
 $anzahl = "0";
-$online_data = mysql_query("SELECT * FROM eins_users WHERE last_log > '$dtime' ORDER BY username");
+$online_data = mysql_query("SELECT * FROM users WHERE last_log > '$dtime' ORDER BY username");
 echo "<table width=100% bgcolor=#F2F2E5><tr><td>";
 while($ond = mysql_fetch_object($online_data))
 {
@@ -234,7 +234,7 @@ function looking_page($wo)
   {
     if($wo != ""){
       $time = time();
-      mysql_query("UPDATE eins_users SET last_site = '$text', last_log = '$time' WHERE username LIKE '$_COOKIE[username]'");
+      mysql_query("UPDATE users SET last_site = '$text', last_log = '$time' WHERE username LIKE '$_COOKIE[username]'");
 	}
   }
 }
@@ -243,11 +243,12 @@ function erzeuge_error($text)
   echo "<center><table style='border: 1px solid #000050;' width=50% height=50%>  
 <tr bgcolor=#397BC6><td><font color=snow><b>". SITENAME ." - Fehlermeldung</b></td></tr>
 	<tr><td align=center>$text</td></tr></table></center>";
+  page_footer();
 }
 function connect_to_database()
 {
   include("./config.php");
-  include_once("includes/function_define.php");
+  include("includes/function_define.php");
 
   mysql_connect($HOST,$USER,$PW)or die(mysql_error());
   mysql_select_db($DB)or die(mysql_error());
@@ -265,7 +266,7 @@ function config($erken, $clude_true, $what)
 
   mysql_connect($HOST,$USER,$PW)or die(mysql_error());
   mysql_select_db($DB)or die(mysql_error());
-  $config_wert = mysql_query("SELECT * FROM eins_config WHERE erkennungscode LIKE '$erken'");
+  $config_wert = mysql_query("SELECT * FROM config WHERE erkennungscode LIKE '$erken'");
   $con = mysql_fetch_object($config_wert);
   $daten = array ("wert1" => $con->wert1, 
 				  "wert2" => $con->wert2, 
@@ -274,11 +275,11 @@ function config($erken, $clude_true, $what)
   if($what != "")
   {
     $clude_path = "$what.php";
-    include_once($clude_path);
+    include($clude_path);
   }
   if($clude_true == false)
   {
-    include_once("../includes/function_user.php");
+    include("../includes/function_user.php");
   }
 }
 function check_data($wert1, $wert2, $fehlertext, $method)
@@ -343,7 +344,7 @@ function login()
 {
   //Aufruf dieser Funktion, vor dem Aufruf page_header() Ansonsten Design-Fehler
   config("f2name2", true, "function_define");
-  include_once("function_user.php");
+  include("function_user.php");
   if(USER == "")
   {
     include("login.php");
@@ -360,7 +361,7 @@ function error()
 }
 function text_ausgabe($text, $betreff, $from)
 {
-  $from_data = mysql_query("SELECT * FROM eins_users WHERE username LIKE '$from'");
+  $from_data = mysql_query("SELECT * FROM users WHERE username LIKE '$from'");
   $fd = mysql_fetch_object($from_data);
   $datum = date("d.m.Y",$fd->reg_dat);
   $text = strip_tags($text);
@@ -371,7 +372,7 @@ function text_ausgabe($text, $betreff, $from)
   $text = str_replace("\n", "<br />", $text);
   $betreff = strip_tags($betreff);
   
-  $smilie_data = mysql_query("SELECT * FROM eins_smilie WHERE packet = '1'");
+  $smilie_data = mysql_query("SELECT * FROM smilie WHERE packet = '1'");
   while($sd = mysql_fetch_object($smilie_data))
   {
     $text = str_replace($sd->abk1,"<img src=images/$sd->images_path width=25 height=25>", $text);
@@ -398,7 +399,7 @@ $fd->rang</br><br>
 <td valign=top width=51%>
 <b>$betreff</b><hr>
 $text";
-$config_datas = mysql_query("SELECT * FROM eins_config WHERE erkennungscode LIKE 'f2pnsignfs'");
+$config_datas = mysql_query("SELECT * FROM config WHERE erkennungscode LIKE 'f2pnsignfs'");
 $cd = mysql_fetch_object($config_datas);
 if($fd->sign != "" AND $cd->zahl1 == "1")
 {
@@ -429,6 +430,6 @@ function today($datum)
   }
 }
 // Ende der Funktionen, Abrufe wichtiger Arrays!
-$warn_dauer = Array("86400","172800","604800","1209600","2678400","5097600","15638400","31536000","63072000");
-$warn_text = Array("1 Tag","2 Tage","1 Woche","2 Wochen","1 Monat","2 Monate","6 Monate","1 Jahr","2 Jahre");
+$warn_dauer = Array("86400","172800","432000","604800","1209600","2678400","5097600","15638400","31536000","63072000");
+$warn_text = Array("1 Tag","2 Tage","5 Tage","1 Woche","2 Wochen","1 Monat","2 Monate","6 Monate","1 Jahr","2 Jahre");
 ?>

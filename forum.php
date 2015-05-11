@@ -1,10 +1,10 @@
 <?php
 //Wichtige Angaben für jede Datei!
-include_once("includes/functions.php");
+include("includes/functions.php");
 page_header();
 looking_page("forum-view");
-include_once("includes/function_forum.php");
-include_once("includes/function_user.php");
+include("includes/function_forum.php");
+include("includes/function_user.php");
 error();
 $id = $_GET["id"];
 $topics = "0";
@@ -12,7 +12,7 @@ if($id == "")
 {
   forum_error("Dieses Forum exestiert nicht.");
 }
-$for_dat = mysql_query("SELECT * FROM eins_foren WHERE id LIKE '$id'");
+$for_dat = mysql_query("SELECT * FROM foren WHERE id LIKE '$id'");
 $fd = mysql_fetch_object($for_dat);
 if($fd->guest_see == "1")
 {
@@ -28,7 +28,7 @@ if($fd->min_posts != "0")
     forum_error("Leider hast du nicht genügen Beiträge. Bitte poste erst noch sinnvolle Beiträge, um Zugriff auf das Forum zu bekommen");
   }
 }
-$them_dat = mysql_query("SELECT * FROM eins_thema WHERE where_forum LIKE '$id' ORDER BY import DESC, last_post_time DESC");
+$them_dat = mysql_query("SELECT * FROM thema WHERE where_forum LIKE '$id' ORDER BY import DESC, last_post_time DESC");
 
 if($fd->admin_start_thema == "0")
 {
@@ -42,20 +42,20 @@ else
   echo "<a href=newtopic.php?id=$fd->id><img src=images/newtopic.png border=0 title=\"Neues Thema\" width=105 height=60></a>";
 }
 
-echo "<table width=73% height=10% border=0 cellpadding=6 cellspacing=0><tr bgcolor=#000050 height=10%><td height=10%><font color=snow> <center> <b><big>$fd->name</big> - Themenübersicht</b> </center> </font></td></tr></table>";
+echo "<table width=73% height=10% border=0 cellpadding=6 cellspacing=0><tr background='images/dark_table.png' height=10%><td height=10%><font color=snow> <center> <b><big>$fd->name</big> - Themenübersicht</b> </center> </font></td></tr></table>";
 
 echo "<table width=73%><tr bgcolor=#397bc6 style='font-weight:bold;'><td width=3%></td><td width=40% valign=center>Title</td><td width=20% valign=center>Autor</td><td width=10%  valign=center>Antworten</td></tr>";
 
 while($thd = mysql_fetch_object($them_dat))
 {
   $topics++;
-  $answers = mysql_query("SELECT * FROM eins_beitrag WHERE where_forum LIKE '$thd->id'");
+  $answers = mysql_query("SELECT * FROM beitrag WHERE where_forum LIKE '$thd->id'");
   $zahl = mysql_num_rows($answers);
   
-  $datas = mysql_query("SELECT * FROM eins_read_all WHERE uname LIKE '". USER ."' AND thema_id LIKE '0' ORDER BY id DESC LIMIT 1");
+  $datas = mysql_query("SELECT * FROM read_all WHERE uname LIKE '". USER ."' AND thema_id LIKE '0' ORDER BY id DESC LIMIT 1");
   $das = mysql_fetch_object($datas);
   
-  $data = mysql_query("SELECT * FROM eins_read_all WHERE uname LIKE '". USER ."' AND thema_id LIKE '$thd->id'");
+  $data = mysql_query("SELECT * FROM read_all WHERE uname LIKE '". USER ."' AND thema_id LIKE '$thd->id'");
   $da = mysql_fetch_object($data);
   
   $thd->tit = strip_tags($thd->tit);

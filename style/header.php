@@ -1,105 +1,16 @@
+<html>
+
+<head>
 <title><?php echo SITENAME; ?> - Eingeloggt als <?php echo $username; ?></title>
-<body onLoad="uhrzeit('jetzt'); setInterval('uhrzeit()', 1000)">
+<meta name="generator" content="bigforum <?php echo VERSION; ?>" />
+<meta name="description" content="<?php echo SITENAME. " - ". BESCHREIBUNG; ?>" />
 <link rel="shortcut icon" href="images/bfav.ico" type="image/x-icon">
-<style>
-body {
-background: #909090;
+<link rel="stylesheet" type="text/css" href="style/style.css" />
+<script type="text/javascript" src="style/script.js"></script>
+</head>
 
-}
-.bgt{
-background: snow;
-text: black;
-}
-a:link
-{
-	color: #22229C;
-}
-a:visited
-{
-	color: #22229C;
-}
-a:hover, a:active
-{
-	color: #FF4400;
-}
-.navi
-{
-  background: #397BC6;
-  border: 1px solid #000050;
-}
-.navi a:link
-{
-	color: #FFFFFF;
-	text-decoration: none;
-}
-.navi a:visited
-{
-	color: #FFFFFF;
-	text-decoration: none;
-}
-.navi a:hover, a:active
-{
-	color: #FFFFFF;
-	text-decoration: underline;
-}
-.tab1
-{
-	background: #E1E4F2;
-	color: #000000;
-}
-.tab
-{
-    display: block;
-	border: 1px;
-	background: #EAEAEA;
-	color: black;
-	width: 100%;
-	height: 7%;
-	text-decoration: none;
-}
-.tab:hover
-{
-	background: #F0F0F0;
-	color: darkblue;
-	border-width: 75%;
-	border-height: 20%;
-	text-decoration: none;
-}
+<body onLoad="uhrzeit('jetzt'); setInterval('uhrzeit()', 1000)">
 
-.tabelbor
-{
-  border: 1px solid #000050;
-}
-legend
-{
-	color: #22229C;
-	font-size: 12px;
-    font-weight: bold;
-}
-fieldset
-{
-  border: 1px solid #22229C;
-}
-</style>
-<script>
-function logout()
-{
-  x = confirm("Möchtest du dich wirklich ausloggen?");
-  if(x == true)
-  {
-    window.location.href="login.php?do=logout";
-  }
-}
-function uhrzeit(showe) {
- Heute = new Date();
- Sekunde = Heute.getSeconds();
- if (Heute.getSeconds() == 0 || showe == "jetzt") {
-  Stunde  = Heute.getHours();
-  Minute  = Heute.getMinutes();
-  document.getElementById("uhr").innerHTML=Stunde+":"+Minute+" Uhr";
- }
-}
-</script>
 <table class="bgt" width="100%" height="*">
   <tr valign="top">
     <td  style="padding-left:5px">
@@ -115,7 +26,7 @@ if($ud->gesperrt == "1" AND $ud->sptime > $time)
 	<?
   exit;
 }
-$config_datas = mysql_query("SELECT * FROM eins_config WHERE erkennungscode LIKE 'f2closefs'");
+$config_datas = mysql_query("SELECT * FROM config WHERE erkennungscode LIKE 'f2closefs'");
 $cd = mysql_fetch_object($config_datas);
 if($cd->zahl1 == "0" AND $ud->adm_recht <= "5")
 {?>
@@ -130,8 +41,7 @@ if($cd->zahl1 == "0" AND $ud->adm_recht <= "5")
 <big><b>&nbsp;<?php echo SITENAME; ?></b><br>&nbsp;<?php echo BESCHREIBUNG; ?></big></td>
 <td class="tab1" width="30%" valign="top">
 
-Willkommen, <span style="cursor: pointer;" onclick="window.location.href='profil.php?id=<?php echo $ud->id; ?>'"><?php echo $username; ?></span><?php if($username == "Gast"){?>
-<p></p><? } else {
+Willkommen, <span style="cursor: pointer;" onclick="window.location.href='profil.php?id=<?php echo $ud->id; ?>'"><?php echo $username; ?></span><?php if($username == "Gast"){?><br><br><br><br><br>Du bist nicht angemeldet!<? } else {
 $config_datas = mysql_query("SELECT * FROM config WHERE erkennungscode LIKE 'f2pnsignfs'");
 $cd = mysql_fetch_object($config_datas);
 pn_zahl("header"); }
@@ -151,6 +61,14 @@ pn_zahl("header"); }
 <td><a href="javascript:logout()"><b>Abmelden</b></a></td>
 <? } ?>
 <td><a href="search.php">Suche</a></td>
-<? if(GROUP == "3") echo "<td><a href=admin/><b>Administrator-Kontrollzentrum</b></a></td>"; ?>
+<? if(GROUP == "3") echo "<td><a href=admin/><b>Administrator-Kontrollzentrum</b></a></td>"; 
+?>
 </tr></table>
+<br>
+<?php
+if($ud->notice != "" AND $ud->notice != "0")
+{
+  echo "<table style='border: 1px solid rgb(0, 0, 80);' width=100%><tr><td><center> $ud->notice (<a href='javascript:info()'>Info</a>)</center></td></tr></table>";
+}
+?>
 <br>

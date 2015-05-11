@@ -1,9 +1,9 @@
 <?php
 //Wichtige Angaben für jede Datei!
-include_once("includes/functions.php");
+include("includes/functions.php");
 login();
 page_header();
-include_once("includes/function_user.php");
+include("includes/function_user.php");
 $ac = $_GET["action"];
 
   // Start Verwarnungen
@@ -29,7 +29,7 @@ $ac = $_GET["action"];
   // Ende
   if($_GET["id"] != "")
 {
-  $user_data_profile = mysql_query("SELECT * FROM eins_users WHERE id LIKE '$_GET[id]'");
+  $user_data_profile = mysql_query("SELECT * FROM users WHERE id LIKE '$_GET[id]'");
   $udp = mysql_fetch_object($user_data_profile);
   check_data($udp->username, "", "Dieses Benutzerprofil exestiert nicht.", "leer");
   gruppen_aufteilungen($udp->group_id);
@@ -48,7 +48,7 @@ $ac = $_GET["action"];
 	{
 	  check_data($_POST["warn"], "", "Bitte gebe einen allgemeinen Warngrund an", "leer");
 	  check_data($_POST["spgr"], "", "Bitte gebe einen speziellen Warngrund an", "leer");
-	  $gru_ho = mysql_query("SELECT * FROM eins_verwarn_gruend WHERE id LIKE '$_POST[warn]'");
+	  $gru_ho = mysql_query("SELECT * FROM verwarn_gruend WHERE id LIKE '$_POST[warn]'");
 	  $gho = mysql_fetch_object($gru_ho);
 	  $dauer = time() + $gho->zeit;
 	  $time = time();
@@ -65,12 +65,12 @@ $ac = $_GET["action"];
 	  
 	  Mit freundlichen Grüßen
 	  Das Foren-Team";
-	  mysql_query("INSERT INTO eins_user_verwarn (user_id, grund, punkte, dauer, grundpn, von, wann) VALUE ('$_GET[id]', '$gho->grund', '$gho->punkte', '$dauer' ,'$_POST[spgr]', '". USER ."', '$time')");
-	  mysql_query("INSERT INTO eins_prna (abse, emp, dat, betreff, mes, gel) VALUES ('". USER . "', '$udp->username', '$time', 'Sie haben eine Verwarnung erhalten', '$text', '0')")or die(mysql_error());
+	  mysql_query("INSERT INTO user_verwarn (user_id, grund, punkte, dauer, grundpn, von, wann) VALUE ('$_GET[id]', '$gho->grund', '$gho->punkte', '$dauer' ,'$_POST[spgr]', '". USER ."', '$time')");
+	  mysql_query("INSERT INTO prna (abse, emp, dat, betreff, mes, gel) VALUES ('". USER . "', '$udp->username', '$time', 'Sie haben eine Verwarnung erhalten', '$text', '0')")or die(mysql_error());
       echo "Dem Benutzer wurde(n) $gho->punkte Punkt(e) hinzugefügt.<br><a href=profil.php?id=$_GET[id]>Zurück zum Profil</a><br><br><br>";
 	  page_footer();
 	}
-    echo "  <table width=100%><tr bgcolor=#000050><td>
+    echo "  <table width=100%><tr background='images/dark_table.png'><td>
   <b><big><font color=snow>$udp->username verwarnen </font></big></b></td></tr>
     <tr><td>
 	
@@ -80,7 +80,7 @@ $ac = $_GET["action"];
 	
 	<table width=100%><tr style=font-weight:bold>
 	<td></td><td>Grund</td><td>Punkte</td><td>Dauer</td></tr>";
-	$gr_ho = mysql_query("SELECT * FROM eins_verwarn_gruend ORDER BY punkte DESC");
+	$gr_ho = mysql_query("SELECT * FROM verwarn_gruend ORDER BY punkte DESC");
     while($gh = mysql_fetch_object($gr_ho))
     {
       $zeit = $gh->zeit;
@@ -106,7 +106,7 @@ $ac = $_GET["action"];
     }
   }
   ?>
-  <table style="border: 1px solid #000050;" width="100%"><tr bgcolor="#000050"><td>
+  <table style="border: 1px solid #000050;" width="100%"><tr background="images/dark_table.png"><td>
   <b><big><font color="snow">Benutzerprofil von <?php echo $udp->username; ?></font></big></b></td></tr>
   <tr><td>
   <center><b><?php echo $udp->username; ?></b><br><?php echo $udp->rang; ?></center>
@@ -175,12 +175,12 @@ $ac = $_GET["action"];
 if(($ud->group_id == "2" OR $ud->group_id == "3") AND $ud->adm_recht >= $udp->adm_recht)
 {
 ?><br>
-  <table style="border: 1px solid #000050;" width="100%"><tr bgcolor="#000050"><td>
+  <table style="border: 1px solid #000050;" width="100%"><tr  background="images/dark_table.png"><td>
   <table width=100%><tr><td><b><font color="snow">Verwarnungen</font></b></td><td align=right><a href="profil.php?id=<?php echo $_GET["id"];?>&action=warn"><font color=snow>Benutzer Verwarnen</font></a></td></tr></table></td></tr>
   <tr><td>
   <table width=100%><tr align=center style=font-weight:bold><td width=30%>Grund</td><td width=30%>Verwarnt von / Datum</td><td width=10%>Punkte</td><td width=20%>Läuft aus</td><td><?php if($_GET["id"] != $ud->id) echo "Aktionen"; ?></td></tr>
   <?php
-  $us_ver = mysql_query("SELECT * FROM eins_user_verwarn WHERE user_id LIKE '$_GET[id]'");
+  $us_ver = mysql_query("SELECT * FROM user_verwarn WHERE user_id LIKE '$_GET[id]'");
   while($uv = mysql_fetch_object($us_ver))
   {
     $dauer = $uv->dauer;
@@ -199,9 +199,11 @@ if(($ud->group_id == "2" OR $ud->group_id == "3") AND $ud->adm_recht >= $udp->ad
 	    $dauer = date("d.m.Y - H:m", $dauer);
 	  	}
     echo "<tr align=center><td>$uv->grund</td><td>$uv->von / ". date("d.m.Y - H:m", $uv->wann) ."</td><td>$uv->punkte</td><td>$dauer</td><td><a href=?action=no_warn&id=$uv->id>";
-	if($_GET["id"] != $ud->id)
-	  echo "Zurücknehmen";
-	echo "</a></td></tr>";
+	if($_GET["id"] != $ud->id AND $dauer != "Abgelaufen" AND $dauer != "Zurückgenommen")
+	  echo "Zurücknehmen</a>";
+	else
+	  echo "</a>Zurücknehmen";
+	echo "</td></tr>";
   }
   ?>
   </table>

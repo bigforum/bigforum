@@ -3,11 +3,11 @@ function insert_log($text)
 {
   $time = time();
   $ip = $_SERVER["REMOTE_ADDR"];
-  mysql_query("INSERT INTO eins_admin_logs (username, time, aktio, ipadr) VALUE ('$_COOKIE[username]', '$time', '$text', '$ip')");
+  mysql_query("INSERT INTO admin_logs (username, time, aktio, ipadr) VALUE ('$_COOKIE[username]', '$time', '$text', '$ip')");
 }
 function admin_recht($zahl)
 {
-  $uac = mysql_query("SELECT * FROM eins_users WHERE username LIKE '$_COOKIE[username]'");
+  $uac = mysql_query("SELECT * FROM users WHERE username LIKE '$_COOKIE[username]'");
   $ac = mysql_fetch_object($uac);
   if($ac->adm_recht < $zahl)
   {
@@ -17,7 +17,7 @@ function admin_recht($zahl)
 }
 function set_tab($code)
 {
-    $config_wert = mysql_query("SELECT * FROM eins_config WHERE erkennungscode LIKE '$code'");
+    $config_wert = mysql_query("SELECT * FROM config WHERE erkennungscode LIKE '$code'");
     $con = mysql_fetch_object($config_wert);
 	define("WERTE", $con->wert1);
 	define("WERTZ", $con->wert2);

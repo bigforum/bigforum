@@ -3,14 +3,14 @@
   
   //define - Tables
   define("USER", $_COOKIE["username"]);
-  define("HAUPT", "http://bigboard.kilu.de");
+  define("HAUPT", "");
   define("MYSQLUSER", $USER);
   define("HOST", $HOST);
   define("MYSQLPASSWORT", $PW);
   define("MYSQLDB", $DB);
   define("SITENAME", $daten["wert1"]);
   define("BESCHREIBUNG", $daten['wert2']);
-  define("VERSION", "1.0.0");
+  define("VERSION", "1.1");
   
   //Ersetzte manche in Variablen
   $root = HAUPT;

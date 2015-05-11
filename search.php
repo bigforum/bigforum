@@ -6,25 +6,45 @@ page_header();
 looking_page("search");
 if($_GET["do"] == "send")
 {
+  if($_POST["auth"] == "" AND $_POST["schlu"] == "")
+  {
+    erzeuge_error("Du musst schon etwas eingeben!");
+  }
   $lim = $_POST["number"];
   $fi = $_POST["first"];
   if($_POST["search"] == "thema")
-    $search_res = mysql_query("SELECT * FROM eins_thema WHERE verfas LIKE '%$_POST[auth]%' AND text LIKE '%$_POST[schlu]%' ORDER BY id $fi LIMIT $lim")or die(mysql_error());
+    $search_res = mysql_query("SELECT * FROM thema WHERE verfas LIKE '%$_POST[auth]%' AND text LIKE '%$_POST[schlu]%' ORDER BY id $fi LIMIT $lim")or die(mysql_error());
   else
-    $search_res = mysql_query("SELECT * FROM eins_beitrag WHERE verfas LIKE '%$_POST[auth]%' AND text LIKE '%$_POST[schlu]%' ORDER BY id $fi LIMIT $lim")or die(mysql_error());
-echo "<table><tr bgcolor=#397bc6 style='font-weight:bold;'><td width=5%></td><td width=50% valign=center>Title</td><td width=20% valign=center>Autor</td></tr>";
+    $search_res = mysql_query("SELECT * FROM beitrag WHERE verfas LIKE '%$_POST[auth]%' AND text LIKE '%$_POST[schlu]%' ORDER BY id $fi LIMIT $lim")or die(mysql_error());
+echo "<table><tr bgcolor=#397bc6 style='font-weight:bold;'><td width=3%></td><td width=50% valign=center>Title</td><td width=20% valign=center>Autor</td></tr>";
  
   while($sr = mysql_fetch_object($search_res))
   {
     if($_POST["search"] == "beitrag")
 	{
-	  $th_da = mysql_query("SELECT * FROM eins_thema WHERE id LIKE '$sr->where_forum'");
+	  $th_da = mysql_query("SELECT * FROM thema WHERE id LIKE '$sr->where_forum'");
 	  $td = mysql_fetch_object($th_da);
-	  echo "<tr><td></td><td><a href=thread.php?id=$sr->where_forum#$sr->id>Forum: $td->tit</a></td><td>$sr->verfas</td></tr>";
+	  if($td->close == "1")
+      {
+        $close = "<img src=images/th_close.png title='Thema ist geschlossen' width=80% height=80%>";
+      }
+      else
+      {
+        $close = "<img src=images/th_open.png title='Thema ist geöffnet' width=80% height=80%>";
+      }
+	  echo "<tr><td>$close</td><td><a href=thread.php?id=$sr->where_forum#$sr->id>Forum: $td->tit</a></td><td>$sr->verfas</td></tr>";
 	}
 	else
 	{
-	  echo "<tr><td></td><td><a href=thread.php?id=$sr->id>$sr->tit</a></td><td>$sr->verfas</td></tr>";	
+	  if($sr->close == "1")
+      {
+        $close = "<img src=images/th_close.png title='Thema ist geschlossen' width=80% height=80%>";
+      }
+      else
+      {
+        $close = "<img src=images/th_open.png title='Thema ist geöffnet' width=80% height=80%>";
+      }
+	  echo "<tr><td>$close</td><td><a href=thread.php?id=$sr->id>$sr->tit</a></td><td>$sr->verfas</td></tr>";	
 	}
   }
   echo "</table>";
