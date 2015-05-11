@@ -18,7 +18,6 @@ function page_header()
   {
     include_once("includes/function_user.php"); 
   }
- 
   include("style/header.php");   
 }
 function page_close_table()
@@ -59,8 +58,8 @@ if($di == "ant")
   Nachricht:";
 }
 echo "<table bgcolor=silver><tr><td>
-<input type=button style='background-color:silver;font-weight:bold' value=b onclick=\"document.feld.feld.value += '[b][/b]'\"><input type=button style=\"background-color:silver;text-decoration:underline\" value=u onclick=\"document.feld.feld.value += '[u][/u]'\"><input type=button style=\"background-color:silver;font-style:italic\" value=k onclick=\"document.feld.feld.value += '[k][/k]'\">
-<input type=button style='background-color:silver;' value=Link onclick=\"document.feld.feld.value += '[url][/url]'\"><input type=button style='background-color:silver;' value=Code onclick=\"document.feld.feld.value += '[code][/code]'\"><input type=button style='background-color:silver;' value=Bild onclick=\"document.feld.feld.value += '[img][/img]'\"><input type=button style='background-color:silver;' value=Zitat onclick=\"u = prompt('Welchen Benutzer möchtest du zitieren?'); document.feld.feld.value += '[zitat='+u+'][/zitat]'\"><br>
+<input type=button style='background-color:silver;font-weight:bold' value=b onclick=\"insert('[b]', '[/b]')\"><input type=button style=\"background-color:silver;text-decoration:underline\" value=u onclick=\"insert('[u]', '[/u]')\"><input type=button style=\"background-color:silver;font-style:italic\" value=k onclick=\"insert('[k]', '[/k]')\">
+<input type=button style='background-color:silver;' value=Link onclick=\"insert('[url]', '[/url]')\"><input type=button style='background-color:silver;' value=Code onclick=\"insert('[code]', '[/code]')\"><input type=button style='background-color:silver;' value=Bild onclick=\"insert('[img]', '[/img]')\"><input type=button style='background-color:silver;' value=Zitat onclick=\"u = prompt('Welchen Benutzer möchtest du zitieren?'); insert('[zitat='+u+']', '[/zitat]')\"><br>
 <textarea cols=70 rows=7 name=feld>";
 if($di == "sign")
 {
@@ -266,15 +265,16 @@ function looking_page($wo)
   {
     if($wo != ""){
       $time = time();
-      mysql_query("UPDATE users SET last_site = '$text', last_log = '$time' WHERE username LIKE '$_COOKIE[username]'");
+	  $ip = $_SERVER["REMOTE_ADDR"];
+      mysql_query("UPDATE users SET last_site = '$text', last_log = '$time', last_ip = '$ip' WHERE username LIKE '$_COOKIE[username]'");
 	}
   }
 }
 function erzeuge_error($text)
 {
-  echo "<center><table style='border: 1px solid #000050;' width=50% height=50%>  
-<tr bgcolor=#397BC6><td><font color=snow><b>". SITENAME ." - Fehlermeldung</b></td></tr>
-	<tr><td align=center>$text</td></tr></table></center>";
+  echo "<center><table class=bord width=50% height=50%>  
+<tr class=normal><td><font color=snow><b>". SITENAME ." - Fehlermeldung</b></td></tr>
+	<tr><td align=center>$text</td></tr></table></center><br><br>";
   page_footer();
 }
 function connect_to_database()
@@ -350,7 +350,7 @@ function check_data($wert1, $wert2, $fehlertext, $method)
   }
   if($method == "laenge")
   {
-    if(strlen($wert1) <= $wert2)
+    if(strlen($wert1) < $wert2)
 	{
 	  echo "<b>Fehler:</b> $fehlertext";
 	  page_footer();
@@ -391,6 +391,18 @@ function error()
     error_reporting(E_ALL);
   }
 }
+function show_online($zeit, $user)
+{
+  $rech = $zeit - time();
+  if($rech > "-901")
+  {
+    echo " <img src=images/green.png border=0 title='$user ist online' height=18px>";
+  }
+  else
+  {
+    echo " <img src=images/rot.png border=0 title='$user ist offline' height=18px>";
+  }
+}
 function text_ausgabe($text, $betreff, $from)
 {
   $from_data = mysql_query("SELECT * FROM users WHERE username LIKE '$from'");
@@ -400,12 +412,12 @@ function text_ausgabe($text, $betreff, $from)
   $text = preg_replace('/\[b\](.*?)\[\/b\]/', '<b>$1</b>', $text);  
   $text = preg_replace('/\[k\](.*?)\[\/k\]/', '<i>$1</i>', $text);  
   $text = preg_replace('/\[u\](.*?)\[\/u\]/', '<u>$1</u>', $text);  
-  $text = preg_replace('/\[code\](.*?)\[\/code\]/', "<small>Code:</small><table width=80% bgcolor=snow><tr><td>$1</td></tr></table>", $text);  
+  $text = preg_replace('/\[code\](.*?)\[\/code\]/', "<small style='display:block;'>Code:</small><table width=80% bgcolor=snow><tr><td>$1</td></tr></table>", $text);  
   $text = eregi_replace("\[url\]([^\[]+)\[/url\]","<a href=\"http://\\1\" target=\"_blank\">\\1</a>",$text);
   $text = eregi_replace("\[img\]([^\[]+)\[/img\]","<img src=\"\\1\" border=0>",$text);
   $text = preg_replace("/\[color=(.*)\](.*)\[\/color\]/Usi", "<font color=\"\\1\">\\2</font>", $text); 
   $text = preg_replace("/\[size=(.*)\](.*)\[\/size\]/Usi", "<font size=\"\\1\">\\2</font>", $text); 
-  $text = preg_replace("/\[zitat=(.*)\](.*)\[\/zitat\]/Usi", "<small>Zitat von \\1:</small><table width=80% bgcolor=snow><tr><td>\\2</td></tr></table>", $text);
+  $text = preg_replace("/\[zitat=(.*)\](.*)\[\/zitat\]/Usi", "<small style='display:block;'>Zitat von \\1:</small><table width=80% bgcolor=snow><tr><td>\\2</td></tr></table>", $text);
   $text = str_replace("http://http://" ,"http://", $text);
   $text = str_replace("\n", "<br />", $text);
   $betreff = strip_tags($betreff);
@@ -423,12 +435,14 @@ function text_ausgabe($text, $betreff, $from)
   {
     $ava = "<img src=$fd->ava_link title=\"$fd->username's Avatar\" width=100 height=100>";
   }
-  echo "<table border=1  width=80% bgcolor=#E1E4F9>
+  echo "<table border=1  width=80% class=post>
 <tr>
 <td width=29% valign=top>
 <table>
 <tr><td>$ava</td><td>
-<b><span style=\"cursor: pointer;\" onclick=\"window.location.href='profil.php?id=$fd->id'\">$from</b><br>
+<b><span style=\"cursor: pointer;\" onclick=\"window.location.href='profil.php?id=$fd->id'\">$from</b>";
+show_online($fd->last_log, $fd->username);
+echo "<br>
 $fd->rang</br><br>
 </td></tr></table>
 

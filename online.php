@@ -16,7 +16,7 @@ $tauio = "900";
 $dtime = time() - $tauio;
 $online_data = mysql_query("SELECT * FROM users WHERE last_log > '$dtime' ORDER BY '$order'");
 $besucher_zahl = mysql_num_rows($online_data);
-echo "<table bgcolor=#397BC6 width=90%><tr><td><font color=snow>Angezeigt werden alle Benutzer, die während der letzten ". date("i",$tauio) ." Minuten online waren. ($besucher_zahl Besucher online)</font></td></tr></table>
+echo "<table class=normal width=90%><tr><td><font color=snow>Angezeigt werden alle Benutzer, die während der letzten ". date("i",$tauio) ." Minuten online waren. ($besucher_zahl Besucher online)</font></td></tr></table>
 <table width=90%><tr style=font-weight:bold><td>Benutzername</td><td>Letzte Aktivität</td><td>Aufenthaltsort</td></tr>";
 while($od = mysql_fetch_object($online_data))
 {

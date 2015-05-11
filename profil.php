@@ -72,10 +72,10 @@ $ac = $_GET["action"];
 	  Das Foren-Team";
 	  mysql_query("INSERT INTO user_verwarn (user_id, grund, punkte, dauer, grundpn, von, wann) VALUE ('$_GET[id]', '$gho->grund', '$gho->punkte', '$dauer' ,'$_POST[spgr]', '". USER ."', '$time')");
 	  mysql_query("INSERT INTO prna (abse, emp, dat, betreff, mes, gel) VALUES ('". USER . "', '$udp->username', '$time', 'Sie haben eine Verwarnung erhalten', '$text', '0')")or die(mysql_error());
-      echo "Dem Benutzer wurde(n) $gho->punkte Punkt(e) hinzugefügt.<br><a href=profil.php?id=$_GET[id]>Zurück zum Profil</a><br><br><br>";
+      echo "<meta http-equiv='refresh' content='1; URL=profil.php?id=$_GET[id]'>Dem Benutzer wurde(n) $gho->punkte Punkt(e) hinzugefügt.<br><br>Sollte die Weiterleitung nicht funktionieren <a href=profil.php?id=$_GET[id]>klicke hier</a><br><br><br>";
 	  page_footer();
 	}
-    echo "  <table width=100%><tr background='images/dark_table.png'><td>
+    echo "  <table width=100%><tr class=dark><td>
   <b><big><font color=snow>$udp->username verwarnen </font></big></b></td></tr>
     <tr><td>
 	
@@ -111,10 +111,12 @@ $ac = $_GET["action"];
     }
   }
   ?>
-  <table style="border: 1px solid #000050;" width="100%"><tr background="images/dark_table.png"><td>
+  <table class="bord" width="100%"><tr class="dark"><td>
   <b><big><font color="snow">Benutzerprofil von <?php echo $udp->username; ?></font></big></b></td></tr>
   <tr><td>
-  <center><b><?php echo $udp->username; ?></b><br><?php echo $udp->rang; ?></center>
+  <center><b><?php echo $udp->username; echo "</b>  ";
+  show_online($udp->last_log, $udp->username);
+  ?><br><?php echo $udp->rang; ?></center>
   
   <table width="100%" valign="top"><tr><td width="65%">
   <?php
@@ -138,17 +140,17 @@ $ac = $_GET["action"];
   $uhrzeit = date("H:i",$udp->reg_dat);
   echo "$datum";?><br><br>
   <b>Beiträge:</b> <?php echo $udp->posts; ?><br>
-  <b>Status:</b>   <?php
-  $rech = $udp->last_log - time();
-  if($rech > "-901")
+  <b>&#216; Beiträge/Tag:</b> <? 
+  $tag = time() - $udp->reg_dat;
+  $da = $tag/84600;
+  $da = round($da);
+  if($udp->posts != "0")
   {
-    echo "<font color=green>Online</font>";
+    $bei_tag = $udp->posts/$da;
+    echo round($bei_tag, 2);
   }
-  else
-  {
-    echo "<font color=red>Offline</font>";
-  }
-  ?><br><br>
+  else { echo "0"; }  ?><br>
+  <br>
   <b>Suche nach:</b> <a href="search.php?do=send&us=<?php echo $udp->username; ?>&action=beitrag">Allen Beiträgen</a> | <a href="search.php?do=send&us=<?php echo $udp->username; ?>&action=thema">Allen Themen</a>
   </td><td valign=top>
   <b>Website:</b> <a href="<? if(str_replace("http://www.", "www.", $udp->website))echo "http://$udp->website";  else echo $udp->website;?>" target="_blank"><? echo $udp->website; ?></a><br>
@@ -177,13 +179,13 @@ $ac = $_GET["action"];
       $text = str_replace($sd->abk1,"<img src=images/$sd->images_path width=25 height=25>", $text);
       $text = str_replace($sd->abk2,"<img src=images/$sd->images_path width=25 height=25>", $text);
     }
-    echo"<table style=\"border: 1px solid #000050;\" width=100%><tr><td>$text</td></tr></table>";
+    echo"<table class=bord width=100%><tr><td>$text</td></tr></table>";
   }
 }
 if((GROUP == "2" OR GROUP == "3") AND $ud->adm_recht >= $udp->adm_recht)
 {
 ?><br>
-  <table style="border: 1px solid #000050;" width="100%"><tr  background="images/dark_table.png"><td>
+  <table class="bord" width="100%"><tr class="dark"><td>
   <table width=100%><tr><td><b><font color="snow">Verwarnungen</font></b></td><td align=right><a href="profil.php?id=<?php echo $_GET["id"];?>&action=warn"><font color=snow>Benutzer verwarnen</font></a></td></tr></table></td></tr>
   <tr><td>
   <table width=100%><tr align=center style=font-weight:bold><td width=30%>Grund</td><td width=30%>Verwarnt von / Datum</td><td width=10%>Punkte</td><td width=20%>Läuft aus</td><td><?php if($_GET["id"] != $ud->id) echo "Aktionen"; ?></td></tr>

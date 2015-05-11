@@ -7,7 +7,7 @@ $do = $_GET["do"];
 $tab = "</td></tr></table>";
 if(GROUP != "3" AND GROUP != "2")
 {
-  echo "Ein Zugriff auf das Moderatoren-Kontrollzentrum ist nur für Moderatoren möglich!"; exit;
+  echo "Ein Zugriff auf das Moderatoren-Kontrollzentrum ist nur für Moderatoren möglich!";
 }
 ?>
 <table width="100%">
@@ -15,7 +15,7 @@ if(GROUP != "3" AND GROUP != "2")
 <!-- Navigation -->
 
 <table width="100%">
-<tr><td bgcolor="#397BC6" color="snow">
+<tr><td class=normal color="snow">
 <b>Allgemeine Einstellungen</b></td></tr>
 <tr><td><a href="?do=spe_us">Gesperrte Benutzer</a></td></tr>
 <tr><td><a href="?do=search_user">Benutzer suchen</a></td></tr>
@@ -35,7 +35,7 @@ switch ($do) {
     $time = time();
   if($_GET["action"] == "del")
   {
-    mysql_query("UPDATE eins_users SET gesperrt = '0', sptime = '0' WHERE id LIKE '$_GET[id]'");
+    mysql_query("UPDATE users SET gesperrt = '0', sptime = '0' WHERE id LIKE '$_GET[id]'");
 	echo "Die Sperre von diesem Benutzer (ID: $_GET[id]) wurde zurückgenommen.";
 	echo "<br> $tab";
     page_footer();
@@ -43,7 +43,7 @@ switch ($do) {
   }
   if($_GET["action"] == "new")
   {
-    $u_da = mysql_query("SELECT * FROM eins_users WHERE username LIKE '$_POST[ben]'");
+    $u_da = mysql_query("SELECT * FROM users WHERE username LIKE '$_POST[ben]'");
 	$ua = mysql_fetch_object($u_da);
 	if($ua->group_id == "3" OR $ua->group_id == "2")
 	{
@@ -55,7 +55,7 @@ switch ($do) {
 	if($ua->username == "")
 	{
 	  echo "<b>Information:</b> Dieser Benutzername exestiert nicht!<br><br>";
-	  $vor = mysql_query("SELECT * FROM eins_users WHERE username LIKE '%$_POST[ben]%' LIMIT 20");
+	  $vor = mysql_query("SELECT * FROM users WHERE username LIKE '%$_POST[ben]%' LIMIT 20");
 	  $erg = mysql_num_rows($vor);
 	  {
 	    if($erg != "0")
@@ -72,14 +72,14 @@ switch ($do) {
 	  exit;
 	}
 	$gesp = $time+$_POST["dauer"];
-	mysql_query("UPDATE eins_users SET gesperrt = '1', sptime = '$gesp' WHERE username LIKE '$_POST[ben]'");
+	mysql_query("UPDATE users SET gesperrt = '1', sptime = '$gesp' WHERE username LIKE '$_POST[ben]'");
 	echo "$_POST[ben] wurde nun vom Forum ausgeschlossen.";
 	echo "<br> $tab";
     page_footer();
 	exit;
   }
 
-  $sperr_data = mysql_query("SELECT * FROM eins_users WHERE gesperrt != '0' OR sptime > '$time'");
+  $sperr_data = mysql_query("SELECT * FROM users WHERE gesperrt != '0' OR sptime > '$time'");
   $sp = "0";
   echo "<form action=?do=spe_us&action=new method=post><table>
   <tr><td>Benutzername: </td><td><input type=text name=ben></td></tr>
@@ -110,7 +110,7 @@ switch ($do) {
   case "search_user":
   if($_GET["id"] == "1")
   {
-    $my_us = mysql_query("SELECT * FROM eins_users WHERE username LIKE '$_POST[benu]'");
+    $my_us = mysql_query("SELECT * FROM users WHERE username LIKE '$_POST[benu]'");
 	$mu = mysql_fetch_object($my_us);
 	if($mu->username == "")
 	{
@@ -138,7 +138,9 @@ switch ($do) {
 	<tr><td>Beiträge:</td><td>$mu->posts</td></tr>
 	<tr><td>Registrierungsdatum:</td><td>". date("d.m.Y - H:i", $mu->reg_dat) ."</td></tr>
 	<tr><td>Registrierungs IP-Adresse:</td><td>$mu->reg_ip</td></tr>
+	<tr><td>Letzte IP-Adresse:</td><td>$mu->last_ip</td></tr>
 	<tr><td>eMail-Adresse</td><td>$mu->mail</td></tr>
+	<tr><td>Empfohlen von:</td><td>$mu->empfo</td></tr>
 	<tr><td>Signatur</td><td>$text</td></tr></table>";
 	echo "<br><br> $tab";
     page_footer();

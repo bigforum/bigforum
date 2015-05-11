@@ -10,9 +10,9 @@ function load_function($id, $adm)
   if($adm == "3")
   {
     //Nur Administratoren haben das Recht themen zu löschen
-    echo "<option value=delete>Thema löschen</option>";
+    echo "<option value=marknew>Thema als neu makieren</option><option value=delete>Thema löschen</option>";
   }
-  echo "</select></form>";
+  echo "<option value=schieb>Thema verschieben</option></select></form>";
 }
 function answer_button($recht, $check_adm, $id, $close)
 {

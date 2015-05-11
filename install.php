@@ -19,7 +19,7 @@ function schr(s)
   document.getElementById("schritt").innerHTML = s;
 }
 </script>
-<table width="100%"><tr><td width="90%"><b>Bigforum - Installationsassistent Schritt <span id=schritt></span>/6</b></td><td><b>Version: 1.5</b></td></tr></table>
+<table width="100%"><tr><td width="90%"><b>Bigforum - Installationsassistent Schritt <span id=schritt></span>/6</b></td><td><b>Version: 2.0</b></td></tr></table>
 <hr><br><br>
 <?php
 $do = $_GET["do"];
@@ -31,7 +31,7 @@ function schr($s)
 switch($do){
   case "":
   schr("1");
-  echo "Bitte wähle als erstes, ob es sich nur um ein Update handelt (letzte Version erfoderlich!) oder ob du das Forum komplett neu installieren möchtest.<br><br>
+  echo "Vielen dank, dass du bigforum installieren bzw. updaten möchtest.<br>Die Installation ist ganz einfach, dir wird ganz genau erklärt, was zu tun ist. Wenn du das Forum updaten willst, musst du die letzte Version haben.<br> Sprünge beim Update führen zu fehlern. <br>Das Update ist bereits nach einem Schritt fertig.<br><br>Sobald du das Forum installiert bzw. geupdatet hast, lösche die Datei install.php.<br><br>
   <input type=button value='Forum installieren' onclick=\"location.href='?do=install&s=1'\"> &nbsp; &nbsp; &nbsp; <input type=button value='Forum updaten' onclick=\"location.href='?do=update'\">";
   break;
   
@@ -42,6 +42,20 @@ switch($do){
     mysql_connect($HOST,$USER,$PW)or die(mysql_error());
     mysql_select_db($DB)or die(mysql_error());
 	//MySQL - Datenbank änderungen	
+	
+	mysql_query("UPDATE config SET wert2 = 'images/logo_new.png' WHERE erkennungscode LIKE 'f2pnsignfs'");
+	mysql_query("UPDATE config set wert2 = 'brown' WHERE erkennungscode LIKE 'f2laengfs'");
+	mysql_query("ALTER TABLE users ADD style varchar(50)");
+	mysql_query("ALTER TABLE users ADD last_ip varchar(80)");
+    mysql_query("ALTER TABLE foren ADD sort int(50)");
+	mysql_query("CREATE TABLE IF NOT EXISTS onlineuser (
+      id INT(11) NOT NULL auto_increment,
+      uid varchar(32) NOT NULL,
+      ip varchar(30) NOT NULL,
+      time INT(11) NOT NULL,
+      PRIMARY KEY (id)
+      );");
+	  mysql_query("ALTER TABLE users ADD empfo varchar(150)");
 	//Ende
     echo "Danke, das Forum wurde nun auf den neusten Stand gebracht.<br>Bitte lösche diese Datei, ansonsten kann jeder dieses Forum beschädigen!";
   break;
@@ -116,6 +130,14 @@ switch($do){
 
       "); 
 	  
+	  mysql_query("CREATE TABLE IF NOT EXISTS onlineuser (
+      id INT(11) NOT NULL auto_increment,
+      uid varchar(32) NOT NULL,
+      ip varchar(30) NOT NULL,
+      time INT(11) NOT NULL,
+      PRIMARY KEY (id)
+      );");
+	  
 	  
 	  mysql_query("CREATE TABLE IF NOT EXISTS beitrag ( 
 
@@ -154,6 +176,7 @@ switch($do){
       min_posts int(8) NOT NULL,
 	  admin_start_thema int(10) NOT NULL,
 	  user_posts int(8) NOT NULL,
+	  sort int(50) NOT NULL,
       PRIMARY KEY (id) );
 
       "); 
@@ -248,6 +271,9 @@ switch($do){
 	  ava_link varchar(500) NOT NULL,
 	  adm_recht int(5) NOT NULL,
 	  notice varchar(100) NOT NULL,
+	  style varchar(50) NOT NULL,
+	  last_ip varchar(80) NOT NULL,
+	  empfo varchar(150) NOT NULL,
       PRIMARY KEY (id) );
 
       "); 
@@ -280,10 +306,10 @@ switch($do){
 	  //Ende
 	  //Einfügen in Tabellen
 	  mysql_query("INSERT INTO config (erkennungscode, wert1, wert2, zahl1, zahl2) VALUES ('f2name2', 'Bigforum', 'Das Forum', '0', '0')");
-	  mysql_query("INSERT INTO config (erkennungscode, wert1, wert2, zahl1, zahl2) VALUES ('f2pnsignfs', '', '', '1', '1')");
+	  mysql_query("INSERT INTO config (erkennungscode, wert1, wert2, zahl1, zahl2) VALUES ('f2pnsignfs', 'images/logo_new.png', '', '1', '1')");
 	  mysql_query("INSERT INTO config (erkennungscode, wert1, wert2, zahl1, zahl2) VALUES ('f2closefs', 'Allgemeine Arbeiten', '', '1', '0')");
 	  mysql_query("INSERT INTO config (erkennungscode, wert1, wert2, zahl1, zahl2) VALUES ('f2imgadfs', 'images/old_post.png', 'images/new_post.png', '3', '0')");
-	  mysql_query("INSERT INTO config (erkennungscode, wert1, wert2, zahl1, zahl2) VALUES ('f2laengfs', 'images/bfav.ico', '', '10', '1')");
+	  mysql_query("INSERT INTO config (erkennungscode, wert1, wert2, zahl1, zahl2) VALUES ('f2laengfs', 'images/bfav.ico', 'brown', '10', '1')");
 	  mysql_query("INSERT INTO smilie (packet, images_path, abk1, abk2) VALUES ('1', 'brille.png', '8-)', '8)')");
 	  mysql_query("INSERT INTO smilie (packet, images_path, abk1, abk2) VALUES ('1', 'grine.png', ':)', ':-)')");
 	  mysql_query("INSERT INTO smilie (packet, images_path, abk1, abk2) VALUES ('1', 'lache.png', ':D', ':-D')");

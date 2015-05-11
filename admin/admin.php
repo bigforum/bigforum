@@ -98,10 +98,16 @@ xmlhttp.send(null);
 echo "<a href=?do=log_out>Aus Admin-Bereich ausloggen</a> | <a href='../index.php' target='_blank'>Foren-Übersicht</a>
 <center><b>Einstellung:</b>
 <select onChange=window.location.href=options[selectedIndex].value;>
-<option></option><option value=admin.php>Start</option><option value=?do=recht>Benutzer: Administratoren-Rechte</option><option value=?do=ver_user>Benutzer: Benutzer suchen</option>
+<option></option><option value=admin.php>Start</option>
+<option value=?do=recht>Benutzer: Administratoren-Rechte</option>
+<option value=?do=ver_user>Benutzer: Benutzer suchen</option>
 <option value=?do=sper_user>Benutzer: Gesperrte</option>
 <option value=?do=new_foren>Foren: Neues Forum</option>
-<option value=?do=ver_foren>Foren: Verwalte Foren</option><option value=?do=settings>Sonstiges: Foren-Einstellungen ändern</option><option value=?do=look_logs>Sonstiges: Log-Einträge</option>
+<option value=?do=ver_foren>Foren: Verwalte Foren</option>
+<option value=?do=settings>Sonstiges: Foren-Einstellungen ändern</option>
+<option value=?do=design>Sonstiges: Link in der Navigation</option>
+<option value=?do=look_logs>Sonstiges: Log-Einträge</option>
+<option value=?do=mods>Sonstiges: Mods/Addons Verwaltung</option>
 <option value=?do=new_warn>Sonstiges: Verwarnungsgründe</option>
 </select><hr style=\"border:1px dotted;\"></center><br>";
 
@@ -125,6 +131,49 @@ switch ($do) {
     user_online(true);
 	echo "</td></tr></table></td></tr></table><br><br>
 	<table class=braun width=50%><tr class=besch><td><b>Detailsbeschreibung</b></td></tr><tr><td> <table><tr><td><b>Foren-Version:</b></td><td>". VERSION ."</td></tr><tr><td><b>Forenentwickler:</b></td><td><a href=http://www.potterfreaks.de>Potterfans</a></td></tr></table> </td></tr></table>";
+  break;
+  
+  
+  case "mods":
+  //Mods die die funktion Admin beeinhalten
+  $mod = array("rules.php","last_posts.php");
+  $laeng = count($mod);
+  $x = "0";
+  echo "Hier hast du eine Verwaltungsmöglichkeit, aller installierten Mods, dieses Systems. Sofern dieser Mod, es zuläßt sich über das Admincp verwalten zu lassen.<br>Der Titel ist gleichzeitig der Dateiname.php<br><br>";
+  for($i=0;$i<$laeng;$i++)
+  {
+    if(file_exists("../$mod[$i]"))
+	{
+    $include_path = "../$mod[$i]";
+    include($include_path);
+	$name = str_replace(".php","",$mod[$i]);
+	echo "<fieldset><legend>$name</legend>";
+	admin();
+	echo "</fieldset>";
+	$x = "5";
+	}
+  }
+  if($x == "0")
+  {
+    echo "Keine Mods installiert, oder keine unterstützten eine Verwaltung über das Admincp.";
+  }
+  break;
+  
+  
+  case "design":
+
+  if($_GET["action"] == "insert")
+  {
+    mysql_query("UPDATE config SET wert2 = '$_POST[link]' WHERE erkennungscode LIKE 'f2closefs'");
+  }
+  $config_data = mysql_query("SELECT * FROM config WHERE erkennungscode LIKE 'f2closefs'");
+  $cd = mysql_fetch_object($config_data);
+  echo "<fieldset><legend>Link in die Navigation</legend>
+  Hier kannst du einen weiteren individuellen Link in der Navigation hinzufügen, ob fett, ob in einem neuem Fenster, es steht alles frei. Bitte verwende HTML, also <i>&#60;a href=http://blablabla.de target=_blank&#62;Angezeigter Text&#60;/a&#62;</i>:<br>
+  <form action=?do=design&action=insert method=post>
+  <input type=text name=link value='$cd->wert2' size=40><input type=submit value=Bestätigen>
+  </form>
+  </fieldset>";
   break;
   
   
@@ -255,6 +304,18 @@ switch ($do) {
   
   case "look_logs":
   admin_recht("2");
+  if($_GET["action"] == "del")
+  {
+    $log_dat = mysql_query("SELECT * FROM admin_logs");
+    while($ld = mysql_fetch_object($log_dat))
+	{
+	    if($_POST["$ld->id"] == "1")
+		{
+	      mysql_query("DELETE FROM admin_logs WHERE id LIKE '$ld->id'");
+		}
+	}
+	echo "Die ausgewählten Log-Einträge wurden gelöscht.";
+  }
   if(!isset($seite))
   {
     $seite = "1";
@@ -282,14 +343,15 @@ switch ($do) {
    } 
   echo ")</b></td></tr><tr><td>";
   $logs_hole = mysql_query("SELECT * FROM admin_logs ORDER BY id DESC LIMIT $start, $eintraege_pro_seite");
-  echo "<table>
-  <tr style=font-weight:bold><td>Benutzername</td><td>Zeitpunkt</td><td>Aktion</td><td>IP-Adresse</td></tr>";
+  echo "<form action=?do=look_logs&action=del method=post><table>
+  <tr style=font-weight:bold><td>Benutzername</td><td>Zeitpunkt</td><td>Aktion</td><td>IP-Adresse</td><td></td></tr>";
   while($lh = mysql_fetch_object($logs_hole))
   {
     $datum = date("d.m.Y - H:i", $lh->time);
-    echo "<tr><td> $lh->username </td><td> $datum </td><td> $lh->aktio </td><td> $lh->ipadr </td></tr>";
+    echo "<tr><td> $lh->username </td><td> $datum </td><td> $lh->aktio </td><td> $lh->ipadr </td><td><input type=checkbox name=$lh->id value=1></td></tr>";
   }
-  echo "</table>
+  echo "<tr><td></td><td></td><td></td><td></td><td><input type=submit value=Löschen></td></tr></table>
+  </form>
   </td></tr></table>";
   break;
   
@@ -335,14 +397,20 @@ switch ($do) {
 	  $gpackt = "images/new_1.png";
 	  $number = "3";
 	}
+	$config_wert = mysql_query("SELECT * FROM config WHERE erkennungscode LIKE 'f2laengfs'");
+    $con = mysql_fetch_object($config_wert); 
+	if($_POST["styl"] != $con->wert2)
+	{
+	  mysql_query("UPDATE users SET style = '$_POST[styl]'");
+	}
     check_data($_POST["fn"], "", "Bitte gebe einen Forum-Name ein.", "leer");
 	check_data($_POST["besch"], "", "Bitte gebe einen Foren-Beschreibung ein.", "leer");
     mysql_query("UPDATE config SET wert1 = '$_POST[fn]', wert2 = '$_POST[besch]' WHERE erkennungscode LIKE 'f2name2'");
-    mysql_query("UPDATE config SET zahl1 = '$_POST[sign]', zahl2 = '$_POST[pn]' WHERE erkennungscode LIKE 'f2pnsignfs'");
+    mysql_query("UPDATE config SET wert2 = '$_POST[logo]', zahl1 = '$_POST[sign]', zahl2 = '$_POST[pn]' WHERE erkennungscode LIKE 'f2pnsignfs'");
     mysql_query("UPDATE config SET wert1 = '$gpack', wert2 = '$gpackt', zahl1 = '$number' WHERE erkennungscode LIKE 'f2imgadfs'");   
     mysql_query("UPDATE config SET wert1 = '$_POST[clos_text]', zahl1 = '$_POST[close]' WHERE erkennungscode LIKE 'f2closefs'");   
-    mysql_query("UPDATE config SET wert1 = '$_POST[bfav]', zahl1 = '7', zahl2 = '$_POST[smilie]' WHERE erkennungscode LIKE 'f2laengfs'");   
-  echo "Danke, die Foreneinstellungen wurden geändert!";
+    mysql_query("UPDATE config SET wert1 = '$_POST[bfav]', wert2 = '$_POST[styl]', zahl1 = '7', zahl2 = '$_POST[smilie]' WHERE erkennungscode LIKE 'f2laengfs'");   
+    echo "Danke, die Foreneinstellungen wurden geändert!";
 	insert_log("Die Foreneinstellungen wurden überarbeitet.");
 	exit;
   }
@@ -351,8 +419,7 @@ switch ($do) {
     <form action=?do=settings&aktion=change method=post>
 	<table>
 	<tr><td>Forum-Name</td><td><input type=text name=fn size=40 value='". SITENAME ."'></td></tr>
-	<tr><td>Forum-Beschreibung</td><td><input type=text name=besch size=40 value='". BESCHREIBUNG ."'></td></tr>
-	<tr><td> &nbsp; </td><td> &nbsp; </td></tr>
+	<tr><td> &nbsp; </td><td><input type=hidden name=besch size=40 value='". BESCHREIBUNG ."'></td></tr>
 	<tr><td>Signatur-Erlauben</td><td> Ja<input type=radio name=sign value=1  onclick=\"javascript:info('')\"";  if(ZAHLE == "1")
   {
     echo "checked";
@@ -397,9 +464,28 @@ switch ($do) {
   {
     $packt = "<option value=2>Neues Packet</option><option value=1>Altes Packet</option>";
   }
-  echo "<tr><td>Smilie-Pack</td><td><select name=smilie>$packt</select>";
-  echo "<tr><td> &nbsp; </td><td> &nbsp; </td></tr>  
+  echo "<tr><td>Smilie-Pack</td><td><select name=smilie>$packt</select>
+  <tr><td> &nbsp; </td><td> &nbsp; </td></tr>";
+	if($con->wert2 == "blue")
+    {
+      $sty = "<option value=blue>Blau</option><option value=red>Rot</option><option value=brown>Braun</option><option value=green>Grün</option>";
+    }
+	if($con->wert2 == "brown")
+	{
+      $sty = "<option value=brown>Braun</option><option value=red>Rot</option><option value=blue>Blau</option><option value=green>Grün</option>";	
+	}
+    if($con->wert2 == "green")
+    {
+     	 $sty = "<option value=green>Grün</option><option value=red>Rot</option><option value=brown>Braun</option><option value=blue>Blau</option>"; 
+    }
+	if($con->wert2 == "red")
+    {
+      $sty = "<option value=red>Rot</option><option value=green>Grün</option><option value=brown>Braun</option><option value=blue>Blau</option>"; 
+    }
+  echo "<tr><td>Forum-Standart der Farbe:</td><td><select name=styl>$sty</select>
+  <tr><td> &nbsp; </td><td> &nbsp; </td></tr>  
   <tr><td> Bild-Adresse für Forum-Favicon </td><td> <input type=text name=bfav value=$con->wert1> </td></tr>  
+  <tr><td> Bild-Adresse für Forum-Logo</td><td><input type=text name=logo value='". WERTZ ."'></td></tr>
   <tr><td> &nbsp; </td><td> &nbsp; </td></tr>  ";
   
   $config_wert = mysql_query("SELECT * FROM config WHERE erkennungscode LIKE 'f2closefs'");
@@ -499,7 +585,7 @@ switch ($do) {
 	  }
 	  else
 	  {
-	    mysql_query("INSERT INTO foren (name, besch, kate, guest_see, min_posts, admin_start_thema, user_posts) VALUES ('$_POST[fname]', '$_POST[besch]', '$_POST[kat]', '$_POST[guest]', '$_POST[min_post]', '$_POST[admin]', '$_POST[ansus]')");
+	    mysql_query("INSERT INTO foren (name, besch, kate, guest_see, min_posts, admin_start_thema, user_posts, sort) VALUES ('$_POST[fname]', '$_POST[besch]', '$_POST[kat]', '$_POST[guest]', '$_POST[min_post]', '$_POST[admin]', '$_POST[ansus]', '$_POST[sort]')");
 	    echo "Das Forum wurde hinzugefügt.";
 		insert_log("Es wurde ein neues Forum hinzugefügt");
 	  }
@@ -508,9 +594,9 @@ switch ($do) {
     echo "<table class=braun width=80%><tr class=besch><td><b>Neues Forum erstellen</b></td></tr><tr><td>
 	<form action=?do=new_foren&action=insert method=post>
 	<table width=100%>
-	<tr><td width=50%>Kategorie oder Forum?</td><td><select name=foka><option value=kate>Kategorie</option><option value=foren>Forum</option></select></td></tr>
-	<tr><td>Name:</td><td><input type=text size=40 name=fname></td></tr>
-	<tr><td>Beschreibung:</td><td><input type=text size=40 name=besch></td></tr>
+	<tr><td width=50%>Kategorie oder Forum?</td><td><select name=foka><option value=kate>Kategorie</option><option value=foren>Forum</option>select></td></tr>
+	<tr><td>Name/Link-Text:</td><td><input type=text size=40 name=fname></td></tr>
+	<tr><td>Beschreibung/Link-Adresse:</td><td><input type=text size=40 name=besch></td></tr>
 	</table>
 	<br><b>Nachfolgende Eingaben werden nur bei einer Foren-Erstellung benötigt.</b><br><br>
 	<table width=100%>
@@ -524,7 +610,8 @@ switch ($do) {
 	<tr><td width=50%>Dürfen Gäste das Forum sehen?</td><td><select name=guest><option value=0>Ja</option><option value=1>Nein</option></td></tr>
 	<tr><td>Nur Administratoren dürfen Themen erstellen?</td><td><select name=admin><option value=1>Nein</option><option value=0>Ja</option></td></tr>
 	<tr><td>Dürfen Benutzer antworten?</td><td><select name=ansus><option value=0>Ja</option><option value=1>Nein</option></td></tr>
-	<tr><td>Wie viele Beiträge muss man haben, um Antworten erstellen zu können?</td><td><input type=text name=min_post></td></tr>
+	<tr><td>Wie viele Beiträge muss man haben, um Zugriff auf das Forum zu bekommen?</td><td><input type=text name=min_post></td></tr>
+	<tr><td>Sortierung, die Foren werden so geordnet, auf der Startseite</td><td><input type=text name=sort></td></tr>
 	</table><br>
 	<input type=submit value='Forum erstellen'>
 	</form>
@@ -686,17 +773,57 @@ switch ($do) {
   {
     if($_GET["done"] == "save")
 	{
-	  mysql_query("UPDATE foren SET name = '$_POST[name]', besch = '$_POST[besch]' WHERE id LIKE '$_GET[id]'");
+	  mysql_query("UPDATE foren SET name = '$_POST[name]', besch = '$_POST[besch]', kate = '$_POST[kate]', guest_see = '$_POST[guest]', admin_start_thema = '$_POST[admin]', user_posts = '$_POST[uspo]', min_posts = '$_POST[posts]', sort = '$_POST[sort]' WHERE id LIKE '$_GET[id]'");
 	  echo "Die Kategorie wurde nun geändert.<br><a href=?do=ver_foren>Zurück zur Foren-Verwaltung</a>";
 	  exit;
 	}
     $for_dat = mysql_query("SELECT * FROM foren WHERE id LIKE '$_GET[id]'");
 	$fd = mysql_fetch_object($for_dat);
+	if($fd->guest_see == "0")
+	{
+	  $gast = "<option value=0>Ja</option><option value=1>Nein</option>";
+	}
+	else
+	{
+	  $gast = "<option value=1>Nein</option><option value=0>Ja</option>";
+	}
+	if($fd->admin_start_thema == "1")
+	{
+	  $admth = "<option value=1>Nein</option><option value=0>Ja</option>";
+	}
+	else
+	{
+	  $admth = "<option value=0>Ja</option><option value=1>Nein</option>";
+	}
+	if($fd->user_posts == "1")
+	{
+	  $uspo = "<option value=1>Nein</option><option value=0>Ja</option>";
+	}
+	else
+	{
+	  $uspo = "<option value=0>Ja</option><option value=1>Nein</option>";
+	}
     echo "<table class=braun width=80%><tr class=besch><td><b>Forum verwalten - $fd->name</b></td></tr><tr><td>
 	<form action=?do=ver_foren&action=for&done=save&id=$_GET[id] method=post>
 	<table>
 	<tr><td>Name:</td><td><input type=text name=name value='$fd->name' size=40></td></tr>
 	<tr><td>Beschreibung:</td><td><input type=text name=besch value='$fd->besch' size=40></td></tr>
+	<tr><td>&nbsp;</td><td>&nbsp;</td></tr>
+	<tr><td>In welcher Kategorie?</td><td><select name=kate>";
+	$akt_kate = mysql_query("SELECT * FROM kate WHERE id LIKE '$fd->kate'");
+	$ak = mysql_fetch_object($akt_kate);
+	echo "<option value=$ak->id>$ak->name</option>";
+	$other_kate = mysql_query("SELECT * FROM kate WHERE id != '$fd->kate'");
+	while($ok = mysql_fetch_object($other_kate))
+	{
+	  echo "<option value=$ok->id>$ok->name</option>";
+	}
+	echo "</select></td></tr>
+	<tr><td>Dürfen Gäste das Forum sehen?</td><td><select name=guest>$gast</select></td></tr>
+	<tr><td>Nur Administratoren dürfen Themen erstellen?</td><td><select name=admin>$admth</select></td></tr>
+	<tr><td>Dürfen Benutzer antworten</td><td><select name=uspo>$uspo</select></td></tr>
+	<tr><td>Wie viele Beiträge muss man haben, um Zugriff auf das Forum zu bekommen?</td><td><input type=text name=posts value='$fd->min_posts'></td></tr>
+	<tr><td>Sortierung, die Foren werden so geordnet, auf der Startseite</td><td><input type=text name=sort value='$fd->sort'></td></tr>
 	</table>
 	<input type=submit value=Speichern>
 	</form>
@@ -707,7 +834,7 @@ switch ($do) {
   while($fr = mysql_fetch_object($foren_data))
   {
     echo "<b>$fr->name</b> <a href=?do=ver_foren&action=kate&id=$fr->id>[ bearbeiten ]</a> <a href=javascript:delkat($fr->id)>[ löschen ]</a><br>";
-	$for_date = mysql_query("SELECT * FROM foren WHERE kate = '$fr->id'");
+	$for_date = mysql_query("SELECT * FROM foren WHERE kate = '$fr->id' ORDER BY sort");
     while($fd = mysql_fetch_object($for_date))
     {
 	  echo "$fd->name  <a href=?do=ver_foren&action=for&id=$fd->id>[ bearbeiten ]</a> <a href=javascript:del($fd->id)>[ löschen ]</a><br>$fd->besch<br><br>";

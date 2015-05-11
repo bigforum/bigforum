@@ -25,6 +25,15 @@ a:hover, a:active
   border: 1px solid #000050;
   font-size: 15px;
 }
+.dark
+{
+   background: url(http://www.bfs.kilu.de/images/dark_table.png) repeat top;
+
+}
+.hell
+{
+   background: url(http://www.bfs.kilu.de/images/blue_table.png) repeat top;
+}
 .navi a:link
 {
 	color: #FFFFFF;
@@ -44,7 +53,23 @@ a:hover, a:active
 {
 	background: #E1E4F2;
 	color: #000000;
-        font-size: 15px;
+    font-size: 15px;
+}
+.titl
+{
+	background: #E1E4F2;
+	color: #000000;
+    font-size: 15px;
+    border: 1px solid #397BC6;
+}
+.bord
+{
+     border: 1px solid #000050;
+}
+.normal
+{
+    background: #397BC6;
+	color: black;
 }
 .tab
 {
@@ -68,6 +93,10 @@ a:hover, a:active
 .tabelbor
 {
   border: 1px solid #000050;
+}
+.post
+{
+  background: #E1E4F9;
 }
 legend
 {

@@ -1,9 +1,10 @@
 <?php
 //Wichtige Angaben für jede Datei!
 include_once("includes/functions.php");
+
+page_header();
 login();
 looking_page("main");
-page_header();
 include_once("includes/function_user.php");
 
 //Wichtige MySQL Abfrage, da bei manchen Anbietern ansonsten fehler kommen.
@@ -41,16 +42,16 @@ else
 <!-- Navigation -->
 
 <table width="100%">
-<tr><td bgcolor="#397BC6" color="snow">
+<tr><td class=normal color="snow">
 <b>Allgemeine Einstellungen</b></td></tr>
 <tr><td><a href="?do=change_pw">Passwort ändern</a></td></tr>
 <tr><td><a href="?do=set">Sonstige Einstellungen</a></td></tr>
-<tr><td bgcolor="#397BC6" color="snow">
+<tr><td class=normal color="snow">
 <b><a href="profil.php?id=<? echo $ud->id;?>"><font color=black>Profil</font></a></b></td></tr>
 <tr><td><a href="?do=profil">Mein Profil</a></td></tr>
 <tr><td><a href="?do=ava">Avatar</a></td></tr>
 <?php echo $sign; ?>
-<tr><td bgcolor="#397BC6" color="snow"><b>Private Nachricht</b></td></tr>
+<tr><td class=normal color="snow"><b>Private Nachricht</b></td></tr>
 <? echo $pn_anzeige; ?>
 </table>
 
@@ -156,6 +157,7 @@ if($do == "set")
 	  {
 	    $eintrag = mysql_query("UPDATE users SET pn_weiter = '0' WHERE username LIKE '". USER ."'");
 	  }
+	  mysql_query("UPDATE users SET style = '$_POST[sty]' WHERE username LIKE '". USER ."'");
 	  speicherung($eintrag, "Deine Einstellungen wurden überarbeitet.", "<b>Fehler:</b> Es gab einen Fehler bei der Speicherung der Einstellungen <a href=history.back()>Zurück</a>");
       page_close_table();
 	}
@@ -165,13 +167,37 @@ if($do == "set")
 	{
 	  $checked = "checked";
 	}
-    echo "<table width=100%><tr bgcolor=#397BC6><td><big><b>Allgemeine Einstellungen » Sonstige Einstellungen » </b> ".USER." </big></td></tr></table><br>
+	if($ud->style == "blue")
+    {
+      $sty = "<option value=blue>Blau</option><option value=red>Rot</option><option value=brown>Braun</option><option value=green>Grün</option>";
+    }
+    if($ud->style == "green")
+    {
+      $sty = "<option value=green>Grün</option><option value=red>Rot</option><option value=brown>Braun</option><option value=blue>Blau</option>"; 
+    }
+	if($ud->style == "red")
+	{
+      $sty = "<option value=red>Rot</option><option value=green>Grün</option><option value=brown>Braun</option><option value=blue>Blau</option>";  	
+	}
+	if($ud->style == "brown")
+	{
+      $sty = "<option value=brown>Braun</option><option value=red>Rot</option><option value=blue>Blau</option><option value=green>Grün</option>";	
+	}
+	elseif(!isset($sty))
+	{
+      $sty = "<option value=brown>Braun</option><option value=red>Rot</option><option value=blue>Blau</option><option value=green>Grün</option>";	
+	}
+    echo "<table width=100%><tr class=normal><td><big><b>Allgemeine Einstellungen » Sonstige Einstellungen » </b> ".USER." </big></td></tr></table><br>
 	<fieldset><legend>Private Nachrichten</legend>
 	<form action=?do=set&aktion=insert method=post>
 	<table>
 	<tr><td>Automatische Weiterleitung zu dem Posteingang, beim Mauskontakt, des blinkenden Textes \"Neue Nachrichten\" oben über deiner Navigationsliste.</td><td width=40%>
 	<input type=checkbox name=pn_weiter value=1 $checked></td></tr></table>
-	</fieldset><br>";
+	</fieldset><br>
+	<fieldset><legend>Design</legend>
+	<table><tr><td>
+    Welche Farbe soll dieses Forum haben?</td><td><select name=sty>$sty</select></selct></td></tr></table></fieldset>
+	<br>";
 	if($ud->notice != "" AND $ud->notice != "0")
 	{
 	  ?>
@@ -227,9 +253,9 @@ if($do == "pn_ein")
     page_close_table();
   }
   looking_page("look_pn");
-    echo "<table width=100%><tr bgcolor=#397BC6><td><big><b>Private Nachrichten » Eingang » </b> ".USER." </big></td></tr></table><br>";
+    echo "<table width=100%><tr class=normal><td><big><b>Private Nachrichten » Eingang » </b> ".USER." </big></td></tr></table><br>";
   $pn_data = mysql_query("SELECT * FROM prna WHERE emp LIKE '". USER ."' ORDER BY dat DESC");
-  echo "<table width=100%><tr style=font-weight:bold;  bgcolor=#e1e4f9><td width=70%>Betreff / Absenden</td><td>Datum</td></tr>";
+  echo "<table width=100%><tr style=font-weight:bold;  class=normal><td width=70%>Betreff / Absenden</td><td>Datum</td></tr>";
   while($pr = mysql_fetch_object($pn_data))
   {
     $betreff_pn = strip_tags($pr->betreff);
@@ -282,9 +308,9 @@ if($do == "pn_aus")
     page_close_table();
   }
   looking_page("look_pn");
-    echo "<table width=100%><tr bgcolor=#397BC6><td><big><b>Private Nachrichten » Eingang » </b> ".USER." </big></td></tr></table><br>";
+    echo "<table width=100%><tr class=normal><td><big><b>Private Nachrichten » Eingang » </b> ".USER." </big></td></tr></table><br>";
   $pn_data = mysql_query("SELECT * FROM prna WHERE abse LIKE '". USER ."' ORDER BY dat DESC");
-  echo "<table width=100%><tr style=font-weight:bold;  bgcolor=#e1e4f9><td width=70%>Betreff / Empfänger</td><td>Datum</td></tr>";
+  echo "<table width=100%><tr style=font-weight:bold;  class=normal><td width=70%>Betreff / Empfänger</td><td>Datum</td></tr>";
   while($pr = mysql_fetch_object($pn_data))
   {
     $datum = date("d.m.Y",$pr->dat);
@@ -321,7 +347,7 @@ page_close_table();
 
 }
 if($do == "change_pw") {
-echo "<table width=100%><tr bgcolor=#397BC6><td><big><b>Allgemeine Einstellungen » Passwort ändern » </b> ".USER." </big></td></tr></table><br>";
+echo "<table width=100%><tr class=normal><td><big><b>Allgemeine Einstellungen » Passwort ändern » </b> ".USER." </big></td></tr></table><br>";
 if($ac == ""){
 echo "<form action=?do=change_pw&aktion=change method=post>
 Bitte gebe zuerst dein aktuelles Passwort ein.<br>
@@ -356,7 +382,7 @@ if($ac == "change")
 }
 if($do == "profil")
 {
-  echo "<table width=100%><tr bgcolor=#397BC6><td><big><b>Profil » Mein Profil » </b> ".USER." </big></td></tr></table><br>";
+  echo "<table width=100%><tr class=normal><td><big><b>Profil » Mein Profil » </b> ".USER." </big></td></tr></table><br>";
   if($ac == "")
   {
     include_once("includes/function_user.php");

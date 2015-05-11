@@ -36,7 +36,7 @@ if($_GET["do"] == "send")
     else
       $search_res = mysql_query("SELECT * FROM beitrag WHERE verfas LIKE '%$aut%' AND text LIKE '%$_POST[schlu]%' ORDER BY id $fi LIMIT $lim")or die(mysql_error());
   }
-  echo "<table><tr bgcolor=#397bc6 style='font-weight:bold;'><td width=3%></td><td width=50% valign=center>Title</td><td width=20% valign=center>Autor</td></tr>";
+  echo "<table><tr class=normal style='font-weight:bold;'><td width=3%></td><td width=50% valign=center>Title</td><td width=20% valign=center>Autor</td></tr>";
  
   while($sr = mysql_fetch_object($search_res))
   {
@@ -52,7 +52,7 @@ if($_GET["do"] == "send")
       {
         $close = "<img src=images/th_open.png title='Thema ist geöffnet' width=80% height=80%>";
       }
-	  echo "<tr><td>$close</td><td><a href=thread.php?id=$sr->where_forum#$sr->id>Forum: $td->tit</a></td><td>$sr->verfas</td></tr>";
+	  echo "<tr><td>$close</td><td>Forum:<a href=thread.php?id=$sr->where_forum#$sr->id>$td->tit</a></td><td>$sr->verfas</td></tr>";
 	}
 	else
 	{

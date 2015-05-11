@@ -1,12 +1,19 @@
 <html>
 
 <head>
-<title><?php echo SITENAME;  if($username == "Gast") echo " - Gastzugang"; ?></title>
+<title><?php echo SITENAME;  if($username == "Gast"){ echo " - Gastzugang"; }?></title>
 <meta name="generator" content="bigforum <?php echo VERSION; ?>" />
 <meta name="description" content="<?php echo SITENAME. " - ". BESCHREIBUNG; 
 $config_datas = mysql_query("SELECT * FROM config WHERE erkennungscode LIKE 'f2laengfs'"); $cd = mysql_fetch_object($config_datas);?>" />
 <link rel="shortcut icon" href="<?php echo $cd->wert1;?>" type="image/x-icon">
-<link rel="stylesheet" type="text/css" href="style/style.css" />
+<link rel="stylesheet" type="text/css" href="style/<? 
+$user_data = mysql_query("SELECT * FROM users WHERE username LIKE '". USER ."'");
+$ud = mysql_fetch_object($user_data);
+if($ud->style == "")
+echo $cd->wert2;
+else
+echo $ud->style;
+?>style.css" />
 <script type="text/javascript" src="style/script.js"></script>
 </head>
 
@@ -21,28 +28,32 @@ $time = time();
 if($ud->gesperrt == "1" AND $ud->sptime > $time)
 {
   ?>
-  <center><table style="border: 1px solid rgb(0, 0, 80);" height="50%" width="50%">  
-<tbody><tr bgcolor="#397bc6"><td><font color="snow"><b>Fehler</b></font></td></tr>
+  <center><table class=bord height="50%" width="50%">  
+<tbody><tr class=normal><td><font color="snow"><b>Fehler</b></font></td></tr>
 	<tr><td align="center">Du wurdest aus diesem Forum ausgeschloßen. Dieses kann mehrere Gründe haben.<br>Deine Sperre läuft bis zum <?php echo date("d.m.Y - h:i", $ud->sptime); ?> </td></tr></tbody></table></center>
 	<?
   exit;
 }
 $config_datas = mysql_query("SELECT * FROM config WHERE erkennungscode LIKE 'f2closefs'");
 $cd = mysql_fetch_object($config_datas);
-if($cd->zahl1 == "0" AND $ud->adm_recht <= "5")
+if($cd->zahl1 == "0" AND $ud->adm_recht <= "5" AND $_SERVER['REQUEST_URI'] != "/login.php")
 {?>
-  <center><table style="border: 1px solid rgb(0, 0, 80);" height="50%" width="50%">  
-<tbody><tr bgcolor="#397bc6"><td><font color="snow"><b>Fehler</b></font></td></tr>
-	<tr><td align="center">Dieses Board wurde von einem Administrator geschloßen.<br><br>Grund für die Schließung: <? echo $cd->wert1; ?></td></tr></tbody></table></center>
+  <center><table class=bord height="50%" width="50%">  
+<tbody><tr class=normal><td><font color="snow"><b>Forum geschlossen</b></font></td></tr>
+	<tr><td align="center">Dieses Forum ist zur Zeit geschlossen und kann somit nicht benutzt werden. Lediglich ein Administrator hat Zugriff auf das Forum, dieser kann sich <a href="login.php">hier</a> einloggen.<br><br><b>Angegebener Grund für die Schließung:</b> <? echo $cd->wert1; ?></td></tr></tbody></table></center>
 <?
   exit;
 }
 ?>
-<table class="tabelbor" width="100%" height="20%"><tr><td width="70%">
-<big><b>&nbsp;<?php echo SITENAME; ?></b><br>&nbsp;<?php echo BESCHREIBUNG; ?></big></td>
+<table class="tabelbor" width="100%" height="8%"><tr><td width="70%">
+<?php
+$config_datas = mysql_query("SELECT * FROM config WHERE erkennungscode LIKE 'f2pnsignfs'");
+$cd = mysql_fetch_object($config_datas);
+echo "<a href=index.php><img src='$cd->wert2' border=0 title='". SITENAME ."' height=70%></a>";
+?></td>
 <td class="tab1" width="30%" valign="top">
 
-Willkommen, <span style="cursor: pointer;" onclick="window.location.href='profil.php?id=<?php echo $ud->id; ?>'"><?php echo $username; ?></span><?php if($username == "Gast"){?>
+Willkommen, <span style="cursor: pointer;" onclick="window.location.href='profil.php?id=<?php echo $ud->id; ?>'"><?php echo USER; ?></span><?php if($username == "Gast"){?>
 <p></p><form action="login.php?do=login" method="post"><table>
 <tr><td>Benutzername:</td><td><input type="text" name="user"></td></tr>
 <tr><td>Passwort:</td><td><input type="password" name="pw"></td></tr>
@@ -55,7 +66,7 @@ pn_zahl("header"); }
 
 </td></tr></table>
 
-<table class="navi" width="100%"><tr width="100%">
+<table width="100%" class="navi"><tr width="100%">
 <td><a href="index.php">Startseite</a></td>
 <?php if($username == "Gast") { ?>
 <td><a href="login.php">Login</a></td>
@@ -66,14 +77,20 @@ pn_zahl("header"); }
 <td><a href="javascript:logout()"><b>Abmelden</b></a></td>
 <? } ?>
 <td><a href="search.php">Suche</a></td>
-<? if(GROUP == "3") echo "<td><a href=admin/><b>Administrator-Kontrollzentrum</b></a></td>"; 
+<?php
+$config_data = mysql_query("SELECT * FROM config WHERE erkennungscode LIKE 'f2closefs'");
+$cd = mysql_fetch_object($config_data);
+if($cd->wert2 != "")
+{
+  echo "<td>$cd->wert2</td>";
+}
+if(GROUP == "3") echo "<td><a href=admin/><b>Administrator-Kontrollzentrum</b></a></td>"; 
 ?>
 </tr></table>
-<br>
 <?php
 if($ud->notice != "" AND $ud->notice != "0")
 {
-  echo "<table style='border: 1px solid rgb(0, 0, 80);' width=100%><tr><td><center> $ud->notice (<a href='javascript:info()'>Info</a>)</center></td></tr></table>";
+  echo "<br><table class=titl width=100%><tr><td><center> $ud->notice (<a href='javascript:info()'>Info</a>)</center></td></tr></table>";
 }
 ?>
 <br>

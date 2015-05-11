@@ -15,14 +15,11 @@ function anzeigen() {
 
 
 Bitte stimme den Nutzungsbedingungen des Forums zu, um einen Foren-Account zu erstellen:<br><br>
-<textarea cols=70 rows=7>Forenregeln
-
-1. Im Forum wird freundlich miteinander Umgegangen, sämtliche Beleidigungen werden mit einer Verwarnung gelöscht.
-2. Spam und/oder Doppelpostings sind untersagt und werden ebenfalls gelöscht.
-3. Allgemeine Werbung ist untersagt, genauso wie Werbung per PN
-
-
-Sollte jemand mehrere Regelverstöße machen, so wird dieser Account gesperrt.</textarea><br>
+<textarea cols=70 rows=7><?php
+$ausgabe = file_get_contents("rules.txt");
+echo $ausgabe;
+fclose($datei);
+?></textarea><br>
 <input type=button value="Ich halte mich an die Regeln" onclick="javascript:anzeigen();"> <input type=button value="Ich bin mit den Regeln nicht einverstanden" onclick="window.location.href='index.php'">
 </div>
 <div style="display: none;" id="zwei">
@@ -43,6 +40,13 @@ Sollte jemand mehrere Regelverstöße machen, so wird dieser Account gesperrt.</te
 <tr><td><input type=text name="mail"></td></tr>
 </table>
 </fieldset>
+<fieldset>
+<legend>Empfohlen von.. (optional)</legend>
+<table><tr><td>Du kannst im folgendem Feld angeben, wer dich geworben hat.</td></tr></table>
+<table><tr><td>Empfohlen von:</td></tr>
+<tr><td><input type=text name="empfo"></td></tr>
+</table>
+</fieldset>
 <input type=submit value="Registrierung Abschicken">
 </form>
 </div>
@@ -60,7 +64,7 @@ if($_GET["do"] == "reg")
   check_data($row, "", "Dieser Benutzername exestiert bereits", "null");
   $pw = md5($_POST["pw1"]);
   $time = time();
-  $eintrag = mysql_query("INSERT INTO users (username, posts, reg_dat, last_log, reg_ip, sign, group_id, pw, mail, rang, last_site, gesperrt, pn_weiter, ava_link) VALUES ('$_POST[user]', '0', '$time', '', '$_SERVER[REMOTE_ADDR]', '', '1', '$pw', '$_POST[mail]', 'Benutzer', '', '0', '1','')");
+  $eintrag = mysql_query("INSERT INTO users (username, posts, reg_dat, last_log, reg_ip, sign, group_id, pw, mail, rang, last_site, gesperrt, pn_weiter, ava_link, empfo) VALUES ('$_POST[user]', '0', '$time', '', '$_SERVER[REMOTE_ADDR]', '', '1', '$pw', '$_POST[mail]', 'Benutzer', '', '0', '1','','$_POST[empfo]')");
   speicherung($eintrag, "Danke, dein Benutzername wurde erfolgreich gespeichert.<br><a href=login.php>Nun aber einloggen</a>", "<b>Fehler:</b> Es gab einen Fehler bei der Speicherung des Benutzernamen.<br>Versuche es nochmal! <a href=javascript:history.back()>Zurück</a>");
 }
 page_footer();

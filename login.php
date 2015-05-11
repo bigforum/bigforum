@@ -3,7 +3,7 @@ include("includes/functions.php");
 if($_GET["do"] == "login")
 {
   connect_to_database();
-  $data = mysql_query("SELECT * FROM eins_users WHERE username LIKE '$_POST[user]'");
+  $data = mysql_query("SELECT * FROM users WHERE username LIKE '$_POST[user]'");
   $dr = mysql_fetch_object($data);
   $pw = md5($_POST["pw"]);
   if($dr->pw == $pw)
@@ -49,13 +49,13 @@ if($_GET["do"] == "")
 }
 if($_GET["do"] == "login")
 {
-  $data = mysql_query("SELECT * FROM eins_users WHERE username LIKE '$_POST[user]'");
+  $data = mysql_query("SELECT * FROM users WHERE username LIKE '$_POST[user]'");
   $dr = mysql_fetch_object($data);
   $pw = md5($_POST["pw"]);
   if($dr->pw == $pw)
   {
     $time = time();
-    mysql_query("UPDATE eins_users SET last_log = '$time' WHERE username LIKE '$dr->username'");
+    mysql_query("UPDATE users SET last_log = '$time' WHERE username LIKE '$dr->username'");
     echo "Erfolgreich eingeloggt.<br><a href=index.php>Zur Startseite</a>";
   }
   else

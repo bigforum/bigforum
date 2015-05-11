@@ -10,8 +10,16 @@ if($ac == "send")
   connect_to_database();
   include_once("includes/function_user.php");
   $time = time();
-  check_data($_POST["bet"], "", "Bitte gebe einen Titel ein.", "leer");
-  check_data($_POST["feld"], "", "Du hast keinen Text eingegeben.", "leer");
+  if($_POST["bet"] == "")
+  {
+    page_header();
+	erzeuge_error("Du musst schon einen Titel angeben.");
+  }
+  if($_POST["feld"] == "")
+  {
+    page_header();
+	erzeuge_error("Du hast keinen Text angegeben.");
+  }
     $close = "0";
 	$imp = "0";
   	if($_POST["close"] == "1")
