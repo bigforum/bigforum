@@ -1,7 +1,14 @@
 <?php
 //Wichtige Angaben für jede Datei!
 include("includes/functions.php");
-login();
+connect_to_database();
+$con_pro = mysql_query("SELECT * FROM config WHERE erkennungscode LIKE 'f2profs'");
+$cp = mysql_fetch_object($con_pro);
+if($cp->zahl2 != "1")
+{
+  login();
+}
+//Folgende Zeile behebt mögliche Fehler:
 page_header();
 include_once("includes/function_user.php");
 
@@ -70,7 +77,7 @@ $ac = $_GET["action"];
 	  
 	  Mit freundlichen Grüßen
 	  Das Foren-Team";
-	  mysql_query("INSERT INTO user_verwarn (user_id, grund, punkte, dauer, grundpn, von, wann) VALUE ('$_GET[id]', '$gho->grund', '$gho->punkte', '$dauer' ,'$_POST[spgr]', '". USER ."', '$time')");
+	  mysql_query("INSERT INTO user_verwarn (user_id, grund, punkte, dauer, grundpn, von, wann) VALUE ('$_GET[id]', '$gho->grund', '$gho->punkte', '$dauer' ,'$_POST[spgr]', '". USER ."', '$time')")or die(mysql_error());
 	  mysql_query("INSERT INTO prna (abse, emp, dat, betreff, mes, gel) VALUES ('". USER . "', '$udp->username', '$time', 'Sie haben eine Verwarnung erhalten', '$text', '0')")or die(mysql_error());
       echo "<meta http-equiv='refresh' content='1; URL=profil.php?id=$_GET[id]'>Dem Benutzer wurde(n) $gho->punkte Punkt(e) hinzugefügt.<br><br>Sollte die Weiterleitung nicht funktionieren <a href=profil.php?id=$_GET[id]>klicke hier</a><br><br><br>";
 	  page_footer();

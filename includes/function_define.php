@@ -8,9 +8,11 @@
   define("HOST", $HOST);
   define("MYSQLPASSWORT", $PW);
   define("MYSQLDB", $DB);
+  if($daten["wert1"] == "")
+    $daten["wert1"] = "Forum";
   define("SITENAME", $daten["wert1"]);
   define("BESCHREIBUNG", $daten['wert2']);
-  define("VERSION", "2.0 BETA");
+  define("VERSION", "2.1");
   
   //Ersetzte manche in Variablen
   $root = HAUPT;

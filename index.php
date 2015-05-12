@@ -86,6 +86,7 @@ while($fr = mysql_fetch_object($foren_data))
 	}
 	if($bd->verfas != "" OR $thd->verfas != "")
 	{
+	  $thd->tit = strip_tags($thd->tit);
 	  $anz = mysql_query("SELECT * FROM beitrag WHERE where_forum LIKE '$thd->id'");
 	  $anza = mysql_num_rows($anz);
 	  $rech = ceil($anza/10);
@@ -146,7 +147,9 @@ if($guest < 0)
   $user_online--;
 }
 
-echo "<br><table width=100% class=normal><tr><td><b><a href=online.php><font color=black>Wer ist online?</font></a></b> Es sind $user_online Besucher online ($meno Eingeloggte und $guest ";
+$online_all = $meno + $guest;
+
+echo "<br><table width=100% class=normal><tr><td><b><a href=online.php><font color=black>Wer ist online?</font></a></b> Es sind $online_all Besucher online ($meno Eingeloggte und $guest ";
 if($guest == "1")
 {
   echo "Gast";
@@ -160,7 +163,8 @@ user_online(false);
 echo "</td></tr></table><br>";
 
 //Abfragen für die Statistik
-$user_dat = mysql_query("SELECT * FROM users WHERE gesperrt = '0'");
+$time = time();
+$user_dat = mysql_query("SELECT * FROM users WHERE sptime < '$time'");
 $stat_use = mysql_num_rows($user_dat);
 
 $last_use = mysql_query("SELECT * FROM users WHERE gesperrt = '0' ORDER BY id DESC LIMIT 1");

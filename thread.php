@@ -174,7 +174,10 @@ if($id != "")
   
 $forum_data = mysql_query("SELECT * FROM foren WHERE id LIKE '$td->where_forum'");
 $fd = mysql_fetch_object($forum_data);
-
+if($ud->posts == "")
+{
+  $ud->posts = "0";
+}
 if($fd->min_posts > $ud->posts)
 {
   erzeuge_error("Du hast keine Berechtigungen auf dieses Thema. Dies kann mehrere Gründe haben.");
@@ -192,7 +195,7 @@ $menge = mysql_num_rows($cou);
 $wieviel = $menge / $eps;
 $ws = ceil($wieviel);
 
-echo "<table class=titl width=100%><tr><td>Du bist hier: <a href=index.php>". SITENAME ."</a> > <a href=forum.php?id=$fd->id>$fd->name</a> > <a href=thread.php?id=$_GET[id]>$td->tit</a></td></tr></table><br>";
+echo "<table class=titl width=100%><tr><td><table><tr><td>Du bist hier:</td><td><a href='index.php'>". SITENAME ."</a> > <a href='forum.php?id=$fd->id'>$fd->name</a></td></tr><tr><td></td><td><big><b>$td->tit</b></big></td></tr></table></td></tr></table><br>";
 answer_button($fd->user_posts, GROUP, $id, $td->close);
 if($ws > "1")
 {
@@ -204,18 +207,47 @@ if($ws == $seite)
 }
 echo "<table width=80%><tr><td align=right valign=right><table class=navi><tr><td>";
 echo "<font color=snow>Seite $seite von $ws &nbsp <a href=?id=$_GET[id]&page=$up><</a>";
+//Welche Seiten sollen angezeigt werden?
+$seiten = "0,1,2,3,5,10,25,50,100,150,250,500,750";
+$pa = array();
+//
 
+
+$z = explode(",", $seiten);
 for($a=0; $a < $wieviel; $a++)
 {
   $b = $a + 1;
-  if($seite == $b)
-  {
-    echo "  <b>$b</b> </font>";
-  }
-  else
-  {
-    echo "  <a href=\"?id=$_GET[id]&page=$b\">$b</a> ";
-  }
+  $q = "0";
+    while($q < count($z))
+	{
+	  $pa[] = $b;
+	  if($z[$q] == $b OR $seite == $b)
+	  {
+
+        if($seite == $b AND $q == "0")
+        {
+		  $min = $b - 1;
+		  $plu = $b + 1;
+		  if(!in_array($min,$z) AND $q == "0")
+		  {
+		    echo "  <a href=\"?id=$_GET[id]&page=$min\">$min</a> ";
+		  }
+          echo " <b>$b</b> </font>";
+		  if(!in_array($plu,$z) AND $q == "0" AND $ws != $seite)
+		  {
+		    echo "  <a href=\"?id=$_GET[id]&page=$plu\">$plu</a> ";
+		  }
+        }
+        else
+        {
+		  if($seite != $b)
+		  {
+            echo "  <a href=\"?id=$_GET[id]&page=$b\">$b</a> ";
+		  }
+        }
+	  }
+	$q++;
+	}
 }
 echo " <a href=?id=$_GET[id]&page=$down>></a></td></tr></table></td></tr>"; 
 }
@@ -277,18 +309,41 @@ if($ws > "1")
 {
 echo "<table width=80%><tr><td align=right valign=right><table class=navi><tr><td>";
 echo "<font color=snow>Seite $seite von $ws &nbsp <a href=?id=$_GET[id]&page=$up><</a>";
-
+$wvpe = $wieviel+1;
 for($a=0; $a < $wieviel; $a++)
 {
   $b = $a + 1;
-  if($seite == $b)
-  {
-    echo "  <b>$b</b> </font>";
-  }
-  else
-  {
-    echo "  <a href=\"?id=$_GET[id]&page=$b\">$b</a> ";
-  }
+  $q = "0";
+    while($q < count($z))
+	{
+	  $pa[] = $b;
+	  if($z[$q] == $b OR $seite == $b)
+	  {
+
+        if($seite == $b AND $q == "0")
+        {
+		  $min = $b - 1;
+		  $plu = $b + 1;
+		  if(!in_array($min,$z) AND $q == "0")
+		  {
+		    echo "  <a href=\"?id=$_GET[id]&page=$min\">$min</a> ";
+		  }
+          echo " <b>$b</b> </font>";
+		  if(!in_array($plu,$z) AND $q == "0" AND $ws != $seite)
+		  {
+		    echo "  <a href=\"?id=$_GET[id]&page=$plu\">$plu</a> ";
+		  }
+        }
+        else
+        {
+		  if($seite != $b)
+		  {
+            echo "  <a href=\"?id=$_GET[id]&page=$b\">$b</a> ";
+		  }
+        }
+	  }
+	$q++;
+	}
 }
 echo " <a href=?id=$_GET[id]&page=$down>></a></td></tr></table></td></tr></table>"; 
 }

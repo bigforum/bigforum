@@ -169,9 +169,9 @@ switch ($do) {
   $config_data = mysql_query("SELECT * FROM config WHERE erkennungscode LIKE 'f2closefs'");
   $cd = mysql_fetch_object($config_data);
   echo "<fieldset><legend>Link in die Navigation</legend>
-  Hier kannst du einen weiteren individuellen Link in der Navigation hinzufügen, ob fett, ob in einem neuem Fenster, es steht alles frei. Bitte verwende HTML, also <i>&#60;a href=http://blablabla.de target=_blank&#62;Angezeigter Text&#60;/a&#62;</i>:<br>
-  <form action=?do=design&action=insert method=post>
-  <input type=text name=link value='$cd->wert2' size=40><input type=submit value=Bestätigen>
+  Hier kannst du einen weiteren individuellen Link in der Navigation hinzufügen, ob fett, ob in einem neuem Fenster, es steht alles frei. Du kannst nur diesen Link in die Navi machen, d.h. wenn das Textfeld leer ist, wird auch kein Link angezeigt. Bitte verwende HTML, also:<br> <i>&#60;a href=http://blablabla.de target=_blank&#62;Angezeigter Text&#60;/a&#62;</i>:<br>
+  <form action=?do=design&action=insert method=post name=feld>
+  <input type=text name=link value='$cd->wert2' size=40><input type=submit value=Bestätigen><input type=button value='Textfeld leeren' onclick=\"feld.link.value=''\">
   </form>
   </fieldset>";
   break;
@@ -410,7 +410,8 @@ switch ($do) {
     mysql_query("UPDATE config SET wert1 = '$gpack', wert2 = '$gpackt', zahl1 = '$number' WHERE erkennungscode LIKE 'f2imgadfs'");   
     mysql_query("UPDATE config SET wert1 = '$_POST[clos_text]', zahl1 = '$_POST[close]' WHERE erkennungscode LIKE 'f2closefs'");   
     mysql_query("UPDATE config SET wert1 = '$_POST[bfav]', wert2 = '$_POST[styl]', zahl1 = '7', zahl2 = '$_POST[smilie]' WHERE erkennungscode LIKE 'f2laengfs'");   
-    echo "Danke, die Foreneinstellungen wurden geändert!";
+    mysql_query("UPDATE config SET zahl2 = '$_POST[pro]' WHERE erkennungscode LIKE 'f2profs'");   
+	echo "Danke, die Foreneinstellungen wurden geändert!";
 	insert_log("Die Foreneinstellungen wurden überarbeitet.");
 	exit;
   }
@@ -487,6 +488,19 @@ switch ($do) {
   <tr><td> Bild-Adresse für Forum-Favicon </td><td> <input type=text name=bfav value=$con->wert1> </td></tr>  
   <tr><td> Bild-Adresse für Forum-Logo</td><td><input type=text name=logo value='". WERTZ ."'></td></tr>
   <tr><td> &nbsp; </td><td> &nbsp; </td></tr>  ";
+  $config_wert = mysql_query("SELECT * FROM config WHERE erkennungscode LIKE 'f2profs'");
+  $con = mysql_fetch_object($config_wert); 
+  if($con->zahl2 == "1")
+  {
+    $prof_pack = "<input type=radio name=pro value=1 checked>Ja <input type=radio name=pro value=2>Nein";
+  }
+  if($con->zahl2 != "1")
+  {
+    $prof_pack = "<input type=radio name=pro value=1>Ja <input type=radio name=pro value=2 checked>Nein";
+  }
+  echo "
+  <tr><td>Gäste dürfen Profile sehen?</td><td>$prof_pack</td></tr>
+  <tr><td> &nbsp; </td><td> &nbsp </td></tr>";
   
   $config_wert = mysql_query("SELECT * FROM config WHERE erkennungscode LIKE 'f2closefs'");
   $con = mysql_fetch_object($config_wert); 
