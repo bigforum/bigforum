@@ -99,9 +99,9 @@ xmlhttp.send(null);
 <?
 echo "<table background=\"bgoben.png\" width=100%><tr><td><a href=?do=log_out>Aus Admin-Bereich ausloggen</a> | <a href='../index.php' target='_blank'>Foren-Übersicht</a><br>
 <center><h4><a href=\"admin.php\">Start</a> &nbsp; <a href=\"?do=ver_user\">Benutzer</a> &nbsp; <a href=\"?do=ver_foren\">Foren</a> &nbsp;<a href=\"?do=settings\">Einstellungen</a></td></tr></table>";
-$sons = array("?do=settings|Foren-Einstellungen","?do=design|Header-Einstellungen","?do=look_logs|Log-Einträge","?do=mods|Mods/Addons Verwaltung","?do=new_warn|Verwarnungsgründe","?do=adser|Adserver");
+$sons = array("?do=settings|Foren-Einstellungen","?do=design|Header-Einstellungen","?do=look_logs|Log-Einträge","?do=mods|Mods/Addons Verwaltung","?do=new_warn|Verwarnungsgründe","?do=adser|Adserver","?do=not_use|Benutzernamen / eMail-Adressen verbieten", "?do=rundbrief| Rundbrief schreiben");
 $for = array("?do=new_foren|Neues Forum","?do=ver_foren|Verwalte Foren");
-$user = array("?do=sper_user|Gesperrte","?do=ver_user|Benutzer suchen","?do=recht| Administratoren-Rechte");
+$user = array("?do=sper_user|Gesperrte","?do=ver_user|Benutzer suchen","?do=recht| Administratoren-Rechte","?do=zuruck|Rechte zurücksetzen");
 $start = array("admin.php|Start","?do=settings|Foren-Einstellungen","?do=look_logs|Log-Einträge ansehen","?do=new_foren|Neues Forum erstellen","?do=ver_user|Benutzer verwalten");
 
 switch ($do) {
@@ -258,6 +258,22 @@ switch ($do) {
 	   {
 	     $gruppe = "Gesperrter Benutzer";
 	   }
+	   if($uds->editrech == "2")
+	   {
+	     $editr = "checked";
+	   }
+	   else
+	   {
+	     $editf = "checked";
+	   }
+	   if($uds->htmlcan == "1")
+	   {
+	     $eeditr = "checked";
+	   }
+	   else
+	   {
+	     $eeditf = "checked";
+	   }
 	   echo "<table class=braun width=50%><tr class=besch><td><b>Benutzerverwaltung - $uds->username</b></td></tr><tr><td>
 	   
 	   <table>
@@ -273,7 +289,11 @@ switch ($do) {
 	   <b>Registriert seit (UNIX!):</b> </td><td> <input type=text name=reg value=$uds->reg_dat> (". date("d.m.Y", $uds->reg_dat).")</td></tr><tr><td>
 	   <b>Benutzergruppe(nid):</b> </td><td> $uds->group_id ( $gruppe )</td></tr><tr><td>
 	   <b>Notiz, die dem Benutzer im Header angezeigt wird:</b></td><td> <input type=text name=unot value='$uds->notice' </td></tr>
-	   &nbsp; </td></tr><tr><td>	
+	   &nbsp; </td></tr>
+	   <tr><td><b>Zeige Bearbeitet von... Bei Beitragsbearbeitung?</b></td><td><input type=radio name=editrech value=5 $editf>Ja <input type=radio name=editrech value=2 $editr> Nein</td></tr>
+	   <tr><td><b>Darf HTML in Beiträgen benutzen</b></td><td> <input type=radio name=htmlcan value=1 $eeditr>Ja <input type=radio name=htmlcan value=2 $eeditf> Nein</td></tr>
+	   <tr><td> &nbsp; </td><td> &nbsp; </td></tr>
+	   <tr><td>	
        <b>Gruppenzugehörigkeit</b> </td><td> Moderator: <input type=checkbox name=grup value=2 $mod_check><br>
 											Administrator: <input type=checkbox name=grup value=3 $adm_check></td></tr><tr><td>
 	   <b>Signatur</b></td><td><textarea name=sign rows=6 cols=60>$uds->sign</textarea></td></tr><tr><td>
@@ -285,6 +305,58 @@ switch ($do) {
 	   
        </td></tr></table>";
 	 }
+  break;
+  
+  case "zuruck":
+    left_table($user);
+  echo "Wähle aus, welche Recht du bei <b>allen</b> Benutzern zurücksetzen möchtest:<br><br>
+  <li><a href=?do=change_htmlcan>HTML Benutzen => Alle auf \"nein\" setzen</a>
+  <li><a href=?do=change_headern>Header-Notiz => Alle ausblenden</a>";
+  break;
+  
+  case "change_headern":
+    left_table($user);
+    mysql_query("UPDATE users SET notice = ''");
+    echo "Es wird nun keinem Benutzer mehr eine Notiz im Header angezeigt.";
+  break;
+  
+  case "change_htmlcan":
+    left_table($user);
+    mysql_query("UPDATE users SET htmlcan = '3'");
+    echo "Es wurde nun allen Benutzern verboten HTML zu benutzen.";
+  break;
+  
+  
+  case "not_use":
+      left_table($sons);
+	  if($_GET["action"] == "del")
+	  {
+	    mysql_query("DELETE FROM verbo WHERE id LIKE '$_GET[id]'");
+	    echo "<b>Information:</b> Die angegebene Sache wurde gelöscht.<br><br>";
+	  }
+	  if($_GET["action"] == "insert")
+	  {
+	    mysql_query("INSERT INTO verbo (name, benemail) VALUES ('$_POST[verbo]','$_POST[bemail]')");
+		echo "Danke, $_POST[name] wurde hinzugefügt.<br> <a href=?do=not_use>Zurück zur Übersicht</a>";
+	    exit;
+	  }
+	  $verho = mysql_query("SELECT * FROM verbo");
+	  echo "<table><tr><td>Verbot</td><td>Eigenschaft</td><td>Aktion</td></tr>";
+	  while($vh = mysql_fetch_object($verho))
+	  {
+	    if($vh->benemail == "1")
+		{
+		  $be = "eMail";
+		}
+		if($vh->benemail == "2")
+		{
+		  $be = "Benutzername";
+		}
+		echo "<tr><td>$vh->name</td><td>$be</td><td><a href=?do=not_use&action=del&id=$vh->id>Löschen</a></td>";
+	  }
+	  echo "</table><hr>
+	  <b>Neues Verbot von Benutzernamen / eMail-Adrsse hinzufügen:<br><br>
+	  <form action=?do=not_use&action=insert method=post><input type=text name=verbo><select name=bemail><option value=1>eMail-Adresse</option><option value=2>Benutzername</option></select><br><input type=submit value=Speichern></form>";
   break;
   
   
@@ -312,6 +384,8 @@ switch ($do) {
 			sign      = '$_POST[sign]',
 			website   = '$_POST[web]',
 			hob       = '$_POST[hob]',
+			editrech  = '$_POST[editrech]',
+			htmlcan   = '$_POST[htmlcan]',
 			adm_recht = '$uds->adm_recht' WHERE id LIKE '$_POST[id]'");
 	insert_log("Profil von $_POST[username] wurde geändert.");
   echo "Danke,<br> das Profil von $_POST[username] wurde erfolgreich überarbeitet.<br><br><a href=admin.php>Zurück zur Administratorern-Übersicht</a>";
@@ -971,6 +1045,47 @@ switch ($do) {
   echo "</table></td></tr></table>
   
   ";
+  break;
+  
+  
+  case "sendbrief":
+    left_table($sons);
+    admin_recht("2");
+	check_data($_POST["tit"], "", "Bitte gebe einen Titel ein.<br><a href='javascript:history.back()'>Zurück</a>", "leer");
+	check_data($_POST["mes"], "", "Bitte gebe eine Nachricht ein.<br><a href='javascript:history.back()'>Zurück</a>", "leer");
+	$time = time() - $_POST["days"];
+	$data_hol = mysql_query("SELECT * FROM users WHERE $time < last_log");
+	$usernamen = array("");
+	while($dh = mysql_fetch_object($data_hol))
+	{
+	  $time = time();
+	  mysql_query("INSERT INTO prna (abse, emp, dat, betreff, mes, gel) VALUES ('". USER . "', '$dh->username', '$time', '$_POST[tit]', '$_POST[mes]', '0')")or die(mysql_error());
+	  $usernamen[] = $dh->username;
+	}
+	$user = count($usernamen);
+	$user--;
+	echo "Danke, dieser Rundbrief wurde an ". count($usernamen)." Benutzer verschickt:<br><br>";
+	for($r=0;$r<count($usernamen);$r++)
+	{
+	  echo "$usernamen[$r]<br>";
+	}
+  break;
+  
+  case "rundbrief":
+    left_table($sons);
+    admin_recht("2");
+	echo "<table class='braun'><tbody><tr class='besch'><td><b>Rundbrief verfassen</b></td></tr><tr><td>
+	Mit den folgenden Feldern kannst du einen Rundbrief, also einen Brief an alle aktiven Mitglieder verfassen.<br>Um Datenbank-belastung auszuschließen, werden inaktive Benutzer von der Rundmail ausgeschlossen.<br><br>
+	<form action=?do=sendbrief method=post>
+	<small>Titel:</small><br>
+	<input type=text name=tit size=50><br><br>
+	<small>Nachricht:</small><br>
+	<textarea rows=5 cols=50 name=mes></textarea><br><br>
+	<small>Benutzer muss aktiv in den letzten</small><br>
+	<select name=days><option value=432000>5</option><option value=604800>7</option><option value=864000>10</option><option value=1209600>14</option></select>Tagen sein.<br><br>
+	<input type=submit value='Nachrichten verschicken'>
+	</form>
+	";
   break;
 }
 ?>

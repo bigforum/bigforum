@@ -426,6 +426,7 @@ function text_ausgabe($text, $betreff, $from)
   $text = preg_replace('/\[u\](.*?)\[\/u\]/', '<u>$1</u>', $text);  
   $text = preg_replace('/\[code\](.*?)\[\/code\]/', "<small style='display:block;'>Code:</small><table width=80% bgcolor=snow><tr><td>$1</td></tr></table>", $text);  
   $text = eregi_replace("\[url\]([^\[]+)\[/url\]","<a href=\"http://\\1\" target=\"_blank\">\\1</a>",$text);
+  $text = preg_replace('/\[url=([^ ]+).*\](.*)\[\/url\]/', '<a href="http://$1" target=\"_blank\">$2</a>', $text);  
   $text = eregi_replace("\[img\]([^\[]+)\[/img\]","<img src=\"\\1\" border=0>",$text);
   $text = preg_replace("/\[color=(.*)\](.*)\[\/color\]/Usi", "<font color=\"\\1\">\\2</font>", $text); 
   $text = preg_replace("/\[size=(.*)\](.*)\[\/size\]/Usi", "<font size=\"\\1\">\\2</font>", $text); 
@@ -473,8 +474,10 @@ if($fd->sign != "" AND $cd->zahl1 == "1")
   $text = preg_replace('/\[b\](.*?)\[\/b\]/', '<b>$1</b>', $text);  
   $text = preg_replace('/\[k\](.*?)\[\/k\]/', '<i>$1</i>', $text);  
   $text = preg_replace('/\[u\](.*?)\[\/u\]/', '<u>$1</u>', $text);  
-  $text = eregi_replace("\[url\]([^\[]+)\[/url\]","<a href=\"\\1\" target=\"_blank\">\\1</a>",$text);
+  $text = eregi_replace("\[url\]([^\[]+)\[/url\]","<a href=\"http://\\1\" target=\"_blank\">\\1</a>",$text);
+  $text = preg_replace('/\[url=([^ ]+).*\](.*)\[\/url\]/', '<a href="http://$1" target=\"_blank\">$2</a>', $text);  
   $text = str_replace("\n", "<br />", $text);
+  $text = str_replace("http://http://" ,"http://", $text);
   $config_wert = mysql_query("SELECT * FROM config WHERE erkennungscode LIKE 'f2laengfs'");
   $con = mysql_fetch_object($config_wert); 
   $smilie_data = mysql_query("SELECT * FROM smilie WHERE packet = '$con->zahl2'");

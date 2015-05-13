@@ -19,7 +19,7 @@ function schr(s)
   document.getElementById("schritt").innerHTML = s;
 }
 </script>
-<table width="100%"><tr><td width="90%"><b>Bigforum - Installationsassistent Schritt <span id=schritt></span>/6</b></td><td><b>Version: 3.0</b></td></tr></table>
+<table width="100%"><tr><td width="90%"><b>Bigforum - Installationsassistent Schritt <span id=schritt></span>/6</b></td><td><b>Version: 3.1</b></td></tr></table>
 <hr><br><br>
 <?php
 $do = $_GET["do"];
@@ -42,18 +42,7 @@ switch($do){
     mysql_connect($HOST,$USER,$PW)or die(mysql_error());
     mysql_select_db($DB)or die(mysql_error());
 	//MySQL - Datenbank änderungen	
-	mysql_query("ALTER TABLE users ADD provi int(50) NOT NULL");
-	mysql_query("INSERT INTO config (erkennungscode, wert1, wert2, zahl1, zahl2) VALUES ('f2adser2', '', '', '1', '0')"); //Zahl1 (1=aktiv 0=deakt)
-	  mysql_query("CREATE TABLE IF NOT EXISTS adser ( 
-
-      id INT(20) NOT NULL auto_increment,
-      bannerad varchar(150) NOT NULL,
-      link varchar(200) NOT NULL,
-      klicks int(7) NOT NULL,
-	  see int(9) NOT NULL,
-      PRIMARY KEY (id) );
-
-      "); 
+	mysql_query("ALTER TABLE users ADD editrech int(2) NOT NULL");
 	//Ende
     echo "Danke, das Forum wurde nun auf den neusten Stand gebracht.<br>Bitte lösche diese Datei, ansonsten kann jeder dieses Forum beschädigen!";
   break;

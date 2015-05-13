@@ -11,10 +11,19 @@ if($_GET["id"] == "")
 }
 if($_GET["aktion"] != "")
 {
+  $user_data = mysql_query("SELECT * FROM users WHERE username LIKE '". USER ."'");
+  $ud = mysql_fetch_object($user_data);
   $time = time();
   $edi = mysql_query("SELECT * FROM beitrag WHERE id LIKE '$_GET[id]'");
   $ed = mysql_fetch_object($edi);
-  mysql_query("UPDATE beitrag SET text = '$_POST[feld]', edit_by = '". USER ."', last_edit_dat = '$time' WHERE id LIKE '$_GET[id]'");
+  if($ud->editrech == "2")
+  {
+    mysql_query("UPDATE beitrag SET text = '$_POST[feld]' WHERE id LIKE '$_GET[id]'");  
+  }
+  else
+  {
+    mysql_query("UPDATE beitrag SET text = '$_POST[feld]', edit_by = '". USER ."', last_edit_dat = '$time' WHERE id LIKE '$_GET[id]'");
+  }
   echo "Danke, der Beitrag wurde überarbeitet.<br><br><a href=thread.php?id=$ed->where_forum#$ed->id>Zurück zum Thema</a><br><br>";
   page_footer();
   exit;

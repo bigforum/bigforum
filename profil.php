@@ -162,7 +162,7 @@ $ac = $_GET["action"];
   $tag = time() - $udp->reg_dat;
   $da = $tag/84600;
   $da = round($da);
-  if($udp->posts != "0")
+  if($udp->posts != "0" AND $da != "0")
   {
     $bei_tag = $udp->posts/$da;
     echo round($bei_tag, 2);
@@ -223,7 +223,7 @@ $ac = $_GET["action"];
       $text = str_replace($sd->abk1,"<img src=images/$sd->images_path width=25 height=25>", $text);
       $text = str_replace($sd->abk2,"<img src=images/$sd->images_path width=25 height=25>", $text);
     }
-    echo"<tr><td><b>Signatur</b></td></tr><tr><td>$text</td></tr>";
+    echo"<tr><td><b>Signatur</b></td></tr><tr><td></td><td>$text</td></tr>";
   }
   ?>
   
@@ -232,7 +232,7 @@ $ac = $_GET["action"];
   </td></tr></table>
   <?php
 }
-if((GROUP == "2" OR GROUP == "3") AND $ud->adm_recht >= $udp->adm_recht AND $ud->adm_recht != "6")
+if((GROUP == "2" OR GROUP == "3") AND $ud->adm_recht >= $udp->adm_recht)
 {
 ?><br>
   <table class="bord" width="100%"><tr class="dark"><td>
