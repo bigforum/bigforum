@@ -94,5 +94,25 @@ if($ud->notice != "" AND $ud->notice != "0")
 {
   echo "<br><table class=titl width=100%><tr><td><center> $ud->notice (<a href=# onmouseover=\"Tip('Dies ist eine Information, die von einem Administrator erstellt wurde. <br> Du kannst diese im Persönlichem Bereich unter \'Einstellungen\' ausblenden lassen.')\" onmouseout=\"UnTip()\">Info</a>)</center></td></tr></table>";
 }
+//AdServer
+$adal = mysql_query("SELECT * FROM config WHERE erkennungscode LIKE 'f2adser2'");
+$aa = mysql_fetch_object($adal);
+$out = "0";
+$no = explode(",",$aa->wert1);
+for($i=0;$i<count($no);$i++)
+{
+  if($no[$i] == $ud->id)
+  {
+    $out = "1";
+  }
+}
+if($aa->zahl1 == "1" AND $out == "0")
+{
+  $adhol = mysql_query("SELECT * FROM adser ORDER BY rand() LIMIT 1");
+  $ah = mysql_fetch_object($adhol);
+  mysql_query("UPDATE adser SET see = see+1 WHERE id LIKE '$ah->id'");
+  echo "<br><center><a href=misc.php?aktion=adser&id=$ah->id target=_blank><img src=$ah->bannerad border=0></a></center><br>";
+}
+// Ende AdServer
 ?>
 <br>

@@ -270,8 +270,22 @@ if($do == "pn_ein")
     page_close_table();
   }
   looking_page("look_pn");
-    echo "<table width=100%><tr class=normal><td><big><b>Private Nachrichten » Eingang » </b> ".USER." </big></td></tr></table><br>";
-  $pn_data = mysql_query("SELECT * FROM prna WHERE emp LIKE '". USER ."' ORDER BY dat DESC");
+  $seite = $_GET["page"];
+  if(!isset($seite) OR $seite == "0")
+  {
+    $seite = 1;
+  } 
+  $eps = "8";
+  
+  $start = $seite * $eps - $eps;
+  
+  
+  echo "<table width=100%><tr class=normal><td><big><b>Private Nachrichten » Eingang » </b> ".USER." </big></td></tr></table><br>";
+  $pn_data = mysql_query("SELECT * FROM prna WHERE emp LIKE '". USER ."' ORDER BY dat DESC LIMIT $start, $eps");
+  $pn_dataz = mysql_query("SELECT * FROM prna WHERE emp LIKE '". USER ."'");
+  $menge = mysql_num_rows($pn_dataz);
+  $wieviel = $menge / $eps;
+  $ws = ceil($wieviel);
   echo "<table width=100%><tr style=font-weight:bold;  class=normal><td width=70%>Betreff / Absenden</td><td>Datum</td></tr>";
   while($pr = mysql_fetch_object($pn_data))
   {
@@ -288,6 +302,60 @@ if($do == "pn_ein")
 	}
   }
   echo "</table>";
+    if($ws > "1")
+{
+$up = $seite - 1;
+$down = $seite + 1;
+if($ws == $seite)
+{
+  $down--;
+}
+echo "<table width=80%><tr><td align=right valign=right><table class=navi><tr><td>";
+echo "<font color=snow>Seite $seite von $ws &nbsp <a href=?do=pn_ein&page=$up><</a>";
+//Welche Seiten sollen angezeigt werden?
+$seiten = "0,1,2,3,5,10,25,50,100,150,250,500,750";
+$pa = array();
+//
+
+
+$z = explode(",", $seiten);
+for($a=0; $a < $wieviel; $a++)
+{
+  $b = $a + 1;
+  $q = "0";
+    while($q < count($z))
+	{
+	  $pa[] = $b;
+	  if($z[$q] == $b OR $seite == $b)
+	  {
+
+        if($seite == $b AND $q == "0")
+        {
+		  $min = $b - 1;
+		  $plu = $b + 1;
+		  if(!in_array($min,$z) AND $q == "0")
+		  {
+		    echo "  <a href=\"?do=pn_ein&page=$min\">$min</a> ";
+		  }
+          echo " <b>$b</b> </font>";
+		  if(!in_array($plu,$z) AND $q == "0" AND $ws != $seite)
+		  {
+		    echo "  <a href=\"?do=pn_ein&page=$plu\">$plu</a> ";
+		  }
+        }
+        else
+        {
+		  if($seite != $b)
+		  {
+            echo "  <a href=\"?do=pn_ein&page=$b\">$b</a> ";
+		  }
+        }
+	  }
+	$q++;
+	}
+}
+echo " <a href=?do=pn_ein&page=$down>></a></td></tr></table></td></tr>"; 
+}
 }
 if($do == "read_pn" AND $ac != "")
 {
@@ -324,9 +392,21 @@ if($do == "pn_aus")
     echo "Das Private Nachrichten System wurde von einem Administrator gesperrt!";
     page_close_table();
   }
+  $seite = $_GET["page"];
+  if(!isset($seite) OR $seite == "0")
+  {
+    $seite = 1;
+  } 
+  $eps = "8";
+
+  $start = $seite * $eps - $eps;
   looking_page("look_pn");
-    echo "<table width=100%><tr class=normal><td><big><b>Private Nachrichten » Eingang » </b> ".USER." </big></td></tr></table><br>";
-  $pn_data = mysql_query("SELECT * FROM prna WHERE abse LIKE '". USER ."' ORDER BY dat DESC");
+  echo "<table width=100%><tr class=normal><td><big><b>Private Nachrichten » Eingang » </b> ".USER." </big></td></tr></table><br>";
+  $pn_data = mysql_query("SELECT * FROM prna WHERE abse LIKE '". USER ."' ORDER BY dat DESC  LIMIT $start, $eps");
+  $pn_dataz = mysql_query("SELECT * FROM prna WHERE abse LIKE '". USER ."'");
+  $menge = mysql_num_rows($pn_dataz);
+  $wieviel = $menge / $eps;
+  $ws = ceil($wieviel);
   echo "<table width=100%><tr style=font-weight:bold;  class=normal><td width=70%>Betreff / Empfänger</td><td>Datum</td></tr>";
   while($pr = mysql_fetch_object($pn_data))
   {
@@ -335,6 +415,60 @@ if($do == "pn_aus")
     echo "<tr><td> <a href=?do=read_pn&aktion=$pr->id>$pr->betreff</a><br>$pr->emp</td><td>$datum<br>$uhrzeit</td></tr>";	
   }
   echo "</table>";
+  if($ws > "1")
+{
+$up = $seite - 1;
+$down = $seite + 1;
+if($ws == $seite)
+{
+  $down--;
+}
+echo "<table width=80%><tr><td align=right valign=right><table class=navi><tr><td>";
+echo "<font color=snow>Seite $seite von $ws &nbsp <a href=?do=pn_aus&page=$up><</a>";
+//Welche Seiten sollen angezeigt werden?
+$seiten = "0,1,2,3,5,10,25,50,100,150,250,500,750";
+$pa = array();
+//
+
+
+$z = explode(",", $seiten);
+for($a=0; $a < $wieviel; $a++)
+{
+  $b = $a + 1;
+  $q = "0";
+    while($q < count($z))
+	{
+	  $pa[] = $b;
+	  if($z[$q] == $b OR $seite == $b)
+	  {
+
+        if($seite == $b AND $q == "0")
+        {
+		  $min = $b - 1;
+		  $plu = $b + 1;
+		  if(!in_array($min,$z) AND $q == "0")
+		  {
+		    echo "  <a href=\"?do=pn_aus&page=$min\">$min</a> ";
+		  }
+          echo " <b>$b</b> </font>";
+		  if(!in_array($plu,$z) AND $q == "0" AND $ws != $seite)
+		  {
+		    echo "  <a href=\"?do=pn_aus&page=$plu\">$plu</a> ";
+		  }
+        }
+        else
+        {
+		  if($seite != $b)
+		  {
+            echo "  <a href=\"?do=pn_aus&page=$b\">$b</a> ";
+		  }
+        }
+	  }
+	$q++;
+	}
+}
+echo " <a href=?do=pn_aus&page=$down>></a></td></tr></table></td></tr>"; 
+}
 }
 if($do == "make_pn")
 {

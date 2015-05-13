@@ -19,7 +19,7 @@ function schr(s)
   document.getElementById("schritt").innerHTML = s;
 }
 </script>
-<table width="100%"><tr><td width="90%"><b>Bigforum - Installationsassistent Schritt <span id=schritt></span>/6</b></td><td><b>Version: 2.3</b></td></tr></table>
+<table width="100%"><tr><td width="90%"><b>Bigforum - Installationsassistent Schritt <span id=schritt></span>/6</b></td><td><b>Version: 3.0</b></td></tr></table>
 <hr><br><br>
 <?php
 $do = $_GET["do"];
@@ -42,6 +42,18 @@ switch($do){
     mysql_connect($HOST,$USER,$PW)or die(mysql_error());
     mysql_select_db($DB)or die(mysql_error());
 	//MySQL - Datenbank änderungen	
+	mysql_query("ALTER TABLE users ADD provi int(50) NOT NULL");
+	mysql_query("INSERT INTO config (erkennungscode, wert1, wert2, zahl1, zahl2) VALUES ('f2adser2', '', '', '1', '0')"); //Zahl1 (1=aktiv 0=deakt)
+	  mysql_query("CREATE TABLE IF NOT EXISTS adser ( 
+
+      id INT(20) NOT NULL auto_increment,
+      bannerad varchar(150) NOT NULL,
+      link varchar(200) NOT NULL,
+      klicks int(7) NOT NULL,
+	  see int(9) NOT NULL,
+      PRIMARY KEY (id) );
+
+      "); 
 	//Ende
     echo "Danke, das Forum wurde nun auf den neusten Stand gebracht.<br>Bitte lösche diese Datei, ansonsten kann jeder dieses Forum beschädigen!";
   break;
@@ -57,7 +69,7 @@ switch($do){
 	  <br><br>
 	  <form action=?do=install&s=2 method=post>
 	  <table>
-	  <tr><td>Host</td><td><input type=text name=host value='meistens localhost'></td></tr>
+	  <tr><td>Host (meistens localhost)</td><td><input type=text name=host value='localhost'></td></tr>
 	  <tr><td>Datenbank-Name</td><td><input type=text name=dbn></td></tr>
 	  <tr><td>Benutzername</td><td><input type=text name=benu></td></tr>
 	  <tr><td>Passwort</td><td><input type=password name=pw1></td></tr>
@@ -204,6 +216,17 @@ switch($do){
 
       "); 
 	  
+	  mysql_query("CREATE TABLE IF NOT EXISTS adser ( 
+
+      id INT(20) NOT NULL auto_increment,
+      bannerad varchar(150) NOT NULL,
+      link varchar(200) NOT NULL,
+      klicks int(7) NOT NULL,
+	  see int(9) NOT NULL,
+      PRIMARY KEY (id) );
+
+      "); 
+	  
 	  
 	  mysql_query("CREATE TABLE IF NOT EXISTS smilie ( 
 
@@ -261,6 +284,7 @@ switch($do){
 	  last_ip varchar(80) NOT NULL,
 	  empfo varchar(150) NOT NULL,
 	  statshow int(3) NOT NULL,
+	  provi int(50) Not NULL,
       PRIMARY KEY (id) );
 
       "); 
@@ -298,6 +322,7 @@ switch($do){
 	  mysql_query("INSERT INTO config (erkennungscode, wert1, wert2, zahl1, zahl2) VALUES ('f2closefs', 'Allgemeine Arbeiten', '', '1', '0')");
 	  mysql_query("INSERT INTO config (erkennungscode, wert1, wert2, zahl1, zahl2) VALUES ('f2imgadfs', 'images/old_post.png', 'images/new_post.png', '3', '0')");
 	  mysql_query("INSERT INTO config (erkennungscode, wert1, wert2, zahl1, zahl2) VALUES ('f2laengfs', 'images/bfav.ico', 'brown', '10', '1')");
+	  mysql_query("INSERT INTO config (erkennungscode, wert1, wert2, zahl1, zahl2) VALUES ('f2adser2', '', '', '1', '0')");
 	  mysql_query("INSERT INTO smilie (packet, images_path, abk1, abk2) VALUES ('1', 'brille.png', '8-)', '8)')");
 	  mysql_query("INSERT INTO smilie (packet, images_path, abk1, abk2) VALUES ('1', 'grine.png', ':)', ':-)')");
 	  mysql_query("INSERT INTO smilie (packet, images_path, abk1, abk2) VALUES ('1', 'lache.png', ':D', ':-D')");

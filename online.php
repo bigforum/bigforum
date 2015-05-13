@@ -11,6 +11,13 @@ if($order == "")
 {
   $order = "username";
 }
+if($_GET["ip"] != "" AND (GROUP == "2" OR GROUP == "3"))
+{
+  $ip_auf =  gethostbyaddr($_GET["ip"]);
+  echo "<table><tr class=normal><td><big>IP-Adressen auflösen</big></td></tr>
+  <tr><td><b>IP-Adresse:</b> $_GET[ip]<br><b>Aufgelöst:</b> &nbsp; $ip_auf</td></tr></table>";
+  page_footer();
+}
 
 $tauio = "900";
 $dtime = time() - $tauio;
@@ -28,7 +35,7 @@ while($od = mysql_fetch_object($online_data))
   echo "<tr><td><a href=profil.php?id=$od->id>$od->username</a></td><td>". date("H:i", $od->last_log) ."</td><td>$od->last_site</td>";
   if(GROUP == "2" OR GROUP == "3")
   {
-    echo "<td>$od->last_ip</td>";
+    echo "<td><a href=online.php?ip=$od->last_ip title='IP-Adressen auflösen'>$od->last_ip</a></td>";
   }
   echo "</tr>";
 }

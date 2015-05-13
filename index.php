@@ -237,7 +237,7 @@ if($cd->wert2 == "") { $cd->wert2 = "images/new_1.png"; }
 $userdata = mysql_query("SELECT * FROM users WHERE username LIKE '". USER ."'");
 $ud = mysql_fetch_object($userdata);
 echo "<table width=100% class=normal><tr><td><b>Statistiken</td></tr></table>";
-echo "<table width=100% bgcolor=#F2F2E5><tr><td><b>Themen:</b> $stat_them <b>Beitäge:</b> $stat_bei <b>Benutzer:</b> $stat_use<br>Wir begrüßen unser neustes Mitglied: <a href=profil.php?id=$last_use->id>$last_use->username</a></td></tr></table><br>";
+echo "<table width=100% bgcolor=#F2F2E5><tr><td><b>Themen:</b> $stat_them <b>Beiträge:</b> $stat_bei <b>Benutzer:</b> $stat_use<br>Wir begrüßen unser neustes Mitglied: <a href=profil.php?id=$last_use->id>$last_use->username</a></td></tr></table><br>";
 if($ud->statshow == "0")
 {
   $show = "<a href=\"javascript:ds()\">ausblenden</a>";

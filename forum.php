@@ -54,16 +54,26 @@ $them_meng = mysql_query("SELECT id FROM thema WHERE where_forum LIKE '$id'");
 $menge = mysql_num_rows($them_meng); 
 $wieviel_seiten = $menge / $eps; 
 
-if($fd->admin_start_thema == "0")
+if($fd->admin_start_thema == "2")
 {
-  if(GROUP == "3")
+  if(GROUP == "2" OR GROUP == "3")
   {
     echo "<a href=newtopic.php?id=$fd->id><img src=images/newtopic.png border=0 title=\"Neues Thema\" width=105 height=60></a>";
   }
 }
 else
 {
-  echo "<a href=newtopic.php?id=$fd->id><img src=images/newtopic.png border=0 title=\"Neues Thema\" width=105 height=60></a>";
+  if($fd->admin_start_thema == "0")
+  {
+    if(GROUP == "3")
+    {
+      echo "<a href=newtopic.php?id=$fd->id><img src=images/newtopic.png border=0 title=\"Neues Thema\" width=105 height=60></a>";
+    }
+  }
+  else
+  {
+    echo "<a href=newtopic.php?id=$fd->id><img src=images/newtopic.png border=0 title=\"Neues Thema\" width=105 height=60></a>";
+  }
 }
 
 echo "<table width=73% height=10% border=0 cellpadding=6 cellspacing=0><tr class=dark height=10%><td height=10%><font color=snow> <center> <b><big>$fd->name</big> - Themenübersicht</b> </center> </font></td></tr></table>";
@@ -200,16 +210,26 @@ for($a=0; $a < $wieviel; $a++)
 }
 echo " <a href=?id=$_GET[id]&page=$down>></a></td></tr></table></td></tr></table>"; 
 }
-if($fd->admin_start_thema == "0")
+if($fd->admin_start_thema == "2")
 {
-  if(GROUP == "3")
+  if(GROUP == "2" OR GROUP == "3")
   {
     echo "<a href=newtopic.php?id=$fd->id><img src=images/newtopic.png border=0 title=\"Neues Thema\" width=105 height=60></a>";
   }
 }
 else
 {
-  echo "<a href=newtopic.php?id=$fd->id><img src=images/newtopic.png border=0 title=\"Neues Thema\" width=105 height=60></a>";
+  if($fd->admin_start_thema == "0")
+  {
+    if(GROUP == "3")
+    {
+      echo "<a href=newtopic.php?id=$fd->id><img src=images/newtopic.png border=0 title=\"Neues Thema\" width=105 height=60></a>";
+    }
+  }
+  else
+  {
+    echo "<a href=newtopic.php?id=$fd->id><img src=images/newtopic.png border=0 title=\"Neues Thema\" width=105 height=60></a>";
+  }
 }
 
 //Wichtige Datein für den Footer

@@ -19,6 +19,10 @@ if(GROUP != "3" AND GROUP != "2")
 <b>Allgemeine Einstellungen</b></td></tr>
 <tr><td><a href="?do=spe_us">Gesperrte Benutzer</a></td></tr>
 <tr><td><a href="?do=search_user">Benutzer suchen</a></td></tr>
+<tr><td><a href="?do=mail_adr">eMail-Adressen raussuchen</a></td></tr>
+<tr><td class=normal color="snow">
+<b>IP-Adressen</b></td></tr>
+<tr><td><a href="?do=ip_auf">IP-Adresse auflösen</a></td></tr>
 </table>
 
 </td>
@@ -28,6 +32,33 @@ switch ($do) {
   case "":
   echo "Hallo ". USER .",<br> willkommen im Moderatoren-Kontrollzentrum.<br><br>";
   user_online(true);
+  break;
+  
+  case "mail_adr":
+  echo "<form action=?do=ma method=post>Gebe hier eine eMail-Adresse ein, und es werden dir alle Benutzer mit dieser eMail angezeigt.<br>
+  <input type=text name=mail><input type=submit value=Prüfen></form>";
+  break;
+  
+  
+  case "ma":
+  $maish = mysql_query("SELECT * FROM users WHERE mail LIKE '$_POST[mail]'");
+  if(mysql_num_rows($maish) == "0")
+  {
+    echo "Zur angegebenen eMail Adresse wurde leider kein Treffer gefunden.";
+	page_footer();
+  }
+  echo "Folgende Benutzer benutzen die Mail Adresse $_POST[mail]:<br><br>";
+  while($ms = mysql_fetch_object($maish))
+  {
+    echo "<a href=profil.php?id=$ms->id>$ms->username</a><br>";
+  }
+  break;
+  
+  
+  case "ip_auf":
+  echo "<form action=online.php method=get><fieldset><legend>IP-Adresse auflösen</legend>Bitte gebe in das folgende Kästchen die IP-Adresse ein, welche du auflösen möchtest:<br>
+  <input type=text name=ip><input type=submit value=Auflösen></fieldset>
+  </form>";
   break;
   
   
@@ -72,7 +103,8 @@ switch ($do) {
 	  exit;
 	}
 	$gesp = $time+$_POST["dauer"];
-	mysql_query("UPDATE users SET gesperrt = '1', sptime = '$gesp' WHERE username LIKE '$_POST[ben]'");
+	$spertime = ceil($gesp/600)*600;  
+	mysql_query("UPDATE users SET gesperrt = '1', sptime = '$spertime' WHERE username LIKE '$_POST[ben]'");
 	echo "$_POST[ben] wurde nun vom Forum ausgeschlossen.";
 	echo "<br> $tab";
     page_footer();
@@ -137,8 +169,8 @@ switch ($do) {
 	<tr><td>Benutzername:</td><td>$mu->username</td></tr>
 	<tr><td>Beiträge:</td><td>$mu->posts</td></tr>
 	<tr><td>Registrierungsdatum:</td><td>". date("d.m.Y - H:i", $mu->reg_dat) ."</td></tr>
-	<tr><td>Registrierungs IP-Adresse:</td><td>$mu->reg_ip</td></tr>
-	<tr><td>Letzte IP-Adresse:</td><td>$mu->last_ip</td></tr>
+	<tr><td>Registrierungs IP-Adresse:</td><td><a href=online.php?ip=$mu->reg_ip>$mu->reg_ip</a></td></tr>
+	<tr><td>Letzte IP-Adresse:</td><td><a href=online.php?ip=$mu->last_ip>$mu->last_ip</a></td></tr>
 	<tr><td>eMail-Adresse</td><td>$mu->mail</td></tr>
 	<tr><td>Empfohlen von:</td><td>$mu->empfo</td></tr>
 	<tr><td>Signatur</td><td>$text</td></tr></table>";

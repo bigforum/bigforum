@@ -60,7 +60,7 @@ if($_GET["do"] == "login")
   }
   else
   {
-    echo "Leider stimmen die Daten nicht überein.";
+    erzeuge_error("Die Daten stimmen nicht überein. Bitte Versuche es erneut");
   }
 }
 //Wichtige Datein für den Footer

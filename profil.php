@@ -2,6 +2,11 @@
 //Wichtige Angaben für jede Datei!
 include("includes/functions.php");
 connect_to_database();
+if($_COOKIE[$_GET["id"]] != $_GET["id"])
+{
+  mysql_query("UPDATE users SET provi = provi+1 WHERE id LIKE '$_GET[id]'");
+}
+setcookie($_GET["id"], $_GET["id"], time()+7200);
 $con_pro = mysql_query("SELECT * FROM config WHERE erkennungscode LIKE 'f2profs'");
 $cp = mysql_fetch_object($con_pro);
 if($cp->zahl2 != "1")
@@ -132,36 +137,28 @@ $ac = $_GET["action"];
     }
   }
   ?>
-  <table class="bord" width="100%"><tr class="dark"><td>
-  <b><big><font color="snow">Benutzerprofil von <?php echo $udp->username; ?></font></big></b></td></tr>
-  <tr><td>
-  <center><b><?php echo $udp->username; echo "</b>  ";
+  <table width="100%"><tr><td class="bord" width="30%" valign=top style="padding: 5px">
+  <b><?php echo $udp->username; echo "</b>  ";
   show_online($udp->last_log, $udp->username);
-  ?><br><?php echo $udp->rang; ?></center>
+  ?><br><?php echo $udp->rang; ?><br>
+  <?if($udp->ava_link != "")
+  {
+    echo "<img src=$udp->ava_link title=\"$udp->username's Avatar\" width=100 height=100>";
+  }?>
   
+  <br><br>
+  <a href="main.php?do=make_pn&amp;to=<?php echo $udp->username;?>"><img src="images/pn.png" border="0" height="16px" width="30px"> Private Nachricht schicken</a>
+  <br>
+  <br>
   <table width="100%" valign="top"><tr><td width="65%">
-  <?php
-  $rech = $udp->last_log - time();
-  $datum = date("d.m.Y",$udp->last_log);
-  $uhrzeit = date("H:i",$udp->last_log);
-  if($rech > "-901")
-  {
-  ?>
-  <b>Jetzt online:</b> <?php echo $udp->last_site; }
-  else{ 
-  $now = date("d.m.Y", time());
-  if($now == $datum)
-  {
-    $datum = "Heute";
-  }
-
-  echo "<b>Letzte Aktivität:</b> $datum um $uhrzeit"; }?><br>
-  <b>Registriert am:</b> <?php   
-  $datum = date("d.m.Y",$udp->reg_dat);
-  $uhrzeit = date("H:i",$udp->reg_dat);
-  echo "$datum";?><br><br>
-  <b>Beiträge:</b> <?php echo $udp->posts; ?><br>
-  <b>&#216; Beiträge/Tag:</b> <? 
+   <a href="search.php?do=send&us=<?php echo $udp->username; ?>&action=beitrag">Alle Beiträge</a> <br> <a href="search.php?do=send&us=<?php echo $udp->username; ?>&action=thema">Alle Themen</a>
+  </td>
+  </tr>
+  </table>
+  
+  </td><td><table><tr><td><b>Beiträge</b></td></tr>
+  <tr><td width="40%">Beiträge:</td><td><?php echo $udp->posts; ?></td></tr>
+  <tr><td width="40%">&#216; Beiträge/Tag:</td><td><? 
   $tag = time() - $udp->reg_dat;
   $da = $tag/84600;
   $da = round($da);
@@ -170,19 +167,45 @@ $ac = $_GET["action"];
     $bei_tag = $udp->posts/$da;
     echo round($bei_tag, 2);
   }
-  else { echo "0"; }  ?><br>
-  <br>
-  <b>Suche nach:</b> <a href="search.php?do=send&us=<?php echo $udp->username; ?>&action=beitrag">Allen Beiträgen</a> | <a href="search.php?do=send&us=<?php echo $udp->username; ?>&action=thema">Allen Themen</a>
-  </td><td valign=top>
-  <b>Website:</b> <a href="<? if(str_replace("http://www.", "www.", $udp->website))echo "http://$udp->website";  else echo $udp->website;?>" target="_blank"><? echo $udp->website; ?></a><br>
-  <b>Hobbys:</b> <? echo $udp->hob; ?><br><br>
-  <b>Kontakt:</b> <a href="main.php?do=make_pn&amp;to=<?php echo $udp->username;?>"><img src="images/pn.png" alt="<?php echo $udp->username;?> eine Private Nachricht schreiben" border="0" height="32px" width="60px"></a></td>
-  
-  </tr>
-  </table>
-  
-  </td></tr></table>
-  <?
+  else { echo "0"; }  ?></td></tr><tr><td>
+  <b>Über <? echo $udp->username; ?></b></td></tr>
+  <tr><td width="40%">Hobbys:</td><td> <? echo $udp->hob; ?></td></tr>
+  <tr><td width="40%">Website:</td><td><a href="<? if(str_replace("http://www.", "www.", $udp->website))echo "http://$udp->website";  else echo $udp->website;?>" target="_blank"><? echo $udp->website; ?></a></td></tr>
+  <tr><td>
+  <b>Andere Informationen</b></td></tr>
+    <?php
+  $rech = $udp->last_log - time();
+  $datum = date("d.m.Y",$udp->last_log);
+  $uhrzeit = date("H:i",$udp->last_log);
+  if($rech > "-901")
+  {
+  ?>
+  <tr><td width="40%">Jetzt online:</td><td width="60%"> <?php echo $udp->last_site; }
+  else{ 
+  $now = date("d.m.Y", time());
+  if($now == $datum)
+  {
+    $datum = "Heute";
+  }
+  if($datum == "01.01.1970")
+  {
+    $login = array(
+	         "login" => "Noch nie eingeloggt");
+  }
+  else
+  {
+    $login = array(
+			 "login" => "$datum um $uhrzeit");
+  }
+
+  echo "<tr><td width='40%'>Letzte Aktivität: </td><td> $login[login]"; }?></td></tr>
+  <tr><td width="40%">Registriert am:</td><td> <?php   
+  $datum = date("d.m.Y",$udp->reg_dat);
+  $uhrzeit = date("H:i",$udp->reg_dat);
+  echo "$datum";?></td></tr>
+  <tr><td>Empfehlungen:</td><td> <?php $empfh = mysql_query("SELECT * FROM users WHERE empfo LIKE '$udp->username'"); echo mysql_num_rows($empfh); ?> </td></tr>
+  <tr><td>Profilbesucher:</td><td> <?php echo $udp->provi; ?></td></tr>
+  <?php
   if($udp->sign != "")
   {
     $text = $udp->sign;
@@ -200,10 +223,16 @@ $ac = $_GET["action"];
       $text = str_replace($sd->abk1,"<img src=images/$sd->images_path width=25 height=25>", $text);
       $text = str_replace($sd->abk2,"<img src=images/$sd->images_path width=25 height=25>", $text);
     }
-    echo"<table class=bord width=100%><tr><td>$text</td></tr></table>";
+    echo"<tr><td><b>Signatur</b></td></tr><tr><td>$text</td></tr>";
   }
+  ?>
+  
+  </table><br><br>
+  <br>
+  </td></tr></table>
+  <?php
 }
-if((GROUP == "2" OR GROUP == "3") AND $ud->adm_recht >= $udp->adm_recht)
+if((GROUP == "2" OR GROUP == "3") AND $ud->adm_recht >= $udp->adm_recht AND $ud->adm_recht != "6")
 {
 ?><br>
   <table class="bord" width="100%"><tr class="dark"><td>

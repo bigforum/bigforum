@@ -99,7 +99,7 @@ xmlhttp.send(null);
 <?
 echo "<table background=\"bgoben.png\" width=100%><tr><td><a href=?do=log_out>Aus Admin-Bereich ausloggen</a> | <a href='../index.php' target='_blank'>Foren-Übersicht</a><br>
 <center><h4><a href=\"admin.php\">Start</a> &nbsp; <a href=\"?do=ver_user\">Benutzer</a> &nbsp; <a href=\"?do=ver_foren\">Foren</a> &nbsp;<a href=\"?do=settings\">Einstellungen</a></td></tr></table>";
-$sons = array("?do=settings|Foren-Einstellungen","?do=design|Header-Einstellungen","?do=look_logs|Log-Einträge","?do=mods|Mods/Addons Verwaltung","?do=new_warn|Verwarnungsgründe");
+$sons = array("?do=settings|Foren-Einstellungen","?do=design|Header-Einstellungen","?do=look_logs|Log-Einträge","?do=mods|Mods/Addons Verwaltung","?do=new_warn|Verwarnungsgründe","?do=adser|Adserver");
 $for = array("?do=new_foren|Neues Forum","?do=ver_foren|Verwalte Foren");
 $user = array("?do=sper_user|Gesperrte","?do=ver_user|Benutzer suchen","?do=recht| Administratoren-Rechte");
 $start = array("admin.php|Start","?do=settings|Foren-Einstellungen","?do=look_logs|Log-Einträge ansehen","?do=new_foren|Neues Forum erstellen","?do=ver_user|Benutzer verwalten");
@@ -132,7 +132,7 @@ switch ($do) {
   admin_recht("4");
   left_table($sons);
   //Mods die die funktion Admin beeinhalten
-  $mod = array("rules.php","last_posts.php");
+  $mod = array("rules.php","last_posts.php","chat.php");
   $laeng = count($mod);
   $x = "0";
   echo "Hier hast du eine Verwaltungsmöglichkeit, aller installierten Mods, dieses Systems. Sofern dieser Mod, es zuläßt sich über das Admincp verwalten zu lassen.<br>Der Titel ist gleichzeitig der Dateiname.php<br><br>";
@@ -651,7 +651,7 @@ switch ($do) {
 	}
 	echo "</select></td></tr>
 	<tr><td width=50%>Dürfen Gäste das Forum sehen?</td><td><select name=guest><option value=0>Ja</option><option value=1>Nein</option></td></tr>
-	<tr><td>Nur Administratoren dürfen Themen erstellen?</td><td><select name=admin><option value=1>Nein</option><option value=0>Ja</option></td></tr>
+	<tr><td>Nur Administratoren dürfen Themen erstellen?</td><td><select name=admin><option value=1>Nein</option><option value=0>Ja</option><option value=2>Moderatoren und Administratoren</option></td></tr>
 	<tr><td>Dürfen Benutzer antworten?</td><td><select name=ansus><option value=0>Ja</option><option value=1>Nein</option></td></tr>
 	<tr><td>Wie viele Beiträge muss man haben, um Zugriff auf das Forum zu bekommen?</td><td><input type=text name=min_post></td></tr>
 	<tr><td>Sortierung, die Foren werden so geordnet, auf der Startseite</td><td><input type=text name=sort></td></tr>
@@ -836,11 +836,15 @@ switch ($do) {
 	}
 	if($fd->admin_start_thema == "1")
 	{
-	  $admth = "<option value=1>Nein</option><option value=0>Ja</option>";
+	  $admth = "<option value=1>Nein</option><option value=0>Ja</option><option value=2>Administratoren und Moderatoren</option>";
 	}
-	else
+	if($fd->admin_start_thema == "0")
 	{
-	  $admth = "<option value=0>Ja</option><option value=1>Nein</option>";
+	  $admth = "<option value=0>Ja</option><option value=1>Nein</option><option value=2>Administratoren und Moderatoren</option>";
+	}
+	if($fd->admin_start_thema == "2")
+	{
+	  $admth = "<option value=2>Administratoren und Moderatoren</option><option value=0>Ja</option><option value=1>Nein</option>";
 	}
 	if($fd->user_posts == "1")
 	{
@@ -887,6 +891,86 @@ switch ($do) {
 	  echo "$fd->name  <a href=?do=ver_foren&action=for&id=$fd->id>[ bearbeiten ]</a> <a href=javascript:del($fd->id)>[ löschen ]</a><br>$fd->besch<br><br>";
 	}
   }
+  break;
+  
+  
+  
+  case "adser":
+  left_table($sons);
+  admin_recht("3");
+  $adal = mysql_query("SELECT * FROM config WHERE erkennungscode LIKE 'f2adser2'");
+  $aa = mysql_fetch_object($adal);
+  if($_GET["aktion"] == "save")
+  {
+    mysql_query("UPDATE config SET wert1 = '$_POST[notsee]', zahl1 = '$_POST[akti]' WHERE erkennungscode LIKE 'f2adser2'");
+	echo "Die AdServer-Einstellungen wurden geändert.";
+	exit;
+  }
+  if($_GET["aktion"] == "insert")
+  {
+    if($_POST["bannerli"] == "" OR $_POST["link"] == "")
+	{
+	  echo "Bitte fülle die Bild-Adresse genauso wie die Link-Adresse aus.";
+	  exit;
+	}
+    mysql_query("INSERT INTO adser (bannerad, link, klicks, see) VALUES ('$_POST[bannerli]', '$_POST[link]', '0', '0')");
+	echo "Der Link wurde erfolgreich hinzugefügt.";
+    exit;
+  }
+  if($_GET["del"] != "")
+  {
+    mysql_query("DELETE  FROM adser WHERE id LIKE '$_GET[del]'");
+    echo "Eintrag wurde erfolgreich gelöscht.";
+	exit;
+  }
+  if($aa->zahl1 == "1")
+  {
+    //Adserver ist aktiviert
+	$akt = "checked";
+    $dea = "";
+  }
+  else
+  {
+    //Adserver ist aktiviert
+	$akt = "";
+    $dea = "checked";
+  }
+  echo "<table class='braun'><tbody><tr class='besch'><td><b>AdServer Einstellungen festlegen.</b></td></tr><tr><td>
+  <form action=?do=adser&aktion=save method=post>
+  <table>
+  <tr><td>AdServer ist aktiviert</td><td><input type=radio name=akti value=1 $akt>Ja <input type=radio name=akti value=0 $dea>Nein</td></tr>
+  <tr><td>Trage in das folgende Kästchen die Benutzerid ein,<br>
+  die den AdServer nicht sehen.<br>(Mit Komma Trennen ohne Leerzeichen! 2,5,9,7)</td><td><input type=text name=notsee value='$aa->wert1' size=40></td></tr>
+  </table>
+  <input type=submit value=Speichern>
+  </form>
+  </td></tr></table>
+  
+  <br>
+  
+  <table class='braun'><tbody><tr class='besch'><td><b>Links hinzufügen</b></td></tr><tr><td>
+  <form action=?do=adser&aktion=insert method=post>
+  <table>
+  <tr><td> Gebe hier die Grafik-Adresse des Banners ein </td><td> <input type=text name=bannerli size=32> </td></tr>
+  <tr><td> Gebe hier den Link ein, auf den der Banner verweisen soll: </td><td> <input type=text name=link size=32 value='http://'> </td></tr>
+  </table>
+  <input type=submit value=Speichern>
+  </form>
+  </td></tr></table>
+  
+  <br>
+  <table class='braun'><tbody><tr class='besch'><td><b>Links im Adserver</b></td></tr><tr><td>
+  <table>
+  <tr><td>Link-Adresse</td><td>Gesehen</td><td>Klicks</td><td>Aktionen</td></tr>";
+  $addaho = mysql_query("SELECT * FROM adser");
+  while($adh = mysql_fetch_object($addaho))
+  {
+    echo "<tr><td>$adh->link</td><td>$adh->see</td><td>$adh->klicks</td><td><a href=?do=adser&del=$adh->id>Löschen</a></tr>";
+  }
+  
+  echo "</table></td></tr></table>
+  
+  ";
   break;
 }
 ?>

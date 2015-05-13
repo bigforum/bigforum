@@ -8,7 +8,8 @@ if($_SERVER['PHP_SELF'] == "modcp.php" OR $_SERVER['PHP_SELF'] == "/modcp.php")
 }
 ?>
 <br>Es ist jetzt  <span id="uhr"><?php echo date("H:i", time()); ?></span>.<br>
-<center>&copy; by <a href="http://www.potterfans.npage.de">Potterfans</a><br>
-Version <strong> <?php echo VERSION; ?> </strong> </center>
+<center>&copy; by <a href="http://www.bfs.kilu.de" target="_blank">Bigforum-Team</a>
+(Version: <?php echo VERSION; ?> )<br>
+2008 - <?php echo date("Y", time()); ?></center>
 </body>
 </html>
