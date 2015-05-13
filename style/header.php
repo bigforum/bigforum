@@ -14,11 +14,13 @@ echo $cd->wert2;
 else
 echo $ud->style;
 ?>style.css" />
-<script type="text/javascript" src="style/script.js"></script>
+
+
 </head>
 
 <body onLoad="uhrzeit('jetzt'); setInterval('uhrzeit()', 1000)">
-
+<script type="text/javascript" src="style/wz_tooltip.js"></script>
+<script type="text/javascript" src="style/script.js"></script>
 <table class="bgt" width="100%" height="*">
   <tr valign="top">
     <td  style="padding-left:5px">
@@ -90,7 +92,7 @@ if(GROUP == "3") echo "<td><a href=admin/><b>Administrator-Kontrollzentrum</b></
 <?php
 if($ud->notice != "" AND $ud->notice != "0")
 {
-  echo "<br><table class=titl width=100%><tr><td><center> $ud->notice (<a href='javascript:info()'>Info</a>)</center></td></tr></table>";
+  echo "<br><table class=titl width=100%><tr><td><center> $ud->notice (<a href=# onmouseover=\"Tip('Dies ist eine Information, die von einem Administrator erstellt wurde. <br> Du kannst diese im Persönlichem Bereich unter \'Einstellungen\' ausblenden lassen.')\" onmouseout=\"UnTip()\">Info</a>)</center></td></tr></table>";
 }
 ?>
 <br>

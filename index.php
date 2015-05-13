@@ -3,6 +3,61 @@
 include("includes/functions.php");
 page_header();
 looking_page("index");
+if(USER != "")
+{
+//Wenn der Benutzer eingeloggt ist, für Gäste ist die Funktion sinnlos, kann er die untere Statiistik ausblenden
+?>
+<script>
+try {
+xmlhttp = new ActiveXObject("Msxml2.XMLHTTP");
+} catch(e) {
+try {
+xmlhttp = new ActiveXObject("Microsoft.XMLHTTP");
+} catch(e) {
+xmlhttp=false;
+}
+}
+
+if(!xmlhttp && typeof XMLHttpRequest != 'undefined') {
+xmlhttp = new XMLHttpRequest();
+}
+
+ 
+ 
+ 
+function ss() {
+xmlhttp.open("GET", 'index.php?do=ss');
+ if (document.getElementById("zwei").style.display=='none') {
+  document.getElementById("zwei").style.display='block';
+  }
+ else {
+  document.getElementById("zwei").style.display='none';
+ }
+xmlhttp.send(null);
+}
+function ds() {
+ if (document.getElementById("eins").style.display=='none') {
+  document.getElementById("eins").style.display='block';
+ }
+ else {
+  document.getElementById("eins").style.display='none';
+ }
+
+xmlhttp.open("GET", 'index.php?do=ds');
+xmlhttp.send(null);
+}
+
+</script>
+<?php
+if($_GET["do"] == "ss")
+{
+  mysql_query("UPDATE users SET statshow = '0' WHERE username LIKE '". USER ."'");
+}
+if($_GET["do"] == "ds")
+{
+  mysql_query("UPDATE users SET statshow = '1' WHERE username LIKE '". USER ."'");
+}
+}
 $stat_them = "0";
 $stat_bei = "0";
 $user_data = mysql_query("SELECT * FROM users WHERE username LIKE '". USER ."'");
@@ -167,7 +222,9 @@ $time = time();
 $user_dat = mysql_query("SELECT * FROM users WHERE sptime < '$time'");
 $stat_use = mysql_num_rows($user_dat);
 
-$last_use = mysql_query("SELECT * FROM users WHERE gesperrt = '0' ORDER BY id DESC LIMIT 1");
+$time = time();
+
+$last_use = mysql_query("SELECT * FROM users WHERE sptime < '$time' ORDER BY id DESC LIMIT 1");
 $last_use = mysql_fetch_object($last_use);
 
 $config_datas = mysql_query("SELECT * FROM config WHERE erkennungscode LIKE 'f2imgadfs'");
@@ -175,10 +232,43 @@ $cd = mysql_fetch_object($config_datas);
 
 if($cd->wert1 == "") { $cd->wert1 = "images/old_1.png"; }
 if($cd->wert2 == "") { $cd->wert2 = "images/new_1.png"; }
-	
-echo "<table width=100% class=normal><tr><td><b>Statistiken.</td></tr></table>";
-echo "<table width=100% bgcolor=#F2F2E5><tr><td><b>Themen:</b> $stat_them <b>Beitäge:</b> $stat_bei <b>Benutzer:</b> $stat_use<br>Wir begrüßen unser neustes Mitglied: <a href=profil.php?id=$last_use->id>$last_use->username</a></td></tr></table><br>
-<center><img src=$cd->wert1 width=40 height=40> <small>Keine neuen Beiträge</small>  &nbsp; &nbsp; <img src=$cd->wert2 width=40 height=40> <small>Neue Beiträge</small></center><br>";
+$userdata = mysql_query("SELECT * FROM users WHERE username LIKE '". USER ."'");
+$ud = mysql_fetch_object($userdata);
+echo "<table width=100% class=normal><tr><td><b>Statistiken</td></tr></table>";
+echo "<table width=100% bgcolor=#F2F2E5><tr><td><b>Themen:</b> $stat_them <b>Beitäge:</b> $stat_bei <b>Benutzer:</b> $stat_use<br>Wir begrüßen unser neustes Mitglied: <a href=profil.php?id=$last_use->id>$last_use->username</a></td></tr></table><br>";
+if($ud->statshow == "0")
+{
+  $show = "<a href=\"javascript:ds()\">ausblenden</a>";
+  $einb = "n";
+}
+else
+{
+  $show = "<a href=\"javascript:ss()\">einblenden</a>";
+  $einb = "j";
+}
+$stat = "";
+$conda = mysql_query("SELECT * FROM config WHERE erkennungscode LIKE 'f2profs'");
+$codd = mysql_fetch_object($conda);
+if($codd->wert1 == "j")
+{
+  echo "<table width=100% class=normal><tr><td><b>Weitere Statistiken ($show)</td></tr></table>";
+  if($ud->statshow == "0" OR $ud->username == "")
+  {
+    if($einb != "j")
+    {
+      show_stat("j");
+    }
+  }
+  elseif($einb == "j")
+  {
+    echo "<div style=\"display: none;\" id=\"zwei\">";
+    show_stat("n");
+    echo "</div>";
+  }
+  echo "<br>";
+}
+echo "<center><img src=$cd->wert1 width=40 height=40> <small>Keine neuen Beiträge</small>  &nbsp; &nbsp; <img src=$cd->wert2 width=40 height=40> <small>Neue Beiträge</small></center><br>";
+
 if($_GET["do"] == "marks")
 {
   if(USER != "")

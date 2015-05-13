@@ -161,7 +161,8 @@ if($id != "")
 	{
 	  if($td->import != "0")
 	  {
-	    echo "<script>alert('Das Thema wurde bereits als wichtig makiert!')</script>";	  
+	    echo "<script>alert('Das Thema wurde bereits als wichtig makiert, die Makierung wurde nun aufgehoben.')</script>";	 
+	    mysql_query("UPDATE thema SET import = '0' WHERE id LIKE '$id'");		
 	  }
 	  else
 	  {

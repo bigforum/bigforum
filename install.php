@@ -19,7 +19,7 @@ function schr(s)
   document.getElementById("schritt").innerHTML = s;
 }
 </script>
-<table width="100%"><tr><td width="90%"><b>Bigforum - Installationsassistent Schritt <span id=schritt></span>/6</b></td><td><b>Version: 2.1</b></td></tr></table>
+<table width="100%"><tr><td width="90%"><b>Bigforum - Installationsassistent Schritt <span id=schritt></span>/6</b></td><td><b>Version: 2.2</b></td></tr></table>
 <hr><br><br>
 <?php
 $do = $_GET["do"];
@@ -42,7 +42,8 @@ switch($do){
     mysql_connect($HOST,$USER,$PW)or die(mysql_error());
     mysql_select_db($DB)or die(mysql_error());
 	//MySQL - Datenbank änderungen	
-	mysql_query("INSERT INTO config (erkennungscode, wert1, wert2, zahl1, zahl2) VALUES ('f2profs', '', '', '0', '1')");
+	mysql_query("ALTER TABLE users ADD statshow int(2)");
+	mysql_query("UPDATE config SET wert1 = 'j' WHERE erkennungscode LIKE 'f2profs'");
 	//Ende
     echo "Danke, das Forum wurde nun auf den neusten Stand gebracht.<br>Bitte lösche diese Datei, ansonsten kann jeder dieses Forum beschädigen!";
   break;
@@ -261,6 +262,7 @@ switch($do){
 	  style varchar(50) NOT NULL,
 	  last_ip varchar(80) NOT NULL,
 	  empfo varchar(150) NOT NULL,
+	  statshow int(3) NOT NULL,
       PRIMARY KEY (id) );
 
       "); 
@@ -292,7 +294,7 @@ switch($do){
 	  
 	  //Ende
 	  //Einfügen in Tabellen
-	  mysql_query("INSERT INTO config (erkennungscode, wert1, wert2, zahl1, zahl2) VALUES ('f2profs', '', '', '0', '1')");
+	  mysql_query("INSERT INTO config (erkennungscode, wert1, wert2, zahl1, zahl2) VALUES ('f2profs', 'j', '', '0', '1')");
 	  mysql_query("INSERT INTO config (erkennungscode, wert1, wert2, zahl1, zahl2) VALUES ('f2name2', 'Bigforum', 'Das Forum', '0', '0')");
 	  mysql_query("INSERT INTO config (erkennungscode, wert1, wert2, zahl1, zahl2) VALUES ('f2pnsignfs', 'images/logo_new.png', '', '1', '1')");
 	  mysql_query("INSERT INTO config (erkennungscode, wert1, wert2, zahl1, zahl2) VALUES ('f2closefs', 'Allgemeine Arbeiten', '', '1', '0')");

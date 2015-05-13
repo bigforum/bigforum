@@ -484,6 +484,78 @@ function today($datum)
     $datum = "Heute";
   }
 }
+function show_stat($s)
+{
+  //Statistik anzeige
+  $time = time();
+  $most_user_posts = mysql_query("SELECT * FROM users ORDER BY posts DESC LIMIT 5");
+  $new_user = mysql_query("SELECT * FROM users ORDER BY reg_dat DESC LIMIT 5");
+  $new_them = mysql_query("SELECT * FROM thema ORDER BY last_post_time DESC LIMIT 5");
+  $last_akt = mysql_query("SELECT * FROM users ORDER BY last_log DESC LIMIT 5");
+  if($s == "j")
+  {
+    echo "<div style=\"display: block;\" id=\"eins\">";
+  }
+  echo "<table class=bord><tr><td class=normal>Meiste Beiträge</td><td class=normal>Neue Benutzer</td><td class=normal>Letzte Antworten</td><td class=normal>Letzte Aktuallisierungen</td></tr>
+  <tr><td><table>";
+  while($mup = mysql_fetch_object($most_user_posts))
+  {
+    $time = time();
+    if($mup->sptime > $time)
+	{
+	  $usan = "<s>$mup->username</s>";
+	}
+	else
+	{
+      $usan = $mup->username;
+	}
+    echo "<tr><td><a href=profil.php?id=$mup->id>$usan</a></td><td>$mup->posts</td></tr>";
+  }
+  echo "</table></td><td><table>";
+  while($nu = mysql_fetch_object($new_user))
+  {
+    $dat = date("d.m.Y - H:i",$nu->reg_dat);
+    $time = time();
+    if($nu->sptime > $time)
+	{
+	  $usan = "<s>$nu->username</s>";
+	}
+	else
+	{
+      $usan = $nu->username;
+	}
+    echo "<tr><td><a href=profil.php?id=$nu->id>$usan</a></td><td>$dat</td></tr>";
+  } 
+  echo "</table></td><td><table>";
+  while($nt = mysql_fetch_object($new_them))
+  {
+	  $anz = mysql_query("SELECT * FROM beitrag WHERE where_forum LIKE '$nt->id'");
+	  $anza = mysql_num_rows($anz);
+	  $rech = ceil($anza/10);
+	  $dat = date("d.m.Y - H:i", $nt->last_post_time);
+	  echo "<tr><td><a href=thread.php?id=$nt->id&page=$rech>$nt->tit</a></td><td>$dat</td></tr>";
+  }
+  echo "</table></td><td><table>";
+  while($la = mysql_fetch_object($last_akt))
+  {
+    $dat = date("d.m.Y - H:i",$la->last_log);
+    $time = time();
+    if($la->sptime > $time)
+	{
+	  $usan = "<s>$la->username</s>";
+	}
+	else
+	{
+      $usan = $la->username;
+	}
+    echo "<tr><td><a href=profil.php?id=$la->id>$usan</a></td><td>$dat</td></tr>";
+  }
+  echo "</table></td></tr></table>";
+  if($s == "j")
+  {
+    echo "</div>";
+  }
+}
 // Ende der Funktionen, Abrufe wichtiger Arrays!
 $warn_dauer = Array("86400","172800","432000","604800","864000","1209600","2678400","5097600","15638400","31536000","63072000");
 $warn_text = Array("1 Tag","2 Tage","5 Tage","7 Tage","10 Tage","2 Wochen","1 Monat","2 Monate","6 Monate","1 Jahr","2 Jahre");

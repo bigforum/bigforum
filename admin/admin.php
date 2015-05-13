@@ -105,7 +105,7 @@ echo "<a href=?do=log_out>Aus Admin-Bereich ausloggen</a> | <a href='../index.ph
 <option value=?do=new_foren>Foren: Neues Forum</option>
 <option value=?do=ver_foren>Foren: Verwalte Foren</option>
 <option value=?do=settings>Sonstiges: Foren-Einstellungen ändern</option>
-<option value=?do=design>Sonstiges: Link in der Navigation</option>
+<option value=?do=design>Sonstiges: Header-Einstellungen</option>
 <option value=?do=look_logs>Sonstiges: Log-Einträge</option>
 <option value=?do=mods>Sonstiges: Mods/Addons Verwaltung</option>
 <option value=?do=new_warn>Sonstiges: Verwarnungsgründe</option>
@@ -135,6 +135,7 @@ switch ($do) {
   
   
   case "mods":
+  admin_recht("4");
   //Mods die die funktion Admin beeinhalten
   $mod = array("rules.php","last_posts.php");
   $laeng = count($mod);
@@ -161,10 +162,16 @@ switch ($do) {
   
   
   case "design":
-
+  admin_recht("3");
   if($_GET["action"] == "insert")
   {
     mysql_query("UPDATE config SET wert2 = '$_POST[link]' WHERE erkennungscode LIKE 'f2closefs'");
+	echo "<b>Information:</b> Der Header-Link wurde erfolgreich überarbeitet.";
+  }
+  if($_GET["action"] == "noti")
+  {
+    mysql_query("UPDATE users SET notice = '$_POST[noti]'");
+	echo "<b>Information:</b> Die Benutzernotizen wurden erfolgreich überarbeitet."; 
   }
   $config_data = mysql_query("SELECT * FROM config WHERE erkennungscode LIKE 'f2closefs'");
   $cd = mysql_fetch_object($config_data);
@@ -173,7 +180,12 @@ switch ($do) {
   <form action=?do=design&action=insert method=post name=feld>
   <input type=text name=link value='$cd->wert2' size=40><input type=submit value=Bestätigen><input type=button value='Textfeld leeren' onclick=\"feld.link.value=''\">
   </form>
-  </fieldset>";
+  </fieldset>
+  <br>
+  <fieldset><legend>Header-Anzeige</legend>Hier kannst du eine Nachricht eingeben, welche bei <u>allen</u> Benutzern angezeigt wird. Sollte ein User eine alte Header-Notiz haben, wird diese mit dieser überschrieben.<br>
+  Die Benutzer können die Header-Notiz, genauwie eine persönliche Notiz, über das Usercp ausbleden. Bei der Userverlwatung kannst du sehen, was ein Benutzer im Header stehehn hat.<br>
+  <form action=?do=design&action=noti method=post>
+  <input type=text size=40 name=noti><input type=submit value=Speichern></form>";
   break;
   
   
@@ -410,7 +422,7 @@ switch ($do) {
     mysql_query("UPDATE config SET wert1 = '$gpack', wert2 = '$gpackt', zahl1 = '$number' WHERE erkennungscode LIKE 'f2imgadfs'");   
     mysql_query("UPDATE config SET wert1 = '$_POST[clos_text]', zahl1 = '$_POST[close]' WHERE erkennungscode LIKE 'f2closefs'");   
     mysql_query("UPDATE config SET wert1 = '$_POST[bfav]', wert2 = '$_POST[styl]', zahl1 = '7', zahl2 = '$_POST[smilie]' WHERE erkennungscode LIKE 'f2laengfs'");   
-    mysql_query("UPDATE config SET zahl2 = '$_POST[pro]' WHERE erkennungscode LIKE 'f2profs'");   
+    mysql_query("UPDATE config SET wert1 = '$_POST[st]', zahl2 = '$_POST[pro]' WHERE erkennungscode LIKE 'f2profs'");   
 	echo "Danke, die Foreneinstellungen wurden geändert!";
 	insert_log("Die Foreneinstellungen wurden überarbeitet.");
 	exit;
@@ -498,8 +510,17 @@ switch ($do) {
   {
     $prof_pack = "<input type=radio name=pro value=1>Ja <input type=radio name=pro value=2 checked>Nein";
   }
+  if($con->wert1 == "j")
+  {
+    $st = "<input type=radio name=st value=j checked>Ja <input type=radio name=st value=n>Nein";
+  }
+  if($con->wert1 != "j")
+  {
+    $st = "<input type=radio name=st value=j>Ja <input type=radio name=st value=n checked>Nein";
+  }
   echo "
   <tr><td>Gäste dürfen Profile sehen?</td><td>$prof_pack</td></tr>
+  <tr><td>Zeige erweiterte Statistik auf der Startseite?</td><td>$st</td></tr>
   <tr><td> &nbsp; </td><td> &nbsp </td></tr>";
   
   $config_wert = mysql_query("SELECT * FROM config WHERE erkennungscode LIKE 'f2closefs'");
@@ -711,7 +732,8 @@ switch ($do) {
 	}
 	insert_log("Ein Benutzer wurde gesperrt");
 	$gesp = $time+$_POST["dauer"];
-	mysql_query("UPDATE users SET gesperrt = '1', sptime = '$gesp' WHERE username LIKE '$_POST[ben]'");
+	$spertime = ceil($gesp/600)*600;  
+	mysql_query("UPDATE users SET gesperrt = '1', sptime = '$spertime' WHERE username LIKE '$_POST[ben]'");
 	echo "$_POST[ben] wurde nun vom Forum ausgeschlossen.";
 	exit;
   }
