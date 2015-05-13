@@ -17,10 +17,8 @@ if($do == "log_out")
 }
 if($_SESSION["admin_login"] != "login_true")
 {
-  echo "<title>$title</title>";  
-  echo "<b>Schwieriger Fehler:</b> Ein Zugriff auf das Administrator-Kontrollzentrum ist nur für eingeloggte Administraotren möglich.
-  <br>Solltest du einen normalem Link gefolgt sein, melde dich beim Webmaster.";
   insert_log("Fehlgeschlagene Administratoren-Anmeldung.");
+  header("Location: index.php");
   exit;
 }
 echo "<title>$title</title>
@@ -46,6 +44,10 @@ a:visited
 a:hover, a:active
 {
 	color: #767676;
+}
+.navi
+{
+  background: #DE9C39;
 }
 
 </style>";
@@ -95,24 +97,16 @@ xmlhttp.send(null);
 
 </script>
 <?
-echo "<a href=?do=log_out>Aus Admin-Bereich ausloggen</a> | <a href='../index.php' target='_blank'>Foren-Übersicht</a>
-<center><b>Einstellung:</b>
-<select onChange=window.location.href=options[selectedIndex].value;>
-<option></option><option value=admin.php>Start</option>
-<option value=?do=recht>Benutzer: Administratoren-Rechte</option>
-<option value=?do=ver_user>Benutzer: Benutzer suchen</option>
-<option value=?do=sper_user>Benutzer: Gesperrte</option>
-<option value=?do=new_foren>Foren: Neues Forum</option>
-<option value=?do=ver_foren>Foren: Verwalte Foren</option>
-<option value=?do=settings>Sonstiges: Foren-Einstellungen ändern</option>
-<option value=?do=design>Sonstiges: Header-Einstellungen</option>
-<option value=?do=look_logs>Sonstiges: Log-Einträge</option>
-<option value=?do=mods>Sonstiges: Mods/Addons Verwaltung</option>
-<option value=?do=new_warn>Sonstiges: Verwarnungsgründe</option>
-</select><hr style=\"border:1px dotted;\"></center><br>";
+echo "<table background=\"bgoben.png\" width=100%><tr><td><a href=?do=log_out>Aus Admin-Bereich ausloggen</a> | <a href='../index.php' target='_blank'>Foren-Übersicht</a><br>
+<center><h4><a href=\"admin.php\">Start</a> &nbsp; <a href=\"?do=ver_user\">Benutzer</a> &nbsp; <a href=\"?do=ver_foren\">Foren</a> &nbsp;<a href=\"?do=settings\">Einstellungen</a></td></tr></table>";
+$sons = array("?do=settings|Foren-Einstellungen","?do=design|Header-Einstellungen","?do=look_logs|Log-Einträge","?do=mods|Mods/Addons Verwaltung","?do=new_warn|Verwarnungsgründe");
+$for = array("?do=new_foren|Neues Forum","?do=ver_foren|Verwalte Foren");
+$user = array("?do=sper_user|Gesperrte","?do=ver_user|Benutzer suchen","?do=recht| Administratoren-Rechte");
+$start = array("admin.php|Start","?do=settings|Foren-Einstellungen","?do=look_logs|Log-Einträge ansehen","?do=new_foren|Neues Forum erstellen","?do=ver_user|Benutzer verwalten");
 
 switch ($do) {
   case "":
+    left_table($start);
     admin_recht("1");
     $adm_notice = file_get_contents("adm_notice.txt");
 	$adm_notice = str_replace("\n","<br>", $adm_notice);
@@ -122,10 +116,10 @@ switch ($do) {
 	if(file_exists("./install.php") OR file_exists("../install.php"))
 	{
 	echo "<table class=braun width=50%><tr class=besch><td><b>Warnung</b></td></tr><tr><td>
-	Die Datei install.php exestiert noch. Bitte lösche diese Datei.<br> Ansonsten kann jeder andere dieses Forum manipulieren!</tr></table><br><br>";
+	Die Datei install.php exestiert noch. Bitte lösche diese Datei.<br> Ansonsten kann jeder andere dieses Forum manipulieren!</td></tr></table><br><br>";
 
 	}
-	echo "</td></tr></table></td></tr></table><br><br>
+	echo "<br><br>
 	<table class=braun width=50%><tr class=besch><td><b>Administratoren-Notizen (<a href=?do=change_notice>verändern)</b></td></tr><tr><td>$adm_notice</td></tr></table><br><br>";
 	echo "<table class=braun width=50%><tr class=besch><td><b>Benutzer Statistik / Benutzer die online sind</b></td></tr><tr><td>";
     user_online(true);
@@ -136,6 +130,7 @@ switch ($do) {
   
   case "mods":
   admin_recht("4");
+  left_table($sons);
   //Mods die die funktion Admin beeinhalten
   $mod = array("rules.php","last_posts.php");
   $laeng = count($mod);
@@ -162,6 +157,7 @@ switch ($do) {
   
   
   case "design":
+  left_table($sons);
   admin_recht("3");
   if($_GET["action"] == "insert")
   {
@@ -225,6 +221,7 @@ switch ($do) {
   
   
   case "ver_user":
+    left_table($user);
   admin_recht("5");
   echo "<table class=braun width=50%><tr class=besch><td><b>Benutzerverwaltung</b></td></tr><tr><td>
   Bitte gebe in das nachfolgenden Feld den Benutzernamen ein, den du verwalten willst.<br><br>
@@ -234,6 +231,7 @@ switch ($do) {
   
   
   case "pro_user":
+    left_table($user);
     admin_recht("5");
      $user_datas = mysql_query("SELECT * FROM users WHERE username LIKE '$_POST[username]'");
 	 $uds = mysql_fetch_object($user_datas);
@@ -291,6 +289,7 @@ switch ($do) {
   
   
   case "save_userdatas":
+    left_table($user);
        $user_datas = mysql_query("SELECT * FROM users WHERE id LIKE '$_POST[id]'");
 	 $uds = mysql_fetch_object($user_datas);
   admin_recht("5");
@@ -320,6 +319,7 @@ switch ($do) {
   
   
   case "look_logs":
+  left_table($sons);
   admin_recht("2");
   if($_GET["action"] == "del")
   {
@@ -393,6 +393,7 @@ switch ($do) {
   
   
   case "settings":
+  left_table($sons);
   admin_recht("3");
   if($_GET["aktion"] == "change")
   {
@@ -433,7 +434,7 @@ switch ($do) {
 	exit;
   }
   set_tab("f2pnsignfs");
-    echo "<table class=braun width=80%><tr class=besch><td><b>Allgemeine Foreneinstellungen festlegen.</b></td></tr><tr><td>
+    echo "<table class=braun><tr class=besch><td><b>Allgemeine Foreneinstellungen festlegen.</b></td></tr><tr><td>
     <form action=?do=settings&aktion=change method=post>
 	<table>
 	<tr><td>Forum-Name</td><td><input type=text name=fn size=40 value='". SITENAME ."'></td></tr>
@@ -550,6 +551,7 @@ switch ($do) {
   
   
   case "recht":
+   left_table($user);
   admin_recht("6");
   if($_GET["aktion"] == "do")
   {
@@ -615,6 +617,7 @@ switch ($do) {
   
   case "new_foren":
   admin_recht("4");
+    left_table($for);
     if($_GET["action"] == "insert")
 	{
 	  if($_POST["foka"] == "kate")
@@ -660,6 +663,7 @@ switch ($do) {
   
   
   case "new_warn":
+  left_table($sons);
   admin_recht("5");
   if($_GET["action"] == "insert")
   {
@@ -713,6 +717,7 @@ switch ($do) {
   
   
   case "sper_user":
+  left_table($user);
   $time = time();
   if($_GET["action"] == "del")
   {
@@ -772,6 +777,7 @@ switch ($do) {
   
   
   case "ver_foren":
+    left_table($for);
   admin_recht("4");
   $ac = $_GET["action"];
   if($ac == "kate")

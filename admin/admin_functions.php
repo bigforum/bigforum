@@ -24,4 +24,14 @@ function set_tab($code)
 	define("ZAHLE", $con->zahl1);
 	define("ZAHLZ", $con->zahl2);
 }
+function left_table($an)
+{
+  echo "<table valign=top align=top><tr><td valign=top align=top style=\"background-image:url(bglinks.png); background-repeat:no-repeat;\" bgcolor=\"cc9e4e  \">";
+  for($i=0;$i<count($an);$i++)
+  {
+    $e = explode("|",$an[$i]);
+    echo "<a href=$e[0]>$e[1]</a><br>";
+  }
+  echo "</td><td width=80%>";
+}
 ?>
