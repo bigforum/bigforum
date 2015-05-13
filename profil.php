@@ -63,23 +63,32 @@ $ac = $_GET["action"];
 	  $gru_ho = mysql_query("SELECT * FROM verwarn_gruend WHERE id LIKE '$_POST[warn]'");
 	  $gho = mysql_fetch_object($gru_ho);
 	  $dauer = time() + $gho->zeit;
+	  $gru = $gho->grund;
+	  $punk = $gho->punkte;
+	  if($_POST["warn"] == "own")
+	  {
+	    $lange = $_POST["day"] * $_POST["laen"];
+		$dauer = time() + $lange;
+		$gru = $_POST["grund"];
+		$punk = $_POST["punkt"];
+	  }
 	  $time = time();
 	  $text = "Hallo $udp->username
 	  
-	  Sie haben im Forum eine Verwarnung erhalten. Ihrem Verwarn-Konto wurde(n) $gho->punkte Punkt(e) hinzugefügt.
+	  Sie haben im Forum eine Verwarnung erhalten. Ihrem Verwarn-Konto wurde(n) $punk Punkt(e) hinzugefügt.
 	  
 	  Grund der Verwarnung:
 	  $_POST[spgr]
 	  
 	  
-	  Bis diese Verwarnung abläuft, könnte es sein, dass Sie nichtmehr alle Funktionen des Forum nutzen können.
+	  Bis diese Verwarnung abläuft, könnte es sein, dass Sie nicht mehr alle Funktionen des Forum nutzen können.
 	  
 	  
 	  Mit freundlichen Grüßen
 	  Das Foren-Team";
-	  mysql_query("INSERT INTO user_verwarn (user_id, grund, punkte, dauer, grund_pn, von, wann) VALUE ('$_GET[id]', '$gho->grund', '$gho->punkte', '$dauer' ,'$_POST[spgr]', '". USER ."', '$time')")or die(mysql_error());
+	  mysql_query("INSERT INTO user_verwarn (user_id, grund, punkte, dauer, grund_pn, von, wann) VALUE ('$_GET[id]', '$gru', '$punk', '$dauer' ,'$_POST[spgr]', '". USER ."', '$time')")or die(mysql_error());
 	  mysql_query("INSERT INTO prna (abse, emp, dat, betreff, mes, gel) VALUES ('". USER . "', '$udp->username', '$time', 'Sie haben eine Verwarnung erhalten', '$text', '0')")or die(mysql_error());
-      echo "<meta http-equiv='refresh' content='1; URL=profil.php?id=$_GET[id]'>Dem Benutzer wurde(n) $gho->punkte Punkt(e) hinzugefügt.<br><br>Sollte die Weiterleitung nicht funktionieren <a href=profil.php?id=$_GET[id]>klicke hier</a><br><br><br>";
+      echo "<meta http-equiv='refresh' content='1; URL=profil.php?id=$_GET[id]'>Dem Benutzer wurde(n) $punk Punkt(e) hinzugefügt.<br><br>Sollte die Weiterleitung nicht funktionieren <a href=profil.php?id=$_GET[id]>klicke hier</a><br><br><br>";
 	  page_footer();
 	}
     echo "  <table width=100%><tr class=dark><td>
@@ -107,13 +116,18 @@ $ac = $_GET["action"];
 	  }
 
     }
+	if(GROUP == "3")
+	{
+	  //Administratoren dürfen auch eigene Gründe angeben.
+	  echo "<tr><td><input type=radio name=warn value=own></td><td><input type=text name=grund></td><td><input type=text name=punkt size=1 maxlength=3></td><td><input type=text name=day size=2> <select name=laen><option value=86400>Tage</option><option value=604800>Wochen</option><option value=2678400>Monate</option><option value=31536000>Jahre</option></select></td></tr>";
+	}
 	echo "</table></fieldset><br>
 	<fieldset>
 	<legend>Speziellen Grund</legend>
 	Eingabe des Speziellen Grunds: <input type=text name=spgr size=40></fieldset><br>
 	<input type=submit value='Benutzer Verwarnen'>
 	</form>";
-	page_footer();
+	page_close_table();
     exit;
     }
   }
@@ -195,11 +209,21 @@ if((GROUP == "2" OR GROUP == "3") AND $ud->adm_recht >= $udp->adm_recht)
   <table class="bord" width="100%"><tr class="dark"><td>
   <table width=100%><tr><td><b><font color="snow">Verwarnungen</font></b></td><td align=right><a href="profil.php?id=<?php echo $_GET["id"];?>&action=warn"><font color=snow>Benutzer verwarnen</font></a></td></tr></table></td></tr>
   <tr><td>
-  <table width=100%><tr align=center style=font-weight:bold><td width=30%>Grund</td><td width=30%>Verwarnt von / Datum</td><td width=10%>Punkte</td><td width=20%>Läuft aus</td><td><?php if($_GET["id"] != $ud->id) echo "Aktionen"; ?></td></tr>
-  <?php
+ <?php
   $us_ver = mysql_query("SELECT * FROM user_verwarn WHERE user_id LIKE '$_GET[id]'");
+  $ttt = "0";
   while($uv = mysql_fetch_object($us_ver))
   {
+    $ttt++;
+	if($ttt == "1")
+	{
+	  $akt = "";
+	  if($_GET["id"] != $ud->id)
+	  {
+	    $akt = "Aktionen";
+	  }
+	  echo "  <table width=100%><tr style=font-weight:bold><td width=30%>Grund</td><td width=30%>Verwarnt von / Datum</td><td width=10%>Punkte</td><td width=20%>Läuft aus</td><td>$akt</td></tr>";
+	}
     $dauer = $uv->dauer;
 	if($dauer < time())
 	{
@@ -215,12 +239,16 @@ if((GROUP == "2" OR GROUP == "3") AND $ud->adm_recht >= $udp->adm_recht)
 	{
 	    $dauer = date("d.m.Y - H:m", $dauer);
 	  	}
-    echo "<tr align=center><td>$uv->grund</td><td>$uv->von / ". date("d.m.Y - H:m", $uv->wann) ."</td><td>$uv->punkte</td><td>$dauer</td><td><a href=?action=no_warn&id=$uv->id>";
+    echo "<tr align=center><td align=left valign=left>$uv->grund</td><td align=left valign=left>$uv->von / ". date("d.m.Y - H:m", $uv->wann) ."</td><td align=left valign=left>$uv->punkte</td><td align=left valign=left>$dauer</td><td align=left valign=left><a href=?action=no_warn&id=$uv->id>";
 	if($_GET["id"] != $ud->id AND $dauer != "Abgelaufen" AND $dauer != "Zurückgenommen")
 	  echo "Zurücknehmen</a>";
 	else
 	  echo "</a>Zurücknehmen";
 	echo "</td></tr>";
+  }
+  if($ttt == "0")
+  {
+    echo "<table>";
   }
   ?>
   </table>

@@ -5,9 +5,9 @@ page_header();
 login();
 looking_page("edit");
 include("includes/function_forum.php");
-if($_GET["id"] == "" OR GROUP < "2")
+if($_GET["id"] == "")
 {
-  erzeuge_error("Du kannst den Beitrag nicht überarbeiten, antscheinend hast du nicht genügend Rechte.");
+  erzeuge_error("Leider wurde kein Beitrag zum Ändern angegeben.");
 }
 if($_GET["aktion"] != "")
 {
@@ -21,6 +21,13 @@ if($_GET["aktion"] != "")
 }
 $edi = mysql_query("SELECT * FROM beitrag WHERE id LIKE '$_GET[id]'");
 $ed = mysql_fetch_object($edi);
-editor("sign",$ed->text,"?id=$_GET[id]");
+if(GROUP == "2" OR GROUP == "3" OR USER == $ed->verfas)
+{
+  editor("sign",$ed->text,"?id=$_GET[id]");
+}
+else
+{
+  erzeuge_error("Dir Fehlen die Rechte, um diesen Beitrag zu überarbeiten.");
+}
 page_footer();
 ?>

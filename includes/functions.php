@@ -178,8 +178,10 @@ function looking_page($wo)
   }
   if($wo == "profil")
   {
+    $proid = mysql_query("SELECT * FROM users WHERE id LIKE '$_GET[id]'");
+	$pi = mysql_fetch_object($proid);
     $page = "profil.php";
-	$text = "Betrachtet ein Benutzerprofil";
+	$text = "Betrachtet das Benutzerprofi von $pi->username";
   }
   if($wo == "main")
   {
@@ -198,8 +200,10 @@ function looking_page($wo)
   }
   if($wo == "read_pn")
   {
+    $pn_data = mysql_query("SELECT * FROM prna WHERE id LIKE '$_GET[aktion]'");
+	$pd = mysql_fetch_object($pn_data);
     $page = "main.php";
-	$text = "Ließt eine Private Nachricht";
+	$text = "Liest eine Private Nachricht von $pd->abse";
   }
   if($wo == "look_pn")
   {
@@ -208,23 +212,31 @@ function looking_page($wo)
   }
   if($wo == "forum-view")
   {
+    $foda = mysql_query("SELECT * FROM foren WHERE id LIKE '$_GET[id]'");
+	$fd = mysql_fetch_object($foda);
     $page = "forum.php";
-	$text = "Betrachtet ein Forum";
+	$text = "Befindet sich im Forum $fd->name";
   }
   if($wo == "newtopic")
   {
+    $foda = mysql_query("SELECT * FROM foren WHERE id LIKE '$_GET[id]'");
+	$fd = mysql_fetch_object($foda);
     $page = "newtopic.php";
-	$text = "Erstellt ein Thema";
+	$text = "Erstellt ein Thema: $fd->name";
   }
   if($wo == "readthema")
   {
+    $them_dat = mysql_query("SELECT * FROM thema WHERE id LIKE '$_GET[id]'");
+	$td = mysql_fetch_object($them_dat);
     $page = "thread.php";
-	$text = "Betrachtet ein Thema";
+	$text = "Liest ein Thema: $td->tit";
   }
   if($wo == "newreply")
   {
+    $them_dat = mysql_query("SELECT * FROM thema WHERE id LIKE '$_GET[id]'");
+	$td = mysql_fetch_object($them_dat);
     $page = "newreply.php";
-	$text = "Antwortet auf ein Thema";
+	$text = "Antwortet auf $td->tit";
   }
   if($wo == "foren_helfer")
   {

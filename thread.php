@@ -297,7 +297,7 @@ while($bd = mysql_fetch_object($bei_dat))
 $datum = date("d.m.Y",$bd->post_dat);
 $uhrzeit = date("H:i",$bd->post_dat);
 $mod_funk = "";
-if(GROUP == "2" OR GROUP == "3")
+if(GROUP == "2" OR GROUP == "3" OR USER == $bd->verfas)
 {
   $mod_funk = "<td align=right valign=right><a href=edit.php?id=$bd->id><img src=images/edit.png width=30% height=0% border=0></a><a href=javascript:del($bd->id)><img src=images/del.png width=30% height=0% border=0></a></td>";
 }

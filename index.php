@@ -3,6 +3,8 @@
 include("includes/functions.php");
 page_header();
 looking_page("index");
+$userdata = mysql_query("SELECT * FROM users WHERE username LIKE '". USER ."'");
+$ud = mysql_fetch_object($userdata);
 if(USER != "")
 {
 //Wenn der Benutzer eingeloggt ist, für Gäste ist die Funktion sinnlos, kann er die untere Statiistik ausblenden

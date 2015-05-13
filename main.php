@@ -62,6 +62,23 @@ else
 if($do == ""){ 
 echo"Hallo ".USER." ,<br>
 willkommen in deinem Bereich. Hier ist es möglich deine Einstellungen so wie deine Profil-Daten zu ändern.<br><br>";
+$time = time();
+$us_ver = mysql_query("SELECT * FROM user_verwarn WHERE user_id LIKE '$ud->id' AND dauer > '$time'");
+$akt = "0";
+while($uv = mysql_fetch_object($us_ver))
+{
+  if($akt == "0")
+  {
+    echo "<table width=100%><tr class=normal><td align=left valign=left><b>Aktive Verwarnungen</b></td></tr></table><table width=100%><tr><td align=left valign=left><b>Grund</b></td><td align=left valign=left><b>Punkte</b></td><td align=left valign=left><b>Läuft aus...</b></td></tr>";
+  }
+  $dauer = date("d.m.Y - H:m", $uv->dauer);
+  echo "<tr align=center><td align=left valign=left>$uv->grund</td><td align=left valign=left>$uv->punkte</td><td align=left valign=left>$dauer</td></tr>";
+  $akt++;
+}
+if($akt != "0")
+{
+  echo "</table>";
+}
 page_close_table();
 }
 if($do == "sign") {
@@ -295,7 +312,7 @@ if($do == "read_pn" AND $ac != "")
   $from = $pr->abse;
   $datum = date("d.m.Y",$pr->dat);
   $uhrzeit = date("H:i",$pr->dat);
-  echo "<table width=81%><tr background='images/dark_table.png'><td><font color=snow>$datum, $uhrzeit</font></td></tr></table>";
+  echo "<table width=81%><tr class=normal><td><font color=snow>$datum, $uhrzeit</font></td></tr></table>";
   text_ausgabe($text, $betreff, $from);
   $betreff = str_replace(" ", "_", $betreff);
   echo "<table width=81%><tr><td align=right><a href=main.php?do=make_pn&to=$from&bet=$betreff><img src=images/answer.png border=0 width=95 height=50></a>";

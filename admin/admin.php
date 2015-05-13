@@ -267,7 +267,10 @@ switch ($do) {
 	   <form action=?do=save_userdatas method=post>
 	   <b>Benutzername:</b> </td><td> <input type=text name=username value='$uds->username'></td></tr><tr><td>
 	   <b>Rang-Titel:</b> </td><td> <input type=text name=rang value='$uds->rang'></td></tr><tr><td>
-	   &nbsp; </td></tr><tr><td>
+	   &nbsp; </td></tr>
+	   <tr><td><b>Website:</b></td><td><input type=text name=web value='$uds->website'></td></tr>
+	   <tr><td><b>Hobbys:</b></td><td><input type=text name=hob value='$uds->hob'></td></tr>
+	   <tr><td> &nbsp; </td><td>&nbsp;</td></tr><tr><td>
 	   <b>Beiträge:</b> </td><td> <input type=text name=bei value=$uds->posts></td></tr><tr><td>
 	   <b>Registriert seit (UNIX!):</b> </td><td> <input type=text name=reg value=$uds->reg_dat> (". date("d.m.Y", $uds->reg_dat).")</td></tr><tr><td>
 	   <b>Benutzergruppe(nid):</b> </td><td> $uds->group_id ( $gruppe )</td></tr><tr><td>
@@ -308,6 +311,8 @@ switch ($do) {
 			group_id  = '$_POST[grup]',
 			notice    = '$_POST[unot]',
 			sign      = '$_POST[sign]',
+			website   = '$_POST[web]',
+			hob       = '$_POST[hob]',
 			adm_recht = '$uds->adm_recht' WHERE id LIKE '$_POST[id]'");
 	insert_log("Profil von $_POST[username] wurde geändert.");
   echo "Danke,<br> das Profil von $_POST[username] wurde erfolgreich überarbeitet.<br><br><a href=admin.php>Zurück zur Administratorern-Übersicht</a>";
