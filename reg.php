@@ -62,6 +62,32 @@ if($_GET["do"] == "reg")
   $user_data_akt = mysql_query("SELECT * FROM users WHERE username LIKE '$_POST[user]'");
   $row = mysql_num_rows($user_data_akt);
   check_data($row, "", "Dieser Benutzername exestiert bereits", "null");
+  $ben_verb = mysql_query("SELECT * FROM verbo WHERE benemail LIKE '2'");
+  while($bv = mysql_fetch_object($ben_verb))
+  {
+    if($bv->name == $_POST["user"])
+	{
+	  $verb = true;
+	}
+  }
+  if($verb == true)
+  {
+    erzeuge_error("Leider wurde dieser Benutzername von einem Administrator als \"Verboten\" eingestuft. Du kannst diesen somit nicht verwenden.");
+    page_footer();
+  }
+  $em_verb = mysql_query("SELECT * FROM verbo WHERE benemail LIKE '1'");
+  while($ev = mysql_fetch_object($em_verb))
+  {
+    if($ev->name == $_POST["mail"])
+	{
+	  $veb = true;
+	}
+  }
+  if($veb == true)
+  {
+    erzeuge_error("Leider wurde diese eMail-Adresse von einem Administrator als \"Verboten\" eingestuft. Du kannst diesen somit nicht verwenden.");
+    page_footer();
+  }
   $pw = md5($_POST["pw1"]);
   $time = time();
   $eintrag = mysql_query("INSERT INTO users (username, posts, reg_dat, last_log, reg_ip, sign, group_id, pw, mail, rang, last_site, gesperrt, pn_weiter, ava_link, empfo) VALUES ('$_POST[user]', '0', '$time', '', '$_SERVER[REMOTE_ADDR]', '', '1', '$pw', '$_POST[mail]', 'Benutzer', '', '0', '1','','$_POST[empfo]')");

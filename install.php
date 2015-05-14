@@ -19,7 +19,7 @@ function schr(s)
   document.getElementById("schritt").innerHTML = s;
 }
 </script>
-<table width="100%"><tr><td width="90%"><b>Bigforum - Installationsassistent Schritt <span id=schritt></span>/6</b></td><td><b>Version: 3.1</b></td></tr></table>
+<table width="100%"><tr><td width="90%"><b>Bigforum - Installationsassistent Schritt <span id=schritt></span>/6</b></td><td><b>Version: 3.2</b></td></tr></table>
 <hr><br><br>
 <?php
 $do = $_GET["do"];
@@ -42,7 +42,15 @@ switch($do){
     mysql_connect($HOST,$USER,$PW)or die(mysql_error());
     mysql_select_db($DB)or die(mysql_error());
 	//MySQL - Datenbank änderungen	
-	mysql_query("ALTER TABLE users ADD editrech int(2) NOT NULL");
+	mysql_query("ALTER TABLE users ADD htmlcan int(2) NOT NULL");
+	mysql_query("CREATE TABLE IF NOT EXISTS verbo ( 
+
+      id INT(20) NOT NULL auto_increment,
+      name varchar(1000) NOT NULL,
+      benemail int(7) NOT NULL,
+      PRIMARY KEY (id) );
+
+      "); 	  
 	//Ende
     echo "Danke, das Forum wurde nun auf den neusten Stand gebracht.<br>Bitte lösche diese Datei, ansonsten kann jeder dieses Forum beschädigen!";
   break;
@@ -274,9 +282,21 @@ switch($do){
 	  empfo varchar(150) NOT NULL,
 	  statshow int(3) NOT NULL,
 	  provi int(50) Not NULL,
+	  editrech int(2) NOT NULL,
+	  htmlcan int(2) NOT NULL,
       PRIMARY KEY (id) );
 
-      "); 
+      ");
+
+
+	  mysql_query("CREATE TABLE IF NOT EXISTS verbo ( 
+
+      id INT(20) NOT NULL auto_increment,
+      name varchar(1000) NOT NULL,
+      benemail int(7) NOT NULL,
+      PRIMARY KEY (id) );
+
+      "); 	  
 	  
 	  
 	  mysql_query("CREATE TABLE IF NOT EXISTS user_verwarn ( 

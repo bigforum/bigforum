@@ -1,8 +1,8 @@
 <?php
 //Wichtige Angaben für jede Datei!
 include("includes/functions.php");
-page_header();
 login();
+page_header();
 if($_GET["do"] == "groups")
 {
   looking_page("foren_helfer");

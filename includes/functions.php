@@ -291,11 +291,18 @@ function erzeuge_error($text)
 }
 function connect_to_database()
 {
-  include("./config.php");
+
   include("includes/function_define.php");
+  include("config.php");
 
   mysql_connect($HOST,$USER,$PW)or die(mysql_error());
   mysql_select_db($DB)or die(mysql_error());
+}
+function backup()
+{
+  include("../config.php");
+  $time = date("dMY", time());
+  system(" -u$USER -p$PW -h $HOST $DB > ".dirname(__FILE__)."/backup_$time.sql", $fp); 
 }
 function config($erken, $clude_true, $what)
 {
@@ -420,7 +427,11 @@ function text_ausgabe($text, $betreff, $from)
   $from_data = mysql_query("SELECT * FROM users WHERE username LIKE '$from'");
   $fd = mysql_fetch_object($from_data);
   $datum = date("d.m.Y",$fd->reg_dat);
-  $text = htmlspecialchars($text);
+  if($fd->htmlcan != "1")
+  {
+    // Wenn der Benutzer laut Admincp HTML benutzen darf, wird es in Beiträgen deaktiviert. Funktion wird nur Administratoren empfohlen, die dieses wirklich brauchen!
+    $text = htmlspecialchars($text);
+  }
   $text = preg_replace('/\[b\](.*?)\[\/b\]/', '<b>$1</b>', $text);  
   $text = preg_replace('/\[k\](.*?)\[\/k\]/', '<i>$1</i>', $text);  
   $text = preg_replace('/\[u\](.*?)\[\/u\]/', '<u>$1</u>', $text);  
