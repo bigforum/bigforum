@@ -132,7 +132,7 @@ switch ($do) {
   admin_recht("4");
   left_table($sons);
   //Mods die die funktion Admin beeinhalten
-  $mod = array("rules.php","last_posts.php","chat.php");
+  $mod = array("rules.php","last_posts.php","chat.php","addon_basic_modul.php");
   $laeng = count($mod);
   $x = "0";
   echo "Hier hast du eine Verwaltungsmöglichkeit, aller installierten Mods, dieses Systems. Sofern dieser Mod, es zuläßt sich über das Admincp verwalten zu lassen.<br>Der Titel ist gleichzeitig der Dateiname.php<br><br>";
@@ -1054,17 +1054,28 @@ switch ($do) {
 	check_data($_POST["tit"], "", "Bitte gebe einen Titel ein.<br><a href='javascript:history.back()'>Zurück</a>", "leer");
 	check_data($_POST["mes"], "", "Bitte gebe eine Nachricht ein.<br><a href='javascript:history.back()'>Zurück</a>", "leer");
 	$time = time() - $_POST["days"];
-	$data_hol = mysql_query("SELECT * FROM users WHERE $time < last_log");
+	$posts = $_POST["posts"];
+	if($posts == "")
+	{
+	  $posts = "0";
+	}
+	$data_hol = mysql_query("SELECT * FROM users WHERE $time < last_log AND posts >= $posts");
 	$usernamen = array("");
 	while($dh = mysql_fetch_object($data_hol))
 	{
 	  $time = time();
-	  mysql_query("INSERT INTO prna (abse, emp, dat, betreff, mes, gel) VALUES ('". USER . "', '$dh->username', '$time', '$_POST[tit]', '$_POST[mes]', '0')")or die(mysql_error());
+	  $mes = $_POST["mes"];
+	  $mes = str_replace("[USERNAME]", $dh->username, $mes);
+	  $mes = str_replace("[BEITRAEGE]", $dh->posts, $mes);
+	  $tit = $_POST["tit"];
+	  $tit = str_replace("[USERNAME]", $dh->username, $tit);
+	  $tit = str_replace("[BEITRAEGE]", $dh->posts, $tit);
+	  mysql_query("INSERT INTO prna (abse, emp, dat, betreff, mes, gel) VALUES ('". USER . "', '$dh->username', '$time', '$tit', '$mes', '0')")or die(mysql_error());
 	  $usernamen[] = $dh->username;
 	}
 	$user = count($usernamen);
 	$user--;
-	echo "Danke, dieser Rundbrief wurde an ". count($usernamen)." Benutzer verschickt:<br><br>";
+	echo "Danke, dieser Rundbrief wurde an $user Benutzer verschickt:<br><br>";
 	for($r=0;$r<count($usernamen);$r++)
 	{
 	  echo "$usernamen[$r]<br>";
@@ -1075,14 +1086,23 @@ switch ($do) {
     left_table($sons);
     admin_recht("2");
 	echo "<table class='braun'><tbody><tr class='besch'><td><b>Rundbrief verfassen</b></td></tr><tr><td>
-	Mit den folgenden Feldern kannst du einen Rundbrief, also einen Brief an alle aktiven Mitglieder verfassen.<br>Um Datenbank-belastung auszuschließen, werden inaktive Benutzer von der Rundmail ausgeschlossen.<br><br>
+	Mit den folgenden Feldern kannst du einen Rundbrief, also einen Brief an alle aktiven Mitglieder verfassen.<br>Um Datenbank-belastung auszuschließen, werden inaktive Benutzer von der Rundmail ausgeschlossen.<br>
+	<b>Variablen-Ersetzung:</b>
+	<table>
+	<tr><td>[USERNAME]</td><td>Zeigt den jeweiligen Benutzernamen an</td></tr>
+	<tr><td>[BEITRAEGE]</td><td>Zeigt die Beiträge des Benutzers an</td></tr>
+	</table><br><br>
 	<form action=?do=sendbrief method=post>
 	<small>Titel:</small><br>
 	<input type=text name=tit size=50><br><br>
 	<small>Nachricht:</small><br>
 	<textarea rows=5 cols=50 name=mes></textarea><br><br>
+	<fieldset><legend>Einstellungen</legend><table><tr><td>
 	<small>Benutzer muss aktiv in den letzten</small><br>
-	<select name=days><option value=432000>5</option><option value=604800>7</option><option value=864000>10</option><option value=1209600>14</option></select>Tagen sein.<br><br>
+	<select name=days><option value=172800>2</option><option value=432000>5</option><option value=604800>7</option><option value=864000>10</option><option value=1209600>14</option><option value=1814400>21</option></select>Tagen sein.</td><td>
+	<small>...und muss mindestens</small><br>
+	<input type=text name=posts value=0 size=3 maxlength=6> Beiträge haben.<br>
+	</td></tr></table></fieldset><br><br>
 	<input type=submit value='Nachrichten verschicken'>
 	</form>
 	";
