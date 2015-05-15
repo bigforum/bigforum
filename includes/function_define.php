@@ -12,7 +12,7 @@
     $daten["wert1"] = "Forum";
   define("SITENAME", $daten["wert1"]);
   define("BESCHREIBUNG", $daten['wert2']);
-  define("VERSION", "3.2");
+  define("VERSION", "3.3");
   
   //Ersetzte manche in Variablen
   $root = HAUPT;

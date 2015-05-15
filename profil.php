@@ -147,7 +147,19 @@ $ac = $_GET["action"];
   }?>
   
   <br><br>
-  <a href="main.php?do=make_pn&amp;to=<?php echo $udp->username;?>"><img src="images/pn.png" border="0" height="16px" width="30px"> Private Nachricht schicken</a>
+  <?php
+  if($udp->onlyadm == "2")
+  {
+    if(GROUP == "2" OR GROUP == "3")
+	{
+	    echo "<a href=\"main.php?do=make_pn&amp;to=$udp->username;\"><img src=\"images/pn.png\" border='0' height='16px' width='30px'> Private Nachricht schicken</a>";
+	}
+  }
+  else
+  {
+    echo "<a href=\"main.php?do=make_pn&amp;to=$udp->username;\"><img src=\"images/pn.png\" border='0' height='16px' width='30px'> Private Nachricht schicken</a>";
+  }
+  ?>
   <br>
   <br>
   <table width="100%" valign="top"><tr><td width="65%">

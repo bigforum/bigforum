@@ -21,19 +21,27 @@ function pn_zahl($where)
     $pn_zahl = mysql_query("SELECT * FROM prna WHERE abse LIKE '". USER . "'");
 	while($zahle = mysql_fetch_object($pn_zahl))
 	{
-	  if($zahle->emp != USER)
+	  $dd = explode("|", $zahle->abse);
+	  if($dd[1] != "del")
 	  {
-	    $zahl++;	  
+	    if($zahle->emp != USER)
+	    {
+	      $zahl++;	  
+	    }
 	  }
 	}
 	$pn_zahls = mysql_query("SELECT * FROM prna WHERE emp LIKE '". USER . "'");
 	while($zahles = mysql_fetch_object($pn_zahls))
 	{
-	  $zahl++;	
-      if($zahles->gel == "0")
-      {  
-	    $gele++;
-      }	  
+	  $d = explode("|", $zahles->emp);
+	  if($d[1] != "del")
+	  {
+	    $zahl++;	
+        if($zahles->gel == "0")
+        {  
+	      $gele++;
+        }	  
+	  }
 	}
 	if($where == "header")
 	{

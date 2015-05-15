@@ -97,7 +97,6 @@ if($di == "pn")
 if($extra != "")
 {
   $extra = str_replace("_", " ", $extra);
-  $extra = "AW: ". $extra;
 }
   echo "
 <form action=?do=make_pn&aktion=change method=post name=feld>

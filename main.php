@@ -168,11 +168,11 @@ if($do == "set")
 	{
 	  if($_POST["pn_weiter"] == "1")
 	  {
-	    $eintrag = mysql_query("UPDATE users SET pn_weiter = '1' WHERE username LIKE '". USER ."'");
+	    $eintrag = mysql_query("UPDATE users SET pn_weiter = '1', onlyadm = '$_POST[am]' WHERE username LIKE '". USER ."'");
 	  }
 	  else
 	  {
-	    $eintrag = mysql_query("UPDATE users SET pn_weiter = '0' WHERE username LIKE '". USER ."'");
+	    $eintrag = mysql_query("UPDATE users SET pn_weiter = '0', onlyadm = '$_POST[am]' WHERE username LIKE '". USER ."'");
 	  }
 	  mysql_query("UPDATE users SET style = '$_POST[sty]' WHERE username LIKE '". USER ."'");
 	  speicherung($eintrag, "Deine Einstellungen wurden überarbeitet.", "<b>Fehler:</b> Es gab einen Fehler bei der Speicherung der Einstellungen <a href=history.back()>Zurück</a>");
@@ -204,16 +204,26 @@ if($do == "set")
 	{
       $sty = "<option value=brown>Braun</option><option value=red>Rot</option><option value=blue>Blau</option><option value=green>Grün</option>";	
 	}
+	if($ud->onlyadm == "2")
+	{
+	  $pnj = "checked";
+	}
+	else
+	{
+	  $pnn = "checked";
+	}
     echo "<table width=100%><tr class=normal><td><big><b>Allgemeine Einstellungen » Sonstige Einstellungen » </b> ".USER." </big></td></tr></table><br>
 	<fieldset><legend>Private Nachrichten</legend>
 	<form action=?do=set&aktion=insert method=post>
 	<table>
 	<tr><td>Automatische Weiterleitung zu dem Posteingang, beim Mauskontakt, des blinkenden Textes \"Neue Nachrichten\" oben über deiner Navigationsliste.</td><td width=40%>
-	<input type=checkbox name=pn_weiter value=1 $checked></td></tr></table>
+	<input type=checkbox name=pn_weiter value=1 $checked></td></tr>
+	<tr><td>Private Nachrichten nur von Administratoren und Moderatoren empfangen?</td><td><input type=radio name=am value=2 $pnj>Ja <input type=radio name=am value=5 $pnn>Nein</td></tr>
+	</table>
 	</fieldset><br>
 	<fieldset><legend>Design</legend>
 	<table><tr><td>
-    Welche Farbe soll dieses Forum haben?</td><td><select name=sty>$sty</select></selct></td></tr></table></fieldset>
+    Welche Farbe soll dieses Forum haben?</td><td><select name=sty>$sty</select></td></tr></table></fieldset>
 	<br>";
 	if($ud->notice != "" AND $ud->notice != "0")
 	{
@@ -266,8 +276,17 @@ if($do == "pn_ein")
 {
   if($pn_deakt == true)
   {
+
     echo "Das Private Nachrichten System wurde von einem Administrator gesperrt!";
     page_close_table();
+  }
+  if($_GET["action"] == "del")
+  {
+    $idda = mysql_query("SELECT * FROM prna WHERE id LIKE '$_GET[id]'");
+	$idd = mysql_fetch_object($idda);
+    mysql_query("UPDATE prna SET emp = '$idd->emp|del' WHERE id LIKE '$_GET[id]'");
+    echo "Die Private Nachricht wurde gelöscht.";
+    exit;
   }
   looking_page("look_pn");
   $seite = $_GET["page"];
@@ -283,24 +302,37 @@ if($do == "pn_ein")
   echo "<table width=100%><tr class=normal><td><big><b>Private Nachrichten » Eingang » </b> ".USER." </big></td></tr></table><br>";
   $pn_data = mysql_query("SELECT * FROM prna WHERE emp LIKE '". USER ."' ORDER BY dat DESC LIMIT $start, $eps");
   $pn_dataz = mysql_query("SELECT * FROM prna WHERE emp LIKE '". USER ."'");
+
+
+  echo "<table width=100%><tr style=font-weight:bold;  class=normal><td width=70%>Betreff / Absenden</td><td>Datum</td><td>Löschen</td></tr>";
+  while($pr = mysql_fetch_object($pn_data))
+  {
+    $d = explode("|", $pr->emp);
+	if($d[1] != "del")
+	{
+      $betreff_pn = strip_tags($pr->betreff);
+      $datum = date("d.m.Y",$pr->dat);
+      $uhrzeit = date("H:i",$pr->dat);
+	  $abse = $pr->abse;
+	  $abse = str_replace("|del","", $abse);
+	  if($pr->gel == "0")
+	  {
+        echo "<tr><td width=70%><b> <a href=?do=read_pn&aktion=$pr->id>$betreff_pn</a> </b><br>$abse</td><td>$datum<br>$uhrzeit</td><td><a href=?do=pn_ein&action=del&id=$pr->id>Löschen</a></td></tr>";
+	  }
+	  else 
+	  {
+        echo "<tr><td> <a href=?do=read_pn&aktion=$pr->id>$betreff_pn</a><br>$abse</td><td>$datum<br>$uhrzeit</td><td><a href=?do=pn_ein&action=del&id=$pr->id>Löschen</a></td></tr>";	
+	  }
+	}
+	else
+	{
+	  $menge--;
+	}
+  }
+
   $menge = mysql_num_rows($pn_dataz);
   $wieviel = $menge / $eps;
   $ws = ceil($wieviel);
-  echo "<table width=100%><tr style=font-weight:bold;  class=normal><td width=70%>Betreff / Absenden</td><td>Datum</td></tr>";
-  while($pr = mysql_fetch_object($pn_data))
-  {
-    $betreff_pn = strip_tags($pr->betreff);
-    $datum = date("d.m.Y",$pr->dat);
-    $uhrzeit = date("H:i",$pr->dat);
-	if($pr->gel == "0")
-	{
-      echo "<tr><td width=70%><b> <a href=?do=read_pn&aktion=$pr->id>$betreff_pn</a> </b><br>$pr->abse</td><td>$datum<br>$uhrzeit</td></tr>";
-	}
-	else 
-	{
-      echo "<tr><td> <a href=?do=read_pn&aktion=$pr->id>$betreff_pn</a><br>$pr->abse</td><td>$datum<br>$uhrzeit</td></tr>";	
-	}
-  }
   echo "</table>";
     if($ws > "1")
 {
@@ -354,8 +386,9 @@ for($a=0; $a < $wieviel; $a++)
 	$q++;
 	}
 }
-echo " <a href=?do=pn_ein&page=$down>></a></td></tr></table></td></tr>"; 
+echo " <a href=?do=pn_ein&page=$down>></a></td></tr></table></td></tr></table>"; 
 }
+page_close_table();
 }
 if($do == "read_pn" AND $ac != "")
 {
@@ -369,7 +402,7 @@ if($do == "read_pn" AND $ac != "")
   $pr = mysql_fetch_object($pn_aus);
   if($pr->mes == "" OR ($pr->abse != USER AND $pr->emp != USER))
   {
-    echo "<b>Fehler:</b>Dir fehlen die Berechtigungen!";
+    erzeuge_error("Angegebene Nachricht exestiert leider nicht. Bitte überprüfe, ob du einen richtigen Link angegeben hast.");
   }
   if($pr->emp == USER)
   {
@@ -383,7 +416,10 @@ if($do == "read_pn" AND $ac != "")
   echo "<table width=81%><tr class=normal><td><font color=snow>$datum, $uhrzeit</font></td></tr></table>";
   text_ausgabe($text, $betreff, $from);
   $betreff = str_replace(" ", "_", $betreff);
-  echo "<table width=81%><tr><td align=right><a href=main.php?do=make_pn&to=$from&bet=$betreff><img src=images/answer.png border=0 width=95 height=50></a>";
+  $betreff = str_replace("AW:_","", $betreff);
+  $betreff = "AW:_$betreff";
+  echo "<table width=81%><tr><td align=right><a href=main.php?do=make_pn&to=$from&bet=$betreff><img src=images/answer.png border=0 width=95 height=50></a></td></tr></table>";
+  page_close_table();
 }
 if($do == "pn_aus")
 {
@@ -391,6 +427,14 @@ if($do == "pn_aus")
   {
     echo "Das Private Nachrichten System wurde von einem Administrator gesperrt!";
     page_close_table();
+  }
+  if($_GET["action"] == "del")
+  {
+    $idda = mysql_query("SELECT * FROM prna WHERE id LIKE '$_GET[id]'");
+	$idd = mysql_fetch_object($idda);
+    mysql_query("UPDATE prna SET abse = '$idd->abse|del' WHERE id LIKE '$_GET[id]'");
+    echo "Die Private Nachricht wurde gelöscht.";
+    exit;
   }
   $seite = $_GET["page"];
   if(!isset($seite) OR $seite == "0")
@@ -407,12 +451,14 @@ if($do == "pn_aus")
   $menge = mysql_num_rows($pn_dataz);
   $wieviel = $menge / $eps;
   $ws = ceil($wieviel);
-  echo "<table width=100%><tr style=font-weight:bold;  class=normal><td width=70%>Betreff / Empfänger</td><td>Datum</td></tr>";
+  echo "<table width=100%><tr style=font-weight:bold;  class=normal><td width=70%>Betreff / Empfänger</td><td>Datum</td><td>Löschen</td></tr>";
   while($pr = mysql_fetch_object($pn_data))
   {
     $datum = date("d.m.Y",$pr->dat);
     $uhrzeit = date("H:i",$pr->dat);
-    echo "<tr><td> <a href=?do=read_pn&aktion=$pr->id>$pr->betreff</a><br>$pr->emp</td><td>$datum<br>$uhrzeit</td></tr>";	
+	$emp = $pr->emp;
+	$emp = str_replace("|del","",$emp);
+    echo "<tr><td> <a href=?do=read_pn&aktion=$pr->id>$pr->betreff</a><br>$emp</td><td>$datum<br>$uhrzeit</td><td><a href=?do=pn_aus&action=del&id=$pr->id>Löschen</a></tr>";	
   }
   echo "</table>";
   if($ws > "1")
@@ -467,8 +513,9 @@ for($a=0; $a < $wieviel; $a++)
 	$q++;
 	}
 }
-echo " <a href=?do=pn_aus&page=$down>></a></td></tr></table></td></tr>"; 
+echo " <a href=?do=pn_aus&page=$down>></a></td></tr></table></td></tr></table>"; 
 }
+page_close_table();
 }
 if($do == "make_pn")
 {
@@ -480,13 +527,22 @@ if($pn_deakt == true)
 }
 if($ac == "change")
 {
-error_reporting(E_ALL);
+  $to_ho = mysql_query("SELECT * FROM users WHERE username LIKE '$_POST[to]'");
+  $th = mysql_fetch_object($to_ho);
+  if($th->onlyadm == "2")
+  {
+    if(GROUP != "2" AND GROUP != "3")
+	{
+	    erzeuge_error("Dieser Benutzer hat angegeben Private Nachrichten nur von  Administratoren bzw. Moderatoren zu empfangen.");
+	}
+  }
+  error_reporting(E_ALL);
   $to = $_POST["to"];
   $text = $_POST["feld"];
 
   check_data($text, "", "Du hast vergessen etwas anzugeben", "leer");
   check_data($_POST["bet"], "", "Du hast vergessen etwas anzugeben", "leer");
-   check_data($to, "", "Du hast keinen Empfänger angegeben", "leer");
+  check_data($to, "", "Du hast keinen Empfänger angegeben", "leer");
   check_data($text, "10", "Der angegebene Text ist zu kurz!", "laenge");
   $time = time();
   $eintrag = mysql_query("INSERT INTO prna (abse, emp, dat, betreff, mes, gel) VALUES ('". USER . "', '$to', '$time', '$_POST[bet]', '$_POST[feld]', '0')")or die(mysql_error());
