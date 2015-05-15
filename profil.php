@@ -152,12 +152,12 @@ $ac = $_GET["action"];
   {
     if(GROUP == "2" OR GROUP == "3")
 	{
-	    echo "<a href=\"main.php?do=make_pn&amp;to=$udp->username;\"><img src=\"images/pn.png\" border='0' height='16px' width='30px'> Private Nachricht schicken</a>";
+	    echo "<a href=\"main.php?do=make_pn&amp;to=$udp->username\"><img src=\"images/pn.png\" border='0' height='16px' width='30px'> Private Nachricht schicken</a>";
 	}
   }
   else
   {
-    echo "<a href=\"main.php?do=make_pn&amp;to=$udp->username;\"><img src=\"images/pn.png\" border='0' height='16px' width='30px'> Private Nachricht schicken</a>";
+    echo "<a href=\"main.php?do=make_pn&amp;to=$udp->username\"><img src=\"images/pn.png\" border='0' height='16px' width='30px'> Private Nachricht schicken</a>";
   }
   ?>
   <br>

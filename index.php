@@ -155,12 +155,20 @@ while($fr = mysql_fetch_object($foren_data))
 	  $last_beitrag = "Keine Beiträge";
 	}
 	}
+	
+	$user_see_forum = mysql_query("SELECT * FROM users WHERE last_site LIKE \"Befindet sich im Forum $fd->name\"")or die(mysql_error());
+	$usf = mysql_num_rows($user_see_forum);
+	$bes = "";
+	if($usf > "0")
+	{
+	  $bes = "($usf Betrachter)";
+	}
 
     if($fd->guest_see == "0")
     {
 	  $stat_them = $stat_them + $zahl_themen;
 	  $stat_bei = $stat_bei + $beit;
-      echo "<table width=100% bgcolor=#F2F2E5><tr><td width=70%><table><tr><td> $forum_stat &nbsp; </td><td><a href=forum.php?id=$fd->id><b>$fd->name</b></a><br><font size=2px>$fd->besch</font></td></tr></table></td><td>$last_beitrag</td><td width=5%>$zahl_themen</td><td width=5%>$beit</td></tr></table>";
+      echo "<table width=100% bgcolor=#F2F2E5><tr><td width=70%><table><tr><td> $forum_stat &nbsp; </td><td><a href=forum.php?id=$fd->id><b>$fd->name</b></a> $bes<br><font size=2px>$fd->besch</font></td></tr></table></td><td>$last_beitrag</td><td width=5%>$zahl_themen</td><td width=5%>$beit</td></tr></table>";
 	}
 	else
 	{
@@ -168,12 +176,12 @@ while($fr = mysql_fetch_object($foren_data))
 	  {
 	  	$stat_them = $stat_them + $zahl_themen;
 		$stat_bei = $stat_bei + $beit;
-        echo "<table width=100% bgcolor=#F2F2E5><tr><td width=70%><table><tr><td> $forum_stat &nbsp; </td><td><a href=forum.php?id=$fd->id><b>$fd->name</b></a></b><br><font size=2px>$fd->besch</font></td></tr></table></td><td>$last_beitrag</td><td width=5%>$zahl_themen</td><td width=5%>$beit</td></tr></table>";
+        echo "<table width=100% bgcolor=#F2F2E5><tr><td width=70%><table><tr><td> $forum_stat &nbsp; </td><td><a href=forum.php?id=$fd->id><b>$fd->name</b></a> $bes<br><font size=2px>$fd->besch</font></td></tr></table></td><td>$last_beitrag</td><td width=5%>$zahl_themen</td><td width=5%>$beit</td></tr></table>";
 	  }
 	}
   }
 }
-echo"<table width=100% class=navi><tr><td style=font-weight:bold;><center><a href=?do=marks>Alle Themen als gelesen markieren</a> | <a href=member.php?do=groups>Forum-Team</a></center></td></table><br>";
+echo "<table width=100% class=navi><tr><td style=font-weight:bold;><center><a href=?do=marks>Alle Themen als gelesen markieren</a> | <a href=member.php?do=groups>Forum-Team</a></center></td></table><br>";
 
 //Statistiken auf der Startseite
 $tabelle = "onlineuser";

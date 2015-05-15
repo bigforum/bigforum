@@ -13,9 +13,10 @@ if($order == "")
 }
 if($_GET["ip"] != "" AND (GROUP == "2" OR GROUP == "3"))
 {
-  $ip_auf =  gethostbyaddr($_GET["ip"]);
-  echo "<table><tr class=normal><td><big>IP-Adressen auflösen</big></td></tr>
-  <tr><td><b>IP-Adresse:</b> $_GET[ip]<br><b>Aufgelöst:</b> &nbsp; $ip_auf</td></tr></table>";
+  $ip = $_GET["ip"];
+    $ip_auf = gethostbyaddr($ip);
+    echo "<table><tr class=normal><td><big>IP-Adressen auflösen</big></td></tr>
+    <tr><td><b>IP-Adresse:</b> $_GET[ip]<br><b>Aufgelöst:</b> &nbsp; $ip_auf</td></tr></table>";
   page_footer();
 }
 

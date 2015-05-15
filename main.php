@@ -534,7 +534,7 @@ if($ac == "change")
     if(GROUP != "2" AND GROUP != "3")
 	{
 	    erzeuge_error("Dieser Benutzer hat angegeben Private Nachrichten nur von  Administratoren bzw. Moderatoren zu empfangen.");
-	}
+	}	
   }
   error_reporting(E_ALL);
   $to = $_POST["to"];

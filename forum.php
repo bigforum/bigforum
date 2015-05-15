@@ -53,7 +53,32 @@ $them_dat = mysql_query("SELECT * FROM thema WHERE where_forum LIKE '$id' ORDER 
 $them_meng = mysql_query("SELECT id FROM thema WHERE where_forum LIKE '$id'");
 $menge = mysql_num_rows($them_meng); 
 $wieviel_seiten = $menge / $eps; 
-
+if(GROUP == "2" OR GROUP == "3")
+{
+?>
+<script type="text/javascript">
+function feld(x,i)
+{
+  y = prompt("Bitte Gebe einen neuen Titel ein:",x);
+  if(y != "")
+  {
+    if(y != null)
+	{
+      window.open("?id=<?php echo $_GET["id"];?>&do=change_title&title="+y+"&idd="+i+"","_self");
+	}
+  }
+}
+</script>
+<?
+}
+if($_GET["do"] == "change_title")
+{
+  if(GROUP == "2" OR GROUP == "3")
+  {
+    mysql_query("UPDATE thema SET tit = '$_GET[title]' WHERE id LIKE '$_GET[idd]'");
+	echo "<script>window.location.href='forum.php?id=$_GET[id]';</script>";
+  }
+}
 if($fd->admin_start_thema == "2")
 {
   if(GROUP == "2" OR GROUP == "3")
@@ -78,7 +103,7 @@ else
 
 echo "<table width=73% height=10% border=0 cellpadding=6 cellspacing=0><tr class=dark height=10%><td height=10%><font color=snow> <center> <b><big>$fd->name</big> - Themenübersicht</b> </center> </font></td></tr></table>";
 
-echo "<table width=73%><tr class=normal style='font-weight:bold;'><td width=3%></td><td width=40% valign=center>Title</td><td width=20% valign=center>Autor</td><td width=10%  valign=center>Antworten</td></tr>";
+echo "<table width=73%><tr class=normal style='font-weight:bold;'><td width=3%></td><td width=40% valign=center>Title</td><td width=20% valign=center>Letzter Beitrag</td><td width=10%  valign=center>Antworten</td></tr>";
 
 while($thd = mysql_fetch_object($them_dat))
 {
@@ -142,12 +167,25 @@ while($thd = mysql_fetch_object($them_dat))
   {
     $rechnung = "1";
   }
-  if($da->when_look < $thd->last_post_time AND $das->when_look < $thd->last_post_time)
+  $last_beitr = mysql_query("SELECT * FROM beitrag WHERE where_forum LIKE '$thd->id' ORDER BY post_dat DESC LIMIT 1")or die(mysql_error());
+  $lb = mysql_fetch_object($last_beitr);
+  if($lb->post_dat != "")
   {
-    echo "<tr><td width=3%>$close</td><td width=50%><b>$wich <a href=thread.php?id=$thd->id&page=$rechnung>$thd->tit</a></b></td><td width=20%><span style=\"cursor: pointer;\" onclick=\"window.location.href='profil.php?id=$vd->id'\">$thd->verfas</span><td width=10%>$zahl</td></tr>";
+    $time_last = date("d.m.Y - H:i", $lb->post_dat);
+    $last_answer = "$time_last<br><small>von $lb->verfas</small>";
   }
   else
-    echo "<tr><td width=3%>$close</td><td width=50%>$wich <a href=thread.php?id=$thd->id&page=$rechnung>$thd->tit</a></td><td width=20%><span style=\"cursor: pointer;\" onclick=\"window.location.href='profil.php?id=$vd->id'\">$thd->verfas</span><td width=10%>$zahl</td></tr>";
+  {
+    $time_last = date("d.m.Y - H:i", $thd->post_when);
+    $last_answer = "$time_last<br><small>von $thd->verfas</small>"; 
+  }
+  
+  if($da->when_look < $thd->last_post_time AND $das->when_look < $thd->last_post_time)
+  {
+    echo "<tr><td width=3%><span id=text ondblclick=\"feld('$thd->tit','$thd->id')\">$close</span></td><td width=50%><b><span id=text ondblclick=\"feld('$thd->tit','$thd->id')\">$wich <a href=thread.php?id=$thd->id&page=$rechnung>$thd->tit</a></span></b><br><span style=\"cursor: pointer;\" onclick=\"window.location.href='profil.php?id=$vd->id'\"><small>$thd->verfas</small></span></td><td width=20%>$last_answer</td><td width=10%>$zahl</td></tr>";
+  }
+  else
+    echo "<tr><td width=3%><span id=text ondblclick=\"feld('$thd->tit','$thd->id')\">$close</span></td><td width=50%><span id=text ondblclick=\"feld('$thd->tit','$thd->id')\">$wich <a href=thread.php?id=$thd->id&page=$rechnung>$thd->tit</a></span><br><span style=\"cursor: pointer;\" onclick=\"window.location.href='profil.php?id=$vd->id'\"><small>$thd->verfas</small></span></td><td width=20%>$last_answer</td><td width=10%>$zahl</td></tr>";
 }
 echo "</table>";
 if($topics == "0")

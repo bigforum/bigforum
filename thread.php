@@ -195,6 +195,11 @@ $cou = mysql_query("SELECT * FROM beitrag WHERE where_forum LIKE '$id'");
 $menge = mysql_num_rows($cou);
 $wieviel = $menge / $eps;
 $ws = ceil($wieviel);
+$modffunk = "";
+if(GROUP == "2" OR GROUP == "3" OR USER == $td->verfas)
+{
+  $modffunk = "<td></td>";
+}
 
 echo "<table class=titl width=100%><tr><td><table><tr><td>Du bist hier:</td><td><a href='index.php'>". SITENAME ."</a> > <a href='forum.php?id=$fd->id'>$fd->name</a></td></tr><tr><td></td><td><big><b>$td->tit</b></big></td></tr></table></td></tr></table><br>";
 answer_button($fd->user_posts, GROUP, $id, $td->close);
@@ -206,7 +211,7 @@ if($ws == $seite)
 {
   $down--;
 }
-echo "<table width=80%><tr><td align=right valign=right><table class=navi><tr><td>";
+echo "<table width=80%><tr>$modffunk<td align=right valign=right><table class=navi><tr><td>";
 echo "<font color=snow>Seite $seite von $ws &nbsp <a href=?id=$_GET[id]&page=$up><</a>";
 //Welche Seiten sollen angezeigt werden?
 $seiten = "0,1,2,3,5,10,25,50,100,150,250,500,750";
@@ -271,8 +276,13 @@ if($td->edit_from != "")
 if($seite <= "1")
 {
   if($ws <= "1")
-    echo "<table width=80%>";
-  echo "<tr class=dark><td><font color=snow><b>$datum, $uhrzeit</b> $edit</font></td></tr></table>";
+    echo "<table width=80% class=dark>";
+  $modfunk = "";
+  if(GROUP == "2" OR GROUP == "3" OR USER == $td->verfas)
+  {
+    $modfunk = "<td align=right valign=right class=dark><a href=thredit.php?id=$td->id><img src=images/edit.png width=10% height=0% border=0></a></td>";
+  }
+  echo "<tr class=dark><td><font color=snow><b>$datum, $uhrzeit</b> $edit</font></td>$modfunk</tr></table>";
   text_ausgabe($td->text, $td->tit, $td->verfas);
 }
 
