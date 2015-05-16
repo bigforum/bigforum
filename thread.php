@@ -6,7 +6,7 @@ looking_page("readthema");
 include("includes/function_forum.php");
 include_once("includes/function_user.php");
 
-//Wichtige MySQL Abfrage, da bei manchen Anbietern ansonsten fehler kommen.
+//Wichtige MySQL Abfrage, da bei manchen Anbietern ansonsten Fehler kommen.
 $user_data = mysql_query("SELECT * FROM users WHERE username LIKE '". USER ."'");
 $ud = mysql_fetch_object($user_data);
 
@@ -280,7 +280,7 @@ if($seite <= "1")
   $modfunk = "";
   if(GROUP == "2" OR GROUP == "3" OR USER == $td->verfas)
   {
-    $modfunk = "<td align=right valign=right class=dark><a href=thredit.php?id=$td->id><img src=images/edit.png width=10% height=0% border=0></a></td>";
+    $modfunk = "<td align=right valign=right class=dark><a href=thredit.php?id=$td->id><img src='images/edit.png' width=13% height=6% border=0 /></a></td>";
   }
   echo "<tr class=dark><td><font color=snow><b>$datum, $uhrzeit</b> $edit</font></td>$modfunk</tr></table>";
   text_ausgabe($td->text, $td->tit, $td->verfas);
@@ -309,7 +309,7 @@ $uhrzeit = date("H:i",$bd->post_dat);
 $mod_funk = "";
 if(GROUP == "2" OR GROUP == "3" OR USER == $bd->verfas)
 {
-  $mod_funk = "<td align=right valign=right><a href=edit.php?id=$bd->id><img src=images/edit.png width=30% height=0% border=0></a><a href=javascript:del($bd->id)><img src=images/del.png width=30% height=0% border=0></a></td>";
+  $mod_funk = "<td align=right valign=right><a href=edit.php?id=$bd->id><img src=images/edit.png width=30% height=50% border=0></a><a href=javascript:del($bd->id)><img src=images/del.png width=30% height=50% border=0></a></td>";
 }
 echo "<br><span id='$bd->id'><table width=80% height=10%><tr class=dark><td><table width=100% height=100%><tr><td width=80%><font color=snow><b>$datum, $uhrzeit</b> $edit</font></td>$mod_funk</tr></table></td></tr></table>";
 echo "<a name=$bd->id>";

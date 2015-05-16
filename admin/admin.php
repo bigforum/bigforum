@@ -179,7 +179,7 @@ switch ($do) {
   </fieldset>
   <br>
   <fieldset><legend>Header-Anzeige</legend>Hier kannst du eine Nachricht eingeben, welche bei <u>allen</u> Benutzern angezeigt wird. Sollte ein User eine alte Header-Notiz haben, wird diese mit dieser überschrieben.<br>
-  Die Benutzer können die Header-Notiz, genauwie eine persönliche Notiz, über das Usercp ausbleden. Bei der Userverlwatung kannst du sehen, was ein Benutzer im Header stehehn hat.<br>
+  Die Benutzer können die Header-Notiz, genauwie eine persönliche Notiz, über den Persönlichen Bereich ausbleden. Bei der Userverwaltung kannst Du sehen, was ein Benutzer im Header stehen hat.<br>
   <form action=?do=design&action=noti method=post>
   <input type=text size=40 name=noti><input type=submit value=Speichern></form>";
   break;
@@ -223,9 +223,9 @@ switch ($do) {
   case "ver_user":
     left_table($user);
   admin_recht("5");
-  echo "<table class=braun width=50%><tr class=besch><td><b>Benutzerverwaltung</b></td></tr><tr><td>
+  echo "<table class=braun width=70%><tr class=besch><td><b>Benutzerverwaltung</b></td></tr><tr><td>
   Bitte gebe in das nachfolgenden Feld den Benutzernamen ein, den du verwalten willst.<br><br>
-  <form action=?do=pro_user method=post>Benutzername: <input type=text name=username value=$_GET[name]><input type=submit value=Verwalten></form>
+  <form action=?do=pro_user method=post>Benutzername: <input type=text name=username value=$_GET[name]><input type=submit value=Suchen></form>
   </td></tr></table>";
   break;
   
@@ -237,9 +237,18 @@ switch ($do) {
 	 $uds = mysql_fetch_object($user_datas);
 	 if($uds->id == "")
 	 {
-	   echo "<table class=braun width=50%><tr class=besch><td><b>Fehler: Benutzername</b></td></tr><tr><td>
-       Fehler, dieser Benutzername ist leider nicht vorhanden.<br> Bitte beachte, dass dieser Benutzername vorhanden sein soll.<br><br><a href=?do=ver_user>Benutzernamen suchen</a>
-	   </td></tr></table>";
+	   echo "<table class=braun width=70%><tr class=besch><td><b>Fehler: Benutzername</b></td></tr><tr><td>
+       Fehler, dieser Benutzername ist leider nicht vorhanden.<br> Bitte beachte, dass dieser Benutzername vorhanden sein soll.<br><br><a href=?do=ver_user>Nochmal suchen</a><br><br>";
+	   $se_da = mysql_query("SELECT * FROM users WHERE username LIKE '%$_POST[username]%'");
+	   if(mysql_num_rows($se_da) != "0")
+	   {
+	     echo "<b>Vorschläge:</b><br><br>";
+	   }
+	   while($sd = mysql_fetch_object($se_da))
+	   {
+	     echo "<a href=?do=ver_user&name=$sd->username>$sd->username</a><br>";
+	   }
+	   echo "</td></tr></table>";
 	 }
 	 else {
 	   $gruppe = "Benutzer";
@@ -315,12 +324,14 @@ switch ($do) {
   break;
   
   case "change_headern":
+  	insert_log("Notiz im Header wurde bei allen Benutzern gelöscht");
     left_table($user);
     mysql_query("UPDATE users SET notice = ''");
     echo "Es wird nun keinem Benutzer mehr eine Notiz im Header angezeigt.";
   break;
   
   case "change_htmlcan":
+  	insert_log("Alle Benutzer dürfen kein HTML mehr benutzen");
     left_table($user);
     mysql_query("UPDATE users SET htmlcan = '3'");
     echo "Es wurde nun allen Benutzern verboten HTML zu benutzen.";
@@ -336,12 +347,21 @@ switch ($do) {
 	  }
 	  if($_GET["action"] == "insert")
 	  {
-	    mysql_query("INSERT INTO verbo (name, benemail) VALUES ('$_POST[verbo]','$_POST[bemail]')");
-		echo "Danke, $_POST[name] wurde hinzugefügt.<br> <a href=?do=not_use>Zurück zur Übersicht</a>";
+	    $data = mysql_query("SELECT * FROM verbo WHERE name LIKE '$_POST[verbo]' AND benemail LIKE '$_POST[bemail]'");
+		if(mysql_num_rows($data) == "0")
+		{
+	      mysql_query("INSERT INTO verbo (name, benemail) VALUES ('$_POST[verbo]','$_POST[bemail]')");
+		  echo "Danke, $_POST[name] wurde hinzugefügt.<br> <a href=?do=not_use>Zurück zur Übersicht</a>";
+		}
+		else
+		{
+		  echo "Dieser Benutzername bzw. diese Mail-Adresse exestiert bereits.";
+		}
 	    exit;
 	  }
 	  $verho = mysql_query("SELECT * FROM verbo");
-	  echo "<table><tr><td>Verbot</td><td>Eigenschaft</td><td>Aktion</td></tr>";
+	  echo "<table><tr><td><div style=\"overflow:auto;width:400px;height:300px;\">
+	  <table><tr><td><b>Verbot</b></td><td><b>Eigenschaft</b></td><td><b>Aktion</b></td></tr>";
 	  while($vh = mysql_fetch_object($verho))
 	  {
 	    if($vh->benemail == "1")
@@ -354,7 +374,7 @@ switch ($do) {
 		}
 		echo "<tr><td>$vh->name</td><td>$be</td><td><a href=?do=not_use&action=del&id=$vh->id>Löschen</a></td>";
 	  }
-	  echo "</table><hr>
+	  echo "</table></td></tr></table><hr>
 	  <b>Neues Verbot von Benutzernamen / eMail-Adrsse hinzufügen:<br><br>
 	  <form action=?do=not_use&action=insert method=post><input type=text name=verbo><select name=bemail><option value=1>eMail-Adresse</option><option value=2>Benutzername</option></select><br><input type=submit value=Speichern></form>";
   break;
@@ -976,6 +996,7 @@ switch ($do) {
   $aa = mysql_fetch_object($adal);
   if($_GET["aktion"] == "save")
   {
+  	insert_log("AdServer-Einstellungen wurden geändert.");
     mysql_query("UPDATE config SET wert1 = '$_POST[notsee]', zahl1 = '$_POST[akti]' WHERE erkennungscode LIKE 'f2adser2'");
 	echo "Die AdServer-Einstellungen wurden geändert.";
 	exit;
@@ -989,12 +1010,14 @@ switch ($do) {
 	}
     mysql_query("INSERT INTO adser (bannerad, link, klicks, see) VALUES ('$_POST[bannerli]', '$_POST[link]', '0', '0')");
 	echo "Der Link wurde erfolgreich hinzugefügt.";
+	insert_log("Link im AdServer wurde hinzugefügt");
     exit;
   }
   if($_GET["del"] != "")
   {
     mysql_query("DELETE  FROM adser WHERE id LIKE '$_GET[del]'");
-    echo "Eintrag wurde erfolgreich gelöscht.";
+    echo "Banner wurde erfolgreich gelöscht.";
+	insert_log("Banner wurde aus dem AdServer entfernt.");
 	exit;
   }
   if($aa->zahl1 == "1")
@@ -1080,6 +1103,7 @@ switch ($do) {
 	{
 	  echo "$usernamen[$r]<br>";
 	}
+	insert_log("Rundbrief wurde an $user Benutzer versendet.");
   break;
   
   case "rundbrief":

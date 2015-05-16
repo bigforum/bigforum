@@ -159,6 +159,10 @@ $ac = $_GET["action"];
   {
     echo "<a href=\"main.php?do=make_pn&amp;to=$udp->username\"><img src=\"images/pn.png\" border='0' height='16px' width='30px'> Private Nachricht schicken</a>";
   }
+  if($udp->show_mail == "0")
+  {
+    echo "<br><a href=\"mailto:$udp->mail\"><img src=\"images/pn.png\" border='0' height='16px' width='30px'> eMail schreiben</a>";
+  }
   ?>
   <br>
   <br>

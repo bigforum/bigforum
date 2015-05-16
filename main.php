@@ -81,6 +81,11 @@ if($akt != "0")
 }
 page_close_table();
 }
+if($do == "del_ava")
+{
+  mysql_query("UPDATE users SET ava_link = '' WHERE username LIKE '". USER ."'");
+  echo "Es wird nun kein Avatar mehr in Beiträgen angezeigt.";
+}
 if($do == "sign") {
 if($cd->zahl1 != "1")
 {
@@ -150,7 +155,7 @@ Hier kannst du dir dein eigenes Avatar hochladen. Bitte beachte, dass dein Avata
 Beachte das egal wie groß dein Avatar ist, es automatisch in 100x100 px  umgewandelt wird (Kann Abweichungen geben).
 <form action="?do=ava&aktion=send" method="post" enctype="multipart/form-data">
 <input type="file" name="datei"><br>
-<input type="submit" value="Hochladen">
+<input type="submit" value="Hochladen"><input type=button value="Bestehendes Avatar löschen" onclick="location.href='?do=del_ava'">
 </form>
 </fieldset>
 <?
@@ -304,7 +309,7 @@ if($do == "pn_ein")
   $pn_dataz = mysql_query("SELECT * FROM prna WHERE emp LIKE '". USER ."'");
 
 
-  echo "<table width=100%><tr style=font-weight:bold;  class=normal><td width=70%>Betreff / Absenden</td><td>Datum</td><td>Löschen</td></tr>";
+  echo "<table width=100%><tr style=font-weight:bold;  class=normal><td width=70%>Betreff / Absender</td><td>Datum</td><td>Löschen</td></tr>";
   while($pr = mysql_fetch_object($pn_data))
   {
     $d = explode("|", $pr->emp);
@@ -593,19 +598,33 @@ if($do == "profil")
   if($ac == "")
   {
     include_once("includes/function_user.php");
+	if($ud->show_mail == "0")
+	{
+	  $showing_mail = "<input type=radio value=0 name=se checked>Ja <input type=radio value=1 name=se>Nein";
+	}
+	else
+	{
+	  $showing_mail = "<input type=radio value=0 name=se>Ja <input type=radio value=1 name=se checked>Nein";
+	}
     echo "<form action=?do=profil&aktion=change method=post>
 	<fieldset><legend>Profil bearbeiten</legend>
 	Hier kannst du deine Website, sowie deine Hobbys angeben. Diese werden dann im Profil zu finden sein.<br>
 	<table><tr><td>Hobbys</td><td>Website</td></tr>
 	<td><input type=text name=hob value=\"$ud->hob\" size=40  maxlength=160></td><td><input type=text name=website value=\"$ud->website\" size=40 maxlength=110></td></tr></table>
-	</fieldset><input type=submit value=Bearbeiten>";
+  </fieldset>
+	<fieldset><legend>Einstellungen</legend>
+	<table>
+	<tr><td>Zeige eMail-Adresse im Profil</td><td>$showing_mail</td></tr>
+	</table>
+	</fieldset>
+	<input type=submit value='Änderungen übernehmen'>";
 	page_close_table();
   }
   if($ac == "change")
   {
     $web = $_POST["website"];
 	$web = str_replace("http://","",$web);
-    $eintrag = mysql_query("UPDATE users SET hob = '$_POST[hob]', website = '$web' WHERE username LIKE '". USER ."'");
+    $eintrag = mysql_query("UPDATE users SET hob = '$_POST[hob]', website = '$web', show_mail = '$_POST[se]' WHERE username LIKE '". USER ."'");
 	speicherung($eintrag, "Danke, dein Profil wurde erfolgreich übernommen", "<b>Fehler:</b> Es gab einen Fehler bei der Speicherung des Profils.<br>Versuche es nochmal! <a href=history.back()>Zurück</a>");
     page_close_table();
   }
