@@ -603,7 +603,7 @@ function show_stat($s)
   $time = time();
   $most_user_posts = mysql_query("SELECT * FROM users ORDER BY posts DESC LIMIT 5");
   $new_user = mysql_query("SELECT * FROM users ORDER BY reg_dat DESC LIMIT 5");
-  $new_them = mysql_query("SELECT * FROM thema ORDER BY last_post_time DESC LIMIT 5");
+  $new_them = mysql_query("SELECT * FROM thema ORDER BY last_post_time DESC");
   $last_akt = mysql_query("SELECT * FROM users ORDER BY last_log DESC LIMIT 5");
   if($s == "j")
   {
@@ -640,13 +640,26 @@ function show_stat($s)
     echo "<tr><td><a href=profil.php?id=$nu->id>$usan</a></td><td>$dat</td></tr>";
   } 
   echo "</table></td><td><table>";
-  while($nt = mysql_fetch_object($new_them))
+  $x = "0";
+  while($nt = mysql_fetch_object($new_them) AND $x != 5)
   {
+
 	  $anz = mysql_query("SELECT * FROM beitrag WHERE where_forum LIKE '$nt->id'");
 	  $anza = mysql_num_rows($anz);
+	  $forum_data = mysql_query("SELECT * FROM foren WHERE id LIKE '$nt->where_forum'");
+      $fd = mysql_fetch_object($forum_data);
 	  $rech = ceil($anza/10);
 	  $dat = date("d.m.Y - H:i", $nt->last_post_time);
-	  echo "<tr><td><a href=thread.php?id=$nt->id&page=$rech>$nt->tit</a></td><td>$dat</td></tr>";
+	  if($fd->guest_see == "2" AND (GROUP == 2 OR GROUP == 3))
+      {
+        $x++;
+	    echo "<tr><td><a href=thread.php?id=$nt->id&page=$rech>$nt->tit</a></td><td>$dat</td></tr>";
+	  }
+	  elseif($fd->guest_see != "2")
+	  {
+	    $x++;
+	    echo "<tr><td><a href=thread.php?id=$nt->id&page=$rech>$nt->tit</a></td><td>$dat</td></tr>";
+	  }
   }
   echo "</table></td><td><table>";
   while($la = mysql_fetch_object($last_akt))
