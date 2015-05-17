@@ -98,7 +98,12 @@ if($extra != "")
 {
   $extra = str_replace("_", " ", $extra);
 }
-  echo "
+  echo "<script>
+  function smilie(sm)
+  {
+    document.feld.feld.value += sm
+  }
+  </script>
 <form action=?do=make_pn&aktion=change method=post name=feld>
 An:<br>
 <input type=text name=to value='$value'><br><br>
@@ -110,7 +115,23 @@ Nachricht:
 <input type=button style='background-color:silver;' value=Link onclick=\"document.feld.feld.value += '[url][/url]'\"><input type=button style='background-color:silver;' value=Code onclick=\"document.feld.feld.value += '[code][/code]'\"><input type=button style='background-color:silver;' value=Bild onclick=\"document.feld.feld.value += '[img][/img]'\"><br>
 <textarea cols=70 rows=7 name=feld></textarea><br>
 <input type=submit value=Absenden style=background-color:silver;>
-</tr></td></table>";
+</td><td valign=top><br>";
+$drei = "0";
+$config_wert = mysql_query("SELECT * FROM config WHERE erkennungscode LIKE 'f2laengfs'");
+$con = mysql_fetch_object($config_wert); 
+$smilie_data = mysql_query("SELECT * FROM smilie WHERE packet = '$con->zahl2'");
+while($sd = mysql_fetch_object($smilie_data))
+{
+  $drei++;
+  echo "<a href=javascript:smilie('$sd->abk1')><img src=images/$sd->images_path width=25 height=25 border=0></a>";
+  if($drei == "3")
+  {
+    $drei = "0";
+	echo "<br>";
+  }
+}
+echo "<br>
+</td></tr></table>";
 }
 }
 function mysqlVersion() {
@@ -237,6 +258,13 @@ function looking_page($wo)
     $page = "newreply.php";
 	$text = "Antwortet auf $td->tit";
   }
+  if($wo == "onekat")
+  {
+    $them_dat = mysql_query("SELECT * FROM kate WHERE id LIKE '$_GET[id]'");
+	$td = mysql_fetch_object($them_dat);
+    $page = "index.php?do=show_one&id=$td->id";
+	$text = "Betrachtet die Foren einer Kategorie $td->name";
+  }
   if($wo == "foren_helfer")
   {
     $page = "member.php";
@@ -287,6 +315,12 @@ function erzeuge_error($text)
 <tr class=normal><td><font color=snow><b>". SITENAME ." - Fehlermeldung</b></td></tr>
 	<tr><td align=center>$text</td></tr></table></center><br><br>";
   page_footer();
+}
+function erzeuge_mysql_error($text)
+{
+  echo "<center><table class=bord width=50% height=50%>  
+<tr class=normal><td><font color=snow><b>". SITENAME ." - Datenbank-Fehler</b></td></tr>
+	<tr><td align=center>$text</td></tr></table></center><br><br>";
 }
 function connect_to_database()
 {
@@ -458,19 +492,36 @@ function text_ausgabe($text, $betreff, $from)
   {
     $ava = "<img src=$fd->ava_link title=\"$fd->username's Avatar\" width=100 height=100>";
   }
+  if(mysql_num_rows($from_data) > 0)
+  {
+    $linkeins = "<span style=\"cursor: pointer;\" onclick=\"window.location.href='profil.php?id=$fd->id'\">";
+	$rang = $fd->rang;
+	$beitr = "<b>Beiträge:</b> $fd->posts<br>";
+	$datum = "<b>Registriert seit:</b> $datum<br><br><br>";
+  }
+  else
+  {
+     $linkeins = "";
+	 $rang = "Gast";
+	 $beitr = "";
+	 $datum = "";
+  }
   echo "<table border=1  width=80% class=post>
 <tr>
 <td width=29% valign=top>
 <table>
 <tr><td>$ava</td><td>
-<b><span style=\"cursor: pointer;\" onclick=\"window.location.href='profil.php?id=$fd->id'\">$from</b>";
-show_online($fd->last_log, $fd->username);
+<b>$linkeins$from</b>";
+if(mysql_num_rows($from_data) > 0)
+{
+  show_online($fd->last_log, $fd->username);
+}
 echo "<br>
-$fd->rang</br><br>
+$rang</br><br>
 </td></tr></table>
 
-<b>Beiträge:</b> $fd->posts<br>
-<b>Registriert seit:</b> $datum<br><br><br>
+$beitr
+$datum
 </td>
 <td valign=top width=51%>
 <b>$betreff</b><hr>
@@ -509,6 +560,43 @@ function today($datum)
     $datum = "Heute";
   }
 }
+function mysql_fehler($fehler, $line, $datei)
+{
+  $err = 'Hallo,
+  
+  soben trat beim Absender dieser Privaten Nachricht folgende Fehlermeldung auf:
+	  
+  [FEHLER]
+	  
+  Der Fehler befindet sich in der Zeile [LINE] und in der Datei [DATEI].
+	  
+  Dieses ist eine automatische Private Nachricht, welche vom Forum aus verschickt wurde.';
+  
+  $error = $fehler;
+  
+  $pn_nach = mysql_query("SELECT * FROM users WHERE group_id = 3 AND adm_recht = 6");
+  while($dh = mysql_fetch_object($pn_nach))
+  { 
+    $error = str_replace(' ','_u_',$error);
+	$error = str_replace("'",'"',$error);
+    $err = str_replace('[LINE]',$line,$err);
+    $err = str_replace('[DATEI]',$datei,$err);
+    $err = str_replace('[FEHLER]',$error,$err);
+	$err = str_replace('_u_',' ',$err);
+    $time = time();
+    mysql_query("INSERT INTO prna (abse, emp, dat, betreff, mes, gel) VALUES ('$_COOKIE[username]', '$dh->username', '$time', 'Datenbank-Fehlermeldung', '$err', '0')");
+  }
+  
+  erzeuge_mysql_error("<table>
+  <tr><td>Zeile:</td><td>$line</td></tr>
+  <tr><td>Datei:</td><td>$datei</td></tr>
+  <tr><td valign=top>Erweiterte Fehlerausgabe:</td><td>$fehler</td></tr>
+  <tr><td>Sonstiges:</td><td>Ein Administrator wurde informiert.</td></tr></table>");
+
+  
+  page_footer();
+
+}
 function show_stat($s)
 {
   //Statistik anzeige
@@ -519,7 +607,7 @@ function show_stat($s)
   $last_akt = mysql_query("SELECT * FROM users ORDER BY last_log DESC LIMIT 5");
   if($s == "j")
   {
-    echo "<div style=\"display: block;\" id=\"eins\">";
+    echo "<div style=\"display: block;\" id=\"zwei\">";
   }
   echo "<table class=bord><tr><td class=normal>Meiste Beiträge</td><td class=normal>Neue Benutzer</td><td class=normal>Letzte Antworten</td><td class=normal>Letzte Aktuallisierungen</td></tr>
   <tr><td><table>";

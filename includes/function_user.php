@@ -16,7 +16,8 @@ function pn_zahl($where)
 {
   if(USER != "Gast")
   {
-    $zahl = "0";
+    $postein = "0";
+	$postaus = "0";
 	$gele = "0";
     $pn_zahl = mysql_query("SELECT * FROM prna WHERE abse LIKE '". USER . "'");
 	while($zahle = mysql_fetch_object($pn_zahl))
@@ -26,7 +27,7 @@ function pn_zahl($where)
 	  {
 	    if($zahle->emp != USER)
 	    {
-	      $zahl++;	  
+	      $postaus++;	  
 	    }
 	  }
 	}
@@ -36,7 +37,7 @@ function pn_zahl($where)
 	  $d = explode("|", $zahles->emp);
 	  if($d[1] != "del")
 	  {
-	    $zahl++;	
+	    $postein++;	
         if($zahles->gel == "0")
         {  
 	      $gele++;
@@ -62,11 +63,11 @@ function pn_zahl($where)
 	    $zeichen = "<span style='cursor: pointer;' onclick=\"window.location.href='main.php?do=pn_ein'\">";
 		$zeichen2 = "</span>";
 	  }
-	  
+	  $gesammt = $postein + $postaus;
 	  if($gele == "0")
-	    echo "<br><br><small><span style='cursor: pointer;' onclick=\"window.location.href='main.php?do=pn_ein'\">Du hast $zahl($gele) Nachrichten.</span></small>";
+	    echo " <span style='cursor: pointer;' onclick=\"window.location.href='main.php?do=pn_ein'\">Posteingang: $postein Postausgang: $postaus Gesamt: $gesammt.</span>";
 	  else
-	    echo "<br><br><blink><font color=red>$zeichen Du hast $zahl($gele) Nachrichten.$zeichen2</font></blink>";
+	    echo " <blink><font color=red>$zeichen Posteingang: $postein Postausgang: $postaus Gesamt: $gesammt. $zeichen2</font></blink>";
 	}
   }
 }

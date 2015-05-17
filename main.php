@@ -189,26 +189,6 @@ if($do == "set")
 	{
 	  $checked = "checked";
 	}
-	if($ud->style == "blue")
-    {
-      $sty = "<option value=blue>Blau</option><option value=red>Rot</option><option value=brown>Braun</option><option value=green>Grün</option>";
-    }
-    if($ud->style == "green")
-    {
-      $sty = "<option value=green>Grün</option><option value=red>Rot</option><option value=brown>Braun</option><option value=blue>Blau</option>"; 
-    }
-	if($ud->style == "red")
-	{
-      $sty = "<option value=red>Rot</option><option value=green>Grün</option><option value=brown>Braun</option><option value=blue>Blau</option>";  	
-	}
-	if($ud->style == "brown")
-	{
-      $sty = "<option value=brown>Braun</option><option value=red>Rot</option><option value=blue>Blau</option><option value=green>Grün</option>";	
-	}
-	elseif(!isset($sty))
-	{
-      $sty = "<option value=brown>Braun</option><option value=red>Rot</option><option value=blue>Blau</option><option value=green>Grün</option>";	
-	}
 	if($ud->onlyadm == "2")
 	{
 	  $pnj = "checked";
@@ -228,7 +208,20 @@ if($do == "set")
 	</fieldset><br>
 	<fieldset><legend>Design</legend>
 	<table><tr><td>
-    Welche Farbe soll dieses Forum haben?</td><td><select name=sty>$sty</select></td></tr></table></fieldset>
+    Welche Farbe soll dieses Forum haben?</td><td><select name=sty>";
+	$style_data = mysql_query("SELECT * FROM style_all");
+	while($sd = mysql_fetch_object($style_data))
+	{
+	  if($ud->style == $sd->sname)
+	  {
+	    echo "<option value='$sd->sname' selected=selected>$sd->sname</option>";
+	  }
+	  else
+	  {
+	  	echo "<option value='$sd->sname'>$sd->sname</option>";
+	  }
+	}
+	echo "</select></td></tr></table></fieldset>
 	<br>";
 	if($ud->notice != "" AND $ud->notice != "0")
 	{
@@ -289,8 +282,15 @@ if($do == "pn_ein")
   {
     $idda = mysql_query("SELECT * FROM prna WHERE id LIKE '$_GET[id]'");
 	$idd = mysql_fetch_object($idda);
-    mysql_query("UPDATE prna SET emp = '$idd->emp|del' WHERE id LIKE '$_GET[id]'");
-    echo "Die Private Nachricht wurde gelöscht.";
+	if($idd->emp == USER)
+	{
+      mysql_query("UPDATE prna SET emp = '$idd->emp|del' WHERE id LIKE '$_GET[id]'");
+      echo "Die Private Nachricht wurde gelöscht.";
+	}
+	else
+	{
+	  erzeuge_error("Du hast keine Rechte diese Private Nachricht zu löschen");
+	}
     exit;
   }
   looking_page("look_pn");
@@ -437,8 +437,15 @@ if($do == "pn_aus")
   {
     $idda = mysql_query("SELECT * FROM prna WHERE id LIKE '$_GET[id]'");
 	$idd = mysql_fetch_object($idda);
-    mysql_query("UPDATE prna SET abse = '$idd->abse|del' WHERE id LIKE '$_GET[id]'");
-    echo "Die Private Nachricht wurde gelöscht.";
+	if($idd->abse == USER)
+	{
+      mysql_query("UPDATE prna SET abse = '$idd->abse|del' WHERE id LIKE '$_GET[id]'");
+      echo "Die Private Nachricht wurde gelöscht.";
+	}
+	else
+	{
+	  erzeuge_error("Du hast keine Rechte diese Private Nachricht zu löschen.");
+	}
     exit;
   }
   $seite = $_GET["page"];

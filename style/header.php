@@ -9,11 +9,19 @@ $config_datas = mysql_query("SELECT * FROM config WHERE erkennungscode LIKE 'f2l
 <link rel="stylesheet" type="text/css" href="style/<? 
 $user_data = mysql_query("SELECT * FROM users WHERE username LIKE '". USER ."'");
 $ud = mysql_fetch_object($user_data);
+$style_data = mysql_query("SELECT * FROM style_all WHERE sname LIKE '$ud->style'");
+$sd = mysql_fetch_object($style_data);
 if($ud->style == "")
-echo $cd->wert2;
+{
+  $style_data = mysql_query("SELECT * FROM style_all WHERE sname LIKE '$cd->wert2'");
+  $sd = mysql_fetch_object($style_data);
+  echo $sd->link_style;
+}
 else
-echo $ud->style;
-?>style.css" />
+{
+  echo $sd->link_style;
+}
+?>" />
 
 
 </head>
@@ -54,15 +62,30 @@ $cd = mysql_fetch_object($config_datas);
 echo "<a href=index.php><img src='$cd->wert2' border=0 title='". SITENAME ."' height=70%></a>";
 ?></td>
 <td class="tab1" width="30%" valign="top">
-
-Willkommen, <span style="cursor: pointer;" onclick="window.location.href='profil.php?id=<?php echo $ud->id; ?>'"><?php echo USER; ?></span><?php if($username == "Gast"){?>
+<?php if($username == "Gast" OR USER == ""){?>
+Willkommen, <span style="cursor: pointer;" onclick="window.location.href='profil.php?id=<?php echo $ud->id; ?>'"><?php echo USER; ?></span>
 <p></p><form action="login.php?do=login" method="post"><table>
 <tr><td>Benutzername:</td><td><input type="text" name="user"></td></tr>
 <tr><td>Passwort:</td><td><input type="password" name="pw"></td></tr>
-</table><input type=submit value="Login"></form><? } else {
+</table><input type=submit value="Login"></form><? }
+
+ else {
+
+  echo "<b>Notiz: (<a href=# onmouseover=\"Tip('Dies ist eine Information, die von einem Administrator erstellt wurde. <br> Du kannst diese im Persönlichem Bereich unter \'Einstellungen\' ausblenden lassen.')\" onmouseout=\"UnTip()\">Info</a>)</b><br>";
+  if($ud->notice != "" AND $ud->notice != "0")
+  { 
+    echo "$ud->notice";
+  }
+  else
+  {
+    echo "Keine Notiz vorhanden.";
+  }
+  $time = time();
+  $us_ver = mysql_query("SELECT * FROM user_verwarn WHERE user_id LIKE '$ud->id' AND dauer > '$time'");
+  echo "<br><br><b>Aktive Verwarnungen:</b> ". mysql_num_rows($us_ver) ."";
 $config_datas = mysql_query("SELECT * FROM config WHERE erkennungscode LIKE 'f2pnsignfs'");
 $cd = mysql_fetch_object($config_datas);
-pn_zahl("header"); }
+ }
 ?>
 <br><br>
 
@@ -70,13 +93,12 @@ pn_zahl("header"); }
 
 <table width="100%" class="navi"><tr width="100%">
 <td><a href="index.php">Startseite</a></td>
-<?php if($username == "Gast") { ?>
+<?php if(USER == "") { ?>
 <td><a href="login.php">Login</a></td>
 <td><a href="reg.php">Registrieren</a></td>
 <? } else { ?>
 <td><a href="main.php">Persönlicher Bereich</a></td>
 <td><a href="member.php">Benutzerliste</a></td>
-<td><a href="javascript:logout()"><b>Abmelden</b></a></td>
 <? } ?>
 <td><a href="search.php">Suche</a></td>
 <?php
@@ -87,12 +109,76 @@ if($cd->wert2 != "")
   echo "<td>$cd->wert2</td>";
 }
 if(GROUP == "3") echo "<td><a href=admin/><b>Administrator-Kontrollzentrum</b></a></td>"; 
-?>
-</tr></table>
-<?php
-if($ud->notice != "" AND $ud->notice != "0")
+
+echo "</tr></table><table class=hell width=30%><tr><td>";
+$da = $_SERVER["PHP_SELF"];
+$id = $_GET["id"];
+//Aufenthalt ermitteln
+$seite = array(
+  "/index.php"     => "Startseite",
+  "/modcp.php"     => "Moderatoren-Kontrollzentrum",
+  "/member.php"    => "Mitglieder",
+  "/search.php"    => "Foren-Suche",
+  "/main.php"      => "Persönlicher-Bereich",
+  "/online.php"    => "Wer ist online?",
+  "/newreply.php"  => "Beitrag schreiben",
+  "/newtopic.php"  => "Thema verfassen",
+  "/edit.php"      => "Beitrag ändern",
+  "/login.php"	   => "Einloggen",
+  "/reg.php"       => "Registrieren",
+);
+if($da == "/reg.php" OR $da == "/login.php" OR $da == "/index.php" OR $da == "/modcp.php" OR $da == "/member.php" OR $da == "/search.php" OR $da == "/main.php" OR $da == "/online.php" OR $da == "/newreply.php" OR $da == "/newtopic.php" Or $da == "/edit.php")
 {
-  echo "<br><table class=titl width=100%><tr><td><center> $ud->notice (<a href=# onmouseover=\"Tip('Dies ist eine Information, die von einem Administrator erstellt wurde. <br> Du kannst diese im Persönlichem Bereich unter \'Einstellungen\' ausblenden lassen.')\" onmouseout=\"UnTip()\">Info</a>)</center></td></tr></table>";
+  echo "<a href=index.php> ".SITENAME." </a><br><b>> $seite[$da]</b>";
+  $status = true;
+}
+if($da == "/thread.php")
+{ 
+  $thema_data = mysql_query("SELECT * FROM thema WHERE id LIKE '$id'");
+  $td = mysql_fetch_object($thema_data); 
+  $forum_data = mysql_query("SELECT * FROM foren WHERE id LIKE '$td->where_forum'");
+  $fd = mysql_fetch_object($forum_data);
+ 
+  echo "<a href=index.php> ".SITENAME." </a> > <a href=forum.php?id=$fd->id>$fd->name</a><br>
+  <b>$td->tit</b>";
+    $status = true;
+}
+if($da == "/profil.php")
+{ 
+  $prof_data = mysql_query("SELECT * FROM users WHERE id LIKE '$id'");
+  $pd = mysql_fetch_object($prof_data);
+ 
+  echo "<a href=index.php> ".SITENAME." </a> > <a href=member.php>Mitglieder</a><br>
+  <b>Profil von $pd->username</b>";
+    $status = true;
+}
+if($da == "/forum.php")
+{ 
+  $forum_data = mysql_query("SELECT * FROM foren WHERE id LIKE '$id'");
+  $fd = mysql_fetch_object($forum_data);
+  $kat_data = mysql_query("SELECT * FROM kate WHERE id LIKE '$fd->kate'");
+  $kd = mysql_fetch_object($kat_data);
+  echo "<a href=index.php> ".SITENAME." </a> > <a href=index.php?do=show_one&id=$kd->id>$kd->name</a><br>
+  <b>$fd->name</b>";
+    $status = true;
+}
+if($status != true)
+{
+  echo "<a href=index.php> ".SITENAME." </a>";
+}
+//Ende
+echo "</td></tr></table><br>";
+if(USER != "")
+{
+  echo "<table class=titl width=100%><tr><td><table width=100%><tr><td>Hallo ". USER ." (<a href=\"javascript:logout()\">Abmelden</a>).<br> <b>Private Nachrichten:</b> ";
+
+
+  pn_zahl("header");
+  echo "</td><td valign=right align=right>";
+  $datum = date("d.m.Y");
+  $uhrzeit = date("H:i");
+  echo $datum," - ",$uhrzeit," Uhr"; 
+  echo "</td></tr></table></td></tr></table>";
 }
 //AdServer
 $adal = mysql_query("SELECT * FROM config WHERE erkennungscode LIKE 'f2adser2'");

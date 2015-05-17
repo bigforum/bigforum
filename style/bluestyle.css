@@ -27,12 +27,12 @@ a:hover, a:active
 }
 .dark
 {
-   background: url(http://www.bfs.kilu.de/images/dark_table.png) repeat top;
+   background: url(../images/dark_table.png) repeat top;
 
 }
 .hell
 {
-   background: url(http://www.bfs.kilu.de/images/blue_table.png) repeat top;
+   background: url(../images/blue_table.png) repeat top;
 }
 .navi a:link
 {

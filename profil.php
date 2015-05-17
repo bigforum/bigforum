@@ -1,20 +1,22 @@
 <?php
 //Wichtige Angaben für jede Datei!
 include("includes/functions.php");
-connect_to_database();
 if($_COOKIE[$_GET["id"]] != $_GET["id"])
+{
+  $xx = true;
+}
+setcookie($_GET["id"], $_GET["id"], time()+7200);
+page_header();
+if($xx == true)
 {
   mysql_query("UPDATE users SET provi = provi+1 WHERE id LIKE '$_GET[id]'");
 }
-setcookie($_GET["id"], $_GET["id"], time()+7200);
 $con_pro = mysql_query("SELECT * FROM config WHERE erkennungscode LIKE 'f2profs'");
 $cp = mysql_fetch_object($con_pro);
 if($cp->zahl2 != "1")
 {
   login();
 }
-//Folgende Zeile behebt mögliche Fehler:
-page_header();
 include_once("includes/function_user.php");
 
 //Wichtige MySQL Abfrage, da bei manchen Anbietern ansonsten fehler kommen.
@@ -137,7 +139,7 @@ $ac = $_GET["action"];
     }
   }
   ?>
-  <table width="100%"><tr><td class="bord" width="30%" valign=top style="padding: 5px">
+  <table width="100%"><tr><td class="bord" width="30%" valign=top style="padding: 5px; -moz-border-radius:15px;-khtml-border-radius:15px;">
   <b><?php echo $udp->username; echo "</b>  ";
   show_online($udp->last_log, $udp->username);
   ?><br><?php echo $udp->rang; ?><br>

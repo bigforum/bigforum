@@ -5,7 +5,7 @@ font-family: Arial;
 
 }
 .bgt{
-background: #e3d1a5 url('http://www.bfs.kilu.de/images/farbv.png') top left repeat-x;
+background: #e3d1a5 url('images/farbv.png') top left repeat-x;
 text: black;
 
 
@@ -24,7 +24,7 @@ a:hover, a:active
 }
 .navi
 {
-  background: transparent url('http://www.bfs.kilu.de/images/navi.png') top left repeat-x;
+  background: transparent url(../images/navi.png) top left repeat-x;
   border: 1px solid #005000;
   font-size: 15px;
 }
@@ -64,7 +64,7 @@ padding:3px;
 }
 .normal
 {
-    background: url('http://www.bfs.kilu.de/images/hell.png') top left repeat-x;
+    background: url(../images/hell.png) top left repeat-x;
 	color: black;
 }
 .tab
@@ -89,16 +89,16 @@ padding:3px;
 .tabelbor
 {
   border: 1px solid #000050;
-  background: #FFF url(http://www.bfs.kilu.de/images/head.png) top left repeat-x;
+  background: #FFF url(../images/head.png) top left repeat-x;
 }
 .dark
 {
-   background: url(http://www.bfs.kilu.de/images/dark.png) repeat top;
+   background: url(../images/dark.png) repeat top;
 
 }
 .hell
 {
-   background: url(http://www.bfs.kilu.de/images/hell.png) repeat top;
+   background: url(../images/hell.png) repeat top;
 
 }
 .post {

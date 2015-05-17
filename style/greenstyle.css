@@ -92,12 +92,12 @@ a:hover, a:active
 }
 .dark
 {
-   background: url(http://www.bfs.kilu.de/images/dark_green.png) repeat top;
+   background: url(../images/dark_green.png) repeat top;
 
 }
 .hell
 {
-   background: url(http://www.bfs.kilu.de/images/table_green.png) repeat top;
+   background: url(../images/table_green.png) repeat top;
 }
 legend
 {

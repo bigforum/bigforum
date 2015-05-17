@@ -31,7 +31,7 @@ if($_GET["do"] == "groups")
   }
   if($mod != "2")
   {
-    echo "<tr><td></td><td>Dieses Board hat keine Moderatorn</td></tr>";
+    echo "<tr><td></td><td>Dieses Board hat keine Moderatoren</td></tr>";
   }
   echo "</table>";
   page_footer();

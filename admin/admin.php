@@ -98,12 +98,12 @@ xmlhttp.send(null);
 </script>
 <?
 echo "<table background=\"bgoben.png\" width=100%><tr><td><a href=?do=log_out>Aus Admin-Bereich ausloggen</a> | <a href='../index.php' target='_blank'>Foren-Übersicht</a><br>
-<center><h4><a href=\"admin.php\">Start</a> &nbsp; <a href=\"?do=ver_user\">Benutzer</a> &nbsp; <a href=\"?do=ver_foren\">Foren</a> &nbsp;<a href=\"?do=settings\">Einstellungen</a></td></tr></table>";
-$sons = array("?do=settings|Foren-Einstellungen","?do=design|Header-Einstellungen","?do=look_logs|Log-Einträge","?do=mods|Mods/Addons Verwaltung","?do=new_warn|Verwarnungsgründe","?do=adser|Adserver","?do=not_use|Benutzernamen / eMail-Adressen verbieten", "?do=rundbrief| Rundbrief schreiben");
+<center><h4><a href=\"admin.php\">Start</a> &nbsp; <a href=\"?do=ver_user\">Benutzer</a> &nbsp; <a href=\"?do=ver_foren\">Foren</a> &nbsp; <a href=\"?do=settings\">Einstellungen</a> &nbsp; <a href=?do=styles>Design</a></td></tr></table>";
+$sons = array("?do=settings|Foren-Einstellungen","?do=look_logs|Log-Einträge","?do=mods|Mods/Addons Verwaltung","?do=new_warn|Verwarnungsgründe","?do=adser|Adserver","?do=not_use|Benutzernamen / eMail-Adressen verbieten", "?do=rundbrief| Rundbrief schreiben");
 $for = array("?do=new_foren|Neues Forum","?do=ver_foren|Verwalte Foren");
 $user = array("?do=sper_user|Gesperrte","?do=ver_user|Benutzer suchen","?do=recht| Administratoren-Rechte","?do=zuruck|Rechte zurücksetzen");
 $start = array("admin.php|Start","?do=settings|Foren-Einstellungen","?do=look_logs|Log-Einträge ansehen","?do=new_foren|Neues Forum erstellen","?do=ver_user|Benutzer verwalten");
-
+$design = array("?do=styles|Styles","?do=insert_style|Style hinzufügen","?do=design|Header-Einstellungen");
 switch ($do) {
   case "":
     left_table($start);
@@ -157,7 +157,7 @@ switch ($do) {
   
   
   case "design":
-  left_table($sons);
+  left_table($design);
   admin_recht("3");
   if($_GET["action"] == "insert")
   {
@@ -283,10 +283,8 @@ switch ($do) {
 	   {
 	     $eeditf = "checked";
 	   }
-	   echo "<table class=braun width=50%><tr class=besch><td><b>Benutzerverwaltung - $uds->username</b></td></tr><tr><td>
-	   
-	   <table>
-	   <tr><td>
+	   echo "<table><tr valign=top align=top><td><table class=braun width=100%><tr class=besch><td><b>Benutzerdaten - $uds->username</b></td></tr><tr><td>
+	   <table><tr><td>
 	   <form action=?do=save_userdatas method=post>
 	   <b>Benutzername:</b> </td><td> <input type=text name=username value='$uds->username'></td></tr><tr><td>
 	   <b>Rang-Titel:</b> </td><td> <input type=text name=rang value='$uds->rang'></td></tr><tr><td>
@@ -295,25 +293,39 @@ switch ($do) {
 	   <tr><td><b>Hobbys:</b></td><td><input type=text name=hob value='$uds->hob'></td></tr>
 	   <tr><td> &nbsp; </td><td>&nbsp;</td></tr><tr><td>
 	   <b>Beiträge:</b> </td><td> <input type=text name=bei value=$uds->posts></td></tr><tr><td>
-	   <b>Registriert seit (UNIX!):</b> </td><td> <input type=text name=reg value=$uds->reg_dat> (". date("d.m.Y", $uds->reg_dat).")</td></tr><tr><td>
-	   <b>Benutzergruppe(nid):</b> </td><td> $uds->group_id ( $gruppe )</td></tr><tr><td>
-	   <b>Notiz, die dem Benutzer im Header angezeigt wird:</b></td><td> <input type=text name=unot value='$uds->notice' </td></tr>
-	   &nbsp; </td></tr>
+	   <b>Registriert seit (UNIX!):</b> </td><td> <input type=text name=reg value=$uds->reg_dat> (". date("d.m.Y", $uds->reg_dat).")</td></tr>
+	   <tr><td><b>Angezeigte Notiz:</b></td><td> <input type=text name=unot value='$uds->notice' </td></tr></table></td></tr></table>
+	   </td><td><table class=braun width=100%><tr class=besch><td><b>Benutzerrechte - $uds->username</b></td></tr><tr><td>
+	   <table>
 	   <tr><td><b>Zeige Bearbeitet von... Bei Beitragsbearbeitung?</b></td><td><input type=radio name=editrech value=5 $editf>Ja <input type=radio name=editrech value=2 $editr> Nein</td></tr>
 	   <tr><td><b>Darf HTML in Beiträgen benutzen</b></td><td> <input type=radio name=htmlcan value=1 $eeditr>Ja <input type=radio name=htmlcan value=2 $eeditf> Nein</td></tr>
 	   <tr><td> &nbsp; </td><td> &nbsp; </td></tr>
 	   <tr><td>	
        <b>Gruppenzugehörigkeit</b> </td><td> Moderator: <input type=checkbox name=grup value=2 $mod_check><br>
 											Administrator: <input type=checkbox name=grup value=3 $adm_check></td></tr><tr><td>
-	   <b>Signatur</b></td><td><textarea name=sign rows=6 cols=60>$uds->sign</textarea></td></tr><tr><td>
+	   <b>Signatur</b></td><td><textarea name=sign rows=6 cols=60>$uds->sign</textarea></td></tr><tr><td>	   </td></tr>
+	   </table></td></tr></table></td></tr></table>
 	   <input type=hidden value=$uds->id name=id>
-	   <input type=submit value=Speichern>
+	   <input type=submit value='Speichern'><input type=button value='Benutzer löschen' onclick=\"window.location.href='?do=del_user&id=$uds->id'\">
 	   </form>
-	   </td></tr>
-	   </table>
+
 	   
        </td></tr></table>";
 	 }
+  break;
+  
+  case "del_user":
+    left_table($user);
+    admin_recht("5");
+    if($_GET["aktion"] == "sure")
+	{
+	  mysql_query("DELETE FROM users WHERE id LIKE '$_GET[id]'");
+	  echo "Der Benutzer wurde gelöscht.";
+	  insert_log("Ein Benutzer (id: $_GET[id]) wurde gelöscht.");
+	  exit;
+	}
+    echo "<b>Möchtest du diesen Benutzer wirklich löschen? Dieser Schritt ist nichtmehr rückgänig machbar!</b><br><br>
+    <input type=button value='Ja, Benutzer löschen' onclick=\"window.location.href='?do=del_user&aktion=sure&id=$_GET[id]'\">  <input type=button value='Nein, Benutzer nicht löschen' onclick=\"window.location.href='admin.php'\">";
   break;
   
   case "zuruck":
@@ -579,23 +591,20 @@ switch ($do) {
   }
   echo "<tr><td>Smilie-Pack</td><td><select name=smilie>$packt</select>
   <tr><td> &nbsp; </td><td> &nbsp; </td></tr>";
-	if($con->wert2 == "blue")
-    {
-      $sty = "<option value=blue>Blau</option><option value=red>Rot</option><option value=brown>Braun</option><option value=green>Grün</option>";
-    }
-	if($con->wert2 == "brown")
+  echo "<tr><td>Forum-Standart Style:</td><td><select name=styl>";
+  	$style_data = mysql_query("SELECT * FROM style_all");
+	while($sd = mysql_fetch_object($style_data))
 	{
-      $sty = "<option value=brown>Braun</option><option value=red>Rot</option><option value=blue>Blau</option><option value=green>Grün</option>";	
+	  if($con->wert2 == $sd->sname)
+	  {
+	    echo "<option value='$sd->sname' selected=selected>$sd->sname</option>";
+	  }
+	  else
+	  {
+	  	echo "<option value='$sd->sname'>$sd->sname</option>";
+	  }
 	}
-    if($con->wert2 == "green")
-    {
-     	 $sty = "<option value=green>Grün</option><option value=red>Rot</option><option value=brown>Braun</option><option value=blue>Blau</option>"; 
-    }
-	if($con->wert2 == "red")
-    {
-      $sty = "<option value=red>Rot</option><option value=green>Grün</option><option value=brown>Braun</option><option value=blue>Blau</option>"; 
-    }
-  echo "<tr><td>Forum-Standart der Farbe:</td><td><select name=styl>$sty</select>
+  echo"</select>
   <tr><td> &nbsp; </td><td> &nbsp; </td></tr>  
   <tr><td> Bild-Adresse für Forum-Favicon </td><td> <input type=text name=bfav value=$con->wert1> </td></tr>  
   <tr><td> Bild-Adresse für Forum-Logo</td><td><input type=text name=logo value='". WERTZ ."'></td></tr>
@@ -700,7 +709,7 @@ switch ($do) {
 	<b>Darf Startseite sehen:</b>Der Administrator darf lediglich die Startseite und die Administratoren-Hilfe sehen<br><br>
 	<b>Darf Log-Einträge sehen:</b> Hat volle Rechte auf Log-Einträge.<br><br>
 	<b>Darf Foreneinstellungen ändern:</b> Darf alle möglichen Foreneinstellungen s.w. den Foren-Titel, Foren beschreibun usw. verändern. Desweiteren darf auch die Administratoren-Notiz ab diesem Level verändert werden.<br><br>
-	<b>Darf Foren verwalten:</b> Darf bestehenden Foren bzw. Kategorien ändern, neue hinzufügen und Rechte für diese verändern<br><br>
+	<b>Darf Foren verwalten:</b> Darf bestehenden Foren bzw. Kategorien ändern, neue hinzufügen und Rechte für diese verändern. Ab dieser Stufe dürfen auch Addons / Mods verwaltet werden.<br><br>
 	<b>Darf Benutzer verwalten:</b> Darf Benutzer verwalten, d.h. diesen Gruppen zuordnen bzw. Rang-Titel oder Beiträge ändern. Das Recht Benutzer zu verwarnen bzw. zu sperren haben auch Moderatoren!<br><br>
 	<b>Ist Gründer:</b> Benutzer darf alles ändern, d.h. Administratoren-Rechte vergeben und Serverseitige Funktionen einsehen,<br><br><br>
 	
@@ -744,9 +753,9 @@ switch ($do) {
 	  echo "<option value=$kd->id>$kd->name</option>";
 	}
 	echo "</select></td></tr>
-	<tr><td width=50%>Dürfen Gäste das Forum sehen?</td><td><select name=guest><option value=0>Ja</option><option value=1>Nein</option></td></tr>
+	<tr><td width=50%>Wer soll Zugriff auf das Forum haben?</td><td><select name=guest><option value=0>Alle dürfen es sehen</option><option value=1>Nur angemeldete Mitglieder</option><option value=2>Nur Administratoren oder Moderatoren</option></td></tr>
 	<tr><td>Nur Administratoren dürfen Themen erstellen?</td><td><select name=admin><option value=1>Nein</option><option value=0>Ja</option><option value=2>Moderatoren und Administratoren</option></td></tr>
-	<tr><td>Dürfen Benutzer antworten?</td><td><select name=ansus><option value=0>Ja</option><option value=1>Nein</option></td></tr>
+	<tr><td>Dürfen Benutzer/Moderatoren antworten?</td><td><select name=ansus><option value=0>Ja</option><option value=1>Nein</option></td></tr>
 	<tr><td>Wie viele Beiträge muss man haben, um Zugriff auf das Forum zu bekommen?</td><td><input type=text name=min_post></td></tr>
 	<tr><td>Sortierung, die Foren werden so geordnet, auf der Startseite</td><td><input type=text name=sort></td></tr>
 	</table><br>
@@ -920,13 +929,20 @@ switch ($do) {
 	}
     $for_dat = mysql_query("SELECT * FROM foren WHERE id LIKE '$_GET[id]'");
 	$fd = mysql_fetch_object($for_dat);
+	// 0 = Gäste dürfen das Forum sehen, also Alle
+	// 1 = Gäste dürfen das Forum nicht sehen Benutzer aber
+	// 2 = Nur Administratoren und Moderatoren
 	if($fd->guest_see == "0")
 	{
-	  $gast = "<option value=0>Ja</option><option value=1>Nein</option>";
+	  $gast = "<option value=0>Alle dürfen es sehen</option><option value=1>Nur angemeldete Mitglieder</option><option value=2>Nur Administratoren oder Moderatoren</option>";
 	}
-	else
+	if($fd->guest_see == "1")
 	{
-	  $gast = "<option value=1>Nein</option><option value=0>Ja</option>";
+	  $gast = "<option value=1>Nur angemeldete Mitglieder</option><option value=0>Alle dürfen es sehen</option><option value=2>Nur Administratoren oder Moderatoren</option>";
+	}
+	if($fd->guest_see == "2")
+	{
+	  $gast = "<option value=2>Nur Administratoren oder Moderatoren</option><option value=1>Nur angemeldete Mitglieder</option><option value=0>Alle dürfen es sehen</option>";
 	}
 	if($fd->admin_start_thema == "1")
 	{
@@ -964,9 +980,9 @@ switch ($do) {
 	  echo "<option value=$ok->id>$ok->name</option>";
 	}
 	echo "</select></td></tr>
-	<tr><td>Dürfen Gäste das Forum sehen?</td><td><select name=guest>$gast</select></td></tr>
+	<tr><td>Wer darf dieses Forum sehen?</td><td><select name=guest>$gast</select></td></tr>
 	<tr><td>Nur Administratoren dürfen Themen erstellen?</td><td><select name=admin>$admth</select></td></tr>
-	<tr><td>Dürfen Benutzer antworten</td><td><select name=uspo>$uspo</select></td></tr>
+	<tr><td>Dürfen Benutzer/Moderatoren antworten</td><td><select name=uspo>$uspo</select></td></tr>
 	<tr><td>Wie viele Beiträge muss man haben, um Zugriff auf das Forum zu bekommen?</td><td><input type=text name=posts value='$fd->min_posts'></td></tr>
 	<tr><td>Sortierung, die Foren werden so geordnet, auf der Startseite</td><td><input type=text name=sort value='$fd->sort'></td></tr>
 	</table>
@@ -1130,6 +1146,54 @@ switch ($do) {
 	<input type=submit value='Nachrichten verschicken'>
 	</form>
 	";
+  break;
+  
+  
+  case "styles":
+    left_table($design);
+    echo "<table class='braun'><tbody><tr class='besch'><td><b>Style-Verwaltung</b></td></tr><tr><td>
+	<table>
+	<tr><td><b>Style-Name</b></td><td><b>Stylelink</b></td></tr>";
+    $style_data = mysql_query("SELECT * FROM style_all");
+	while($sd = mysql_fetch_object($style_data))
+	{
+	  echo "<tr><td>$sd->sname</td><td>$sd->link_style</td></tr>";
+	}
+    echo "</table>
+    </td></tr></table>";
+  break;
+  
+  
+  case "insert_style":
+    left_table($design);
+	if($_GET["aktion"] == "insert")
+	{
+	  $check_style = mysql_query("SELECT * FROM style_all WHERE sname LIKE '$_POST[sname]' OR link_style LIKE '$_POST[link]'");
+	  if(mysql_num_rows($check_style) > 0)
+	  {
+	    echo "<b>Speicherung Fehlgeschlagen:</b> Entweder exestiert dieser Name schon, oder der Style zu der CSS-Datei ist schon vorhanden.";
+		exit;
+	  }
+	  $style_link = "../style/$_POST[link]";
+	  if(!file_exists($style_link))
+	  {
+	    echo "Bevor du dieses Style erstellst, schiebe bitte zuerst die .css Datei in den Ordner \"Style\". Dieses verhindert Probleme!";
+		exit;
+	  }
+	  mysql_query("INSERT INTO style_all (sname, link_style) VALUES ('$_POST[sname]','$_POST[link]')");
+	  echo "Danke, dieser Style wurde erfolgreich hinzugefügt und kann nun verwendet werden.";
+	  exit;
+	}
+	echo "<table class='braun'><tbody><tr class='besch'><td><b>Style-Verwaltung</b></td></tr><tr><td>
+    Hier kannst du einen Style hinzufügen. Bitte beachte, dass diese .css Datei exestieren muss!<br><br>
+	<form action=?do=insert_style&aktion=insert method=post>
+	<table>
+	<tr><td>Name des Styles:</td><td><input type=text name=sname></td></tr>
+	<tr><td>Link zum Style:</td><td>". $_SERVER["SERVER_NAME"] ."/style/<input type=text name=link value='.css'></td></tr>
+	</table>
+	<input type=submit value=Hinzufügen>
+	</form>
+    </td></tr></table>";
   break;
 }
 ?>

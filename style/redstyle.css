@@ -1,5 +1,5 @@
 body {
-background: #b75353 url('http://www.bfs.kilu.de/images/farbvr.png') repeat-x;
+background: #b75353 url(../images/farbvr.png) repeat-x;
 font-family: Arial;
 
 }
@@ -21,7 +21,7 @@ a:hover, a:active
 }
 .navi
 {
-   background: url(http://www.bfs.kilu.de/images/darkr.png) repeat top;
+   background: url(../images/darkr.png) repeat top;
   border: 1px solid #005000;
   font-size: 15px;
 }
@@ -85,17 +85,17 @@ a:hover, a:active
 .tabelbor
 {
   border: 1px solid #000050;
-  background: url(http://www.bfs.kilu.de/images/headr.png) top left repeat-x;
+  background: url(../images/headr.png) top left repeat-x;
   background-color: #bb6b6a;
 }
 .dark
 {
-   background: url(http://www.bfs.kilu.de/images/darkr.png) repeat top;
+   background: url(../images/darkr.png) repeat top;
 
 }
 .hell
 {
-   background: url(http://www.bfs.kilu.de/images/hellr.png) repeat top;
+   background: url(../images/hellr.png) repeat top;
 }
 legend
 {

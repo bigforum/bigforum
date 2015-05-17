@@ -55,6 +55,8 @@ exit;
 }
 if($_GET["do"] == "reg")
 {
+  $_POST["user"] = strip_tags($_POST["user"]);
+  $_POST["user"] = str_replace("  ","",$_POST["user"]);
   check_data($_POST["pw1"], "", "Du musst schon ein Passwort eingeben", "leer");
   check_data($_POST["pw1"], $_POST["pw2"], "Die Passwörter stimmen nicht überein!", "gleich");
   check_data($_POST["mail"], "", "Die angegebene eMail Adresse ist ungültig!", "mail");

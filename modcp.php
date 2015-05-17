@@ -8,6 +8,7 @@ $tab = "</td></tr></table>";
 if(GROUP != "3" AND GROUP != "2")
 {
   echo "Ein Zugriff auf das Moderatoren-Kontrollzentrum ist nur für Moderatoren möglich!";
+  page_footer();
 }
 ?>
 <table width="100%">
@@ -18,7 +19,7 @@ if(GROUP != "3" AND GROUP != "2")
 <tr><td class=normal color="snow">
 <b>Allgemeine Einstellungen</b></td></tr>
 <tr><td><a href="?do=spe_us">Gesperrte Benutzer</a></td></tr>
-<tr><td><a href="?do=search_user">Benutzer suchen</a></td></tr>
+<tr><td><a href="?do=ver_user">Benutzer suchen</a></td></tr>
 <tr><td><a href="?do=mail_adr">eMail-Adressen raussuchen</a></td></tr>
 <tr><td class=normal color="snow">
 <b>IP-Adressen</b></td></tr>
@@ -139,7 +140,7 @@ switch ($do) {
   break;
   
   
-  case "search_user":
+  case "ver_user":
   if($_GET["id"] == "1")
   {
     $my_us = mysql_query("SELECT * FROM users WHERE username LIKE '$_POST[benu]'");
@@ -177,8 +178,8 @@ switch ($do) {
 	echo "<br><br> $tab";
     page_footer();
   }
-  echo "<form action=?do=search_user&id=1 method=post>
-  Benutzername: <input type=text name=benu size=40><input type=submit value='Exakte Suche'></form>";
+  echo "<form action=?do=ver_user&id=1 method=post>
+  Benutzername: <input type=text name=benu size=40 value='$_GET[name]'><input type=submit value='Exakte Suche'></form>";
   break;
 }
 echo "<br><br> $tab";

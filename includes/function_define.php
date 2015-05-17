@@ -1,6 +1,4 @@
 <?php
-  //Aufrufung wichtiger Funktionen!
-  
   //define - Tables
   define("USER", $_COOKIE["username"]);
   define("HAUPT", "");
@@ -12,7 +10,7 @@
     $daten["wert1"] = "Forum";
   define("SITENAME", $daten["wert1"]);
   define("BESCHREIBUNG", $daten['wert2']);
-  define("VERSION", "3.6");
+  define("VERSION", "4.0");
   
   //Ersetzte manche in Variablen
   $root = HAUPT;

@@ -7,7 +7,7 @@ include("includes/function_forum.php");
 include_once("includes/function_user.php");
 
 //Wichtige MySQL Abfrage, da bei manchen Anbietern ansonsten Fehler kommen.
-$user_data = mysql_query("SELECT * FROM users WHERE username LIKE '". USER ."'");
+$user_data = mysql_query("SELECT * FROM users WHERE username LIKE '". USER ."'") or die(mysql_fehler(mysql_error(), __LINE__, $_SERVER["PHP_SELF"]));
 $ud = mysql_fetch_object($user_data);
 
 
@@ -59,7 +59,7 @@ xmlhttp.send(null);
 }
 if($_GET["do"] == "del")
 {
-  $beitrag_data = mysql_query("SELECT * FROM beitrag WHERE id LIKE '$_GET[bid]'");
+  $beitrag_data = mysql_query("SELECT * FROM beitrag WHERE id LIKE '$_GET[bid]'") or die(mysql_fehler(mysql_error(), __LINE__, $_SERVER["PHP_SELF"]));;
   $bed = mysql_fetch_object($beitrag_data);
   mysql_query("UPDATE users SET posts = posts-1 WHERE username LIKE '$bed->verfas'");
   mysql_query("DELETE FROM beitrag WHERE id LIKE '$_GET[bid]'");
@@ -69,7 +69,7 @@ if($id != "")
   $time = time();
   if(USER != "")
   {
-    $data = mysql_query("SELECT * FROM read_all WHERE uname LIKE '". USER ."' AND thema_id LIKE '$id'");
+    $data = mysql_query("SELECT * FROM read_all WHERE uname LIKE '". USER ."' AND thema_id LIKE '$id'") or die(mysql_fehler(mysql_error(), __LINE__, $_SERVER["PHP_SELF"]));;
 	$da = mysql_fetch_object($data);
 	if($da->id == "")
 	{
@@ -184,12 +184,16 @@ if($fd->min_posts > $ud->posts)
   erzeuge_error("Du hast keine Berechtigungen auf dieses Thema. Dies kann mehrere Gründe haben.");
 }
 
-if($fd->guest_see != "0")
+if($fd->guest_see == "1")
 {
   if(USER == "")
   {
     erzeuge_error("Entweder du hast keine Rechte dieses Forum zu sehen, oder das Forum ist gelöscht.");
   }
+}
+if($fd->guest_see == "2" AND (GROUP != 2 AND GROUP != 3))
+{
+  erzeuge_error("Entweder du hast keine Rechte dieses Forum zu sehen, oder das Forum ist gelöscht.");
 }
 $cou = mysql_query("SELECT * FROM beitrag WHERE where_forum LIKE '$id'");
 $menge = mysql_num_rows($cou);
@@ -200,8 +204,9 @@ if(GROUP == "2" OR GROUP == "3" OR USER == $td->verfas)
 {
   $modffunk = "<td></td>";
 }
+//Folgender Code wurde rausgenommen, da dieses mit der Version 4.0 eh wegfällt.
+/*echo "<table class=titl width=100%><tr><td><table><tr><td>Du bist hier:</td><td><a href='index.php'>". SITENAME ."</a> > <a href='forum.php?id=$fd->id'>$fd->name</a></td></tr><tr><td></td><td><big><b>$td->tit</b></big></td></tr></table></td></tr></table><br>";*/
 
-echo "<table class=titl width=100%><tr><td><table><tr><td>Du bist hier:</td><td><a href='index.php'>". SITENAME ."</a> > <a href='forum.php?id=$fd->id'>$fd->name</a></td></tr><tr><td></td><td><big><b>$td->tit</b></big></td></tr></table></td></tr></table><br>";
 answer_button($fd->user_posts, GROUP, $id, $td->close);
 if($ws > "1")
 {
