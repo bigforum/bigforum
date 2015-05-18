@@ -158,12 +158,15 @@ $mos_dat = mysql_query("SELECT * FROM config WHERE erkennungscode LIKE 'f2name2'
 $md = mysql_fetch_object($mos_dat);
 $online_data = mysql_query("SELECT * FROM users WHERE last_log > '$dtime' ORDER BY username");
 $meno = mysql_num_rows($online_data);
+$result = mysql_query("SELECT ip FROM onlineuser"); 
+$user_online = mysql_num_rows($result);
+$meno = $user_online;
 if($meno > $md->zahl1)
 {
   $time = time();
   mysql_query("UPDATE config SET zahl1 = '$meno', zahl2 = '$time' WHERE erkennungscode LIKE 'f2name2'");
 }
-echo "<table width=100% bgcolor=#F2F2E5><tr><td>";
+echo "<table width=100% class=forenbg><tr><td>";
 echo "<small>Der Besucherrekord liegt bei $md->zahl1 Besuchern, die Gleichzeitig am ". date("d.m.Y", $md->zahl2) ." um ". date("H:i", $md->zahl2) ." online waren.</small><br>";
 while($ond = mysql_fetch_object($online_data))
 {

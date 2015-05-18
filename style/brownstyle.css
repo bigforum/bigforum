@@ -1,11 +1,10 @@
-
 body {
 background: #8c7847;
 font-family: Arial;
 
 }
 .bgt{
-background: #e3d1a5 url('images/farbv.png') top left repeat-x;
+background: #e3d1a5 url(../images/farbv.png) top left repeat-x;
 text: black;
 
 
@@ -27,6 +26,10 @@ a:hover, a:active
   background: transparent url(../images/navi.png) top left repeat-x;
   border: 1px solid #005000;
   font-size: 15px;
+}
+.forenbg
+{
+  background: #e3d1a5;
 }
 .navi a:link
 {

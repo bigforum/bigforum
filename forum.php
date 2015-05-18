@@ -161,7 +161,7 @@ function feld(x,i)
   }
 }
 </script>
-<?
+<?php
 }
 if($_GET["do"] == "change_title")
 {

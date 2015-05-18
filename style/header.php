@@ -6,7 +6,7 @@
 <meta name="description" content="<?php echo SITENAME. " - ". BESCHREIBUNG; 
 $config_datas = mysql_query("SELECT * FROM config WHERE erkennungscode LIKE 'f2laengfs'"); $cd = mysql_fetch_object($config_datas);?>" />
 <link rel="shortcut icon" href="<?php echo $cd->wert1;?>" type="image/x-icon">
-<link rel="stylesheet" type="text/css" href="style/<? 
+<link rel="stylesheet" type="text/css" href="style/<?php
 $user_data = mysql_query("SELECT * FROM users WHERE username LIKE '". USER ."'");
 $ud = mysql_fetch_object($user_data);
 $style_data = mysql_query("SELECT * FROM style_all WHERE sname LIKE '$ud->style'");
@@ -15,7 +15,16 @@ if($ud->style == "")
 {
   $style_data = mysql_query("SELECT * FROM style_all WHERE sname LIKE '$cd->wert2'");
   $sd = mysql_fetch_object($style_data);
-  echo $sd->link_style;
+  if($sd->link_style != "")
+  {
+    echo $sd->link_style;
+  }
+  else
+  {
+    $style_data = mysql_query("SELECT * FROM style_all LIMIT 1");
+    $sd = mysql_fetch_object($style_data);
+	echo $sd->link_style;
+  }
 }
 else
 {
@@ -41,7 +50,7 @@ if($ud->gesperrt == "1" AND $ud->sptime > $time)
   <center><table class=bord height="50%" width="50%">  
 <tbody><tr class=normal><td><font color="snow"><b>Fehler</b></font></td></tr>
 	<tr><td align="center">Du wurdest aus diesem Forum ausgeschloßen. Dieses kann mehrere Gründe haben.<br>Deine Sperre läuft bis zum <?php echo date("d.m.Y - h:i", $ud->sptime); ?> </td></tr></tbody></table></center>
-	<?
+	<?php
   exit;
 }
 $config_datas = mysql_query("SELECT * FROM config WHERE erkennungscode LIKE 'f2closefs'");
@@ -50,8 +59,8 @@ if($cd->zahl1 == "0" AND $ud->adm_recht <= "5" AND $_SERVER['REQUEST_URI'] != "/
 {?>
   <center><table class=bord height="50%" width="50%">  
 <tbody><tr class=normal><td><font color="snow"><b>Forum geschlossen</b></font></td></tr>
-	<tr><td align="center">Dieses Forum ist zur Zeit geschlossen und kann somit nicht benutzt werden. Lediglich ein Administrator hat Zugriff auf das Forum, dieser kann sich <a href="login.php">hier</a> einloggen.<br><br><b>Angegebener Grund für die Schließung:</b> <? echo $cd->wert1; ?></td></tr></tbody></table></center>
-<?
+	<tr><td align="center">Dieses Forum ist zur Zeit geschlossen und kann somit nicht benutzt werden. Lediglich ein Administrator hat Zugriff auf das Forum, dieser kann sich <a href="login.php">hier</a> einloggen.<br><br><b>Angegebener Grund für die Schließung:</b> <?php echo $cd->wert1; ?></td></tr></tbody></table></center>
+<?php
   exit;
 }
 ?>
@@ -67,7 +76,8 @@ Willkommen, <span style="cursor: pointer;" onclick="window.location.href='profil
 <p></p><form action="login.php?do=login" method="post"><table>
 <tr><td>Benutzername:</td><td><input type="text" name="user"></td></tr>
 <tr><td>Passwort:</td><td><input type="password" name="pw"></td></tr>
-</table><input type=submit value="Login"></form><? }
+</table><input type=submit value="Login"></form><?php 
+}
 
  else {
 
@@ -96,10 +106,10 @@ $cd = mysql_fetch_object($config_datas);
 <?php if(USER == "") { ?>
 <td><a href="login.php">Login</a></td>
 <td><a href="reg.php">Registrieren</a></td>
-<? } else { ?>
+<?php } else { ?>
 <td><a href="main.php">Persönlicher Bereich</a></td>
 <td><a href="member.php">Benutzerliste</a></td>
-<? } ?>
+<?php } ?>
 <td><a href="search.php">Suche</a></td>
 <?php
 $config_data = mysql_query("SELECT * FROM config WHERE erkennungscode LIKE 'f2closefs'");
@@ -111,7 +121,10 @@ if($cd->wert2 != "")
 if(GROUP == "3") echo "<td><a href=admin/><b>Administrator-Kontrollzentrum</b></a></td>"; 
 
 echo "</tr></table><table class=hell width=30%><tr><td>";
-$da = $_SERVER["PHP_SELF"];
+$da = $_SERVER["SCRIPT_NAME"];
+$da = preg_replace ('#\/.*?\/#m' , '' , $da);  
+$da =  "/$da";
+$da = str_replace("//","/", $da);
 $id = $_GET["id"];
 //Aufenthalt ermitteln
 $seite = array(

@@ -521,6 +521,12 @@ switch ($do) {
 	  $gpackt = "images/new_1.png";
 	  $number = "3";
 	}
+	if($_POST["grafp"] == "pack4")
+	{
+	  $gpack = "images/braun_alt.png";
+	  $gpackt = "images/braun_neu.png";
+	  $number = "4";
+	}
 	$config_wert = mysql_query("SELECT * FROM config WHERE erkennungscode LIKE 'f2laengfs'");
     $con = mysql_fetch_object($config_wert); 
 	if($_POST["styl"] != $con->wert2)
@@ -564,15 +570,19 @@ switch ($do) {
   $con = mysql_fetch_object($config_wert);
   if($con->zahl1 == "1")
   {
-    $pack = "<option value=pack1 >Packet 1 - Buchstaben</option><option value=pack2>Packet 2 - Runde Buttons</option><option value=pack3 >Packet 3 - Eckige Farbige Buttons</option>";
+    $pack = "<option value=pack1 >Packet 1 - Buchstaben</option><option value=pack2>Packet 2 - Runde Buttons</option><option value=pack3 >Packet 3 - Eckige Farbige Buttons</option><option value=pack4 >Packet 4 - Braune Eckige Buttons (Papier)</option>";
   }
   if($con->zahl1 == "2")
   {
-    $pack = "<option value=pack2 >Packet 2 - Runde Buttons</option><option value=pack1 >Packet 1 - Buchstaben</option><option value=pack3 >Packet 3 - Eckige Farbige Buttons</option>";
+    $pack = "<option value=pack2 >Packet 2 - Runde Buttons</option><option value=pack1 >Packet 1 - Buchstaben</option><option value=pack4 >Packet 4 - Braune Eckige Buttons (Papier)</option><option value=pack3 >Packet 3 - Eckige Farbige Buttons</option>";
   }
   if($con->zahl1 == "3")
   {
-    $pack = "<option value=pack3 >Packet 3 - Eckige Farbige Buttons</option><option value=pack1 >Packet 1 - Buchstaben</option><option value=pack2 >Packet 2 - Runde Buttons</option>";
+    $pack = "<option value=pack3 >Packet 3 - Eckige Farbige Buttons</option><option value=pack4 >Packet 4 - Braune Eckige Buttons (Papier)</option><option value=pack1 >Packet 1 - Buchstaben</option><option value=pack2 >Packet 2 - Runde Buttons</option>";
+  }
+  if($con->zahl1 == "4")
+  {
+    $pack = "<option value=pack4 >Packet 4 - Braune Eckige Buttons (Papier)</option><option value=pack3 >Packet 3 - Eckige Farbige Buttons</option><option value=pack1 >Packet 1 - Buchstaben</option><option value=pack2 >Packet 2 - Runde Buttons</option>";
   }
   echo" ></td></tr>
   <tr><td>Information:</td><td> <span id=info></span> </td></tr>
@@ -1153,14 +1163,32 @@ switch ($do) {
     left_table($design);
     echo "<table class='braun'><tbody><tr class='besch'><td><b>Style-Verwaltung</b></td></tr><tr><td>
 	<table>
-	<tr><td><b>Style-Name</b></td><td><b>Stylelink</b></td></tr>";
+	<tr><td><b>Style-Name</b></td><td><b>Stylelink</b></td><td><b>Aktion></b></td></tr>";
     $style_data = mysql_query("SELECT * FROM style_all");
 	while($sd = mysql_fetch_object($style_data))
 	{
-	  echo "<tr><td>$sd->sname</td><td>$sd->link_style</td></tr>";
+	  echo "<tr><td>$sd->sname</td><td>$sd->link_style</td><td><a href=?do=del_style&id=$sd->id>Löschen</a></tr>";
 	}
     echo "</table>
     </td></tr></table>";
+  break;
+  
+  
+  case "del_style":
+    left_table($design);
+    admin_recht("3");
+    $style_data = mysql_query("SELECT * FROM style_all WHERE id LIKE '$_GET[id]'");
+	$sd = mysql_fetch_object($style_data);
+    if($_GET["aktion"] == "del")
+	{
+	  mysql_Query("DELETE FROM style_all WHERE id LIKE '$_GET[id]'");
+	  unlink("../style/$sd->link_style");
+	  echo "Style wurde erfolgreich gelöscht.";
+	  exit;
+	}
+    echo "Möchtest du dieses Style wirklich löschen? Das System löscht die *.css Datei automatisch mit, damit es nicht zu Fehlern führen kann.<br>
+	Wirklich löschen?<br><br>
+	<a href=?do=del_style&aktion=del&id=$_GET[id]>Ja, Style und Datei löschen</a> &nbsp; &nbsp; <a href=?do=styles>Nein, zurück zur Übersicht</a>";
   break;
   
   

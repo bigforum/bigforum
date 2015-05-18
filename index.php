@@ -112,7 +112,7 @@ while($fr = mysql_fetch_object($foren_data))
     {
 	  $stat_them = $stat_them + $zahl_themen;
 	  $stat_bei = $stat_bei + $beit;
-      $ausgabe .= "<table width=100% bgcolor=#F2F2E5><tr><td width=70%><table><tr><td> $forum_stat &nbsp; </td><td><a href=forum.php?id=$fd->id><b>$fd->name</b></a> $bes<br><font size=2px>$fd->besch</font></td></tr></table></td><td>$last_beitrag</td><td width=5%>$zahl_themen</td><td width=5%>$beit</td></tr></table>";
+      $ausgabe .= "<table width=100% class='forenbg'><tr><td width=70%><table><tr><td> $forum_stat &nbsp; </td><td><a href=forum.php?id=$fd->id><b>$fd->name</b></a> $bes<br><font size=2px>$fd->besch</font></td></tr></table></td><td>$last_beitrag</td><td width=5%>$zahl_themen</td><td width=5%>$beit</td></tr></table>";
 	}
 	if($fd->guest_see == "1")
 	{
@@ -120,7 +120,7 @@ while($fr = mysql_fetch_object($foren_data))
 	  {
 	  	$stat_them = $stat_them + $zahl_themen;
 		$stat_bei = $stat_bei + $beit;
-        $ausgabe .= "<table width=100% bgcolor=#F2F2E5><tr><td width=70%><table><tr><td> $forum_stat &nbsp; </td><td><a href=forum.php?id=$fd->id><b>$fd->name</b></a> $bes<br><font size=2px>$fd->besch</font></td></tr></table></td><td>$last_beitrag</td><td width=5%>$zahl_themen</td><td width=5%>$beit</td></tr></table>";
+        $ausgabe .= "<table width=100% class='forenbg'><tr><td width=70%><table><tr><td> $forum_stat &nbsp; </td><td><a href=forum.php?id=$fd->id><b>$fd->name</b></a> $bes<br><font size=2px>$fd->besch</font></td></tr></table></td><td>$last_beitrag</td><td width=5%>$zahl_themen</td><td width=5%>$beit</td></tr></table>";
 	  }
 	}
 	if($fd->guest_see == "2")
@@ -129,7 +129,7 @@ while($fr = mysql_fetch_object($foren_data))
 	  {
 	  	$stat_them = $stat_them + $zahl_themen;
 		$stat_bei = $stat_bei + $beit;
-        $ausgabe .= "<table width=100% bgcolor=#F2F2E5><tr><td width=70%><table><tr><td> $forum_stat &nbsp; </td><td><a href=forum.php?id=$fd->id><b>$fd->name</b></a> $bes<br><font size=2px>$fd->besch</font></td></tr></table></td><td>$last_beitrag</td><td width=5%>$zahl_themen</td><td width=5%>$beit</td></tr></table>";
+        $ausgabe .= "<table width=100% class='forenbg'><tr><td width=70%><table><tr><td> $forum_stat &nbsp; </td><td><a href=forum.php?id=$fd->id><b>$fd->name</b></a> $bes<br><font size=2px>$fd->besch</font></td></tr></table></td><td>$last_beitrag</td><td width=5%>$zahl_themen</td><td width=5%>$beit</td></tr></table>";
 	  }
 	}
 	
@@ -309,7 +309,7 @@ while($fr = mysql_fetch_object($foren_data))
     {
 	  $stat_them = $stat_them + $zahl_themen;
 	  $stat_bei = $stat_bei + $beit;
-      $ausgabe .= "<table width=100% bgcolor=#F2F2E5><tr><td width=70%><table><tr><td> $forum_stat &nbsp; </td><td><a href=forum.php?id=$fd->id><b>$fd->name</b></a> $bes<br><font size=2px>$fd->besch</font></td></tr></table></td><td>$last_beitrag</td><td width=5%>$zahl_themen</td><td width=5%>$beit</td></tr></table>";
+      $ausgabe .= "<table width=100% class=forenbg><tr><td width=70%><table><tr><td> $forum_stat &nbsp; </td><td><a href=forum.php?id=$fd->id><b>$fd->name</b></a> $bes<br><font size=2px>$fd->besch</font></td></tr></table></td><td>$last_beitrag</td><td width=5%>$zahl_themen</td><td width=5%>$beit</td></tr></table>";
 	}
 	if($fd->guest_see == "1")
 	{
@@ -317,7 +317,7 @@ while($fr = mysql_fetch_object($foren_data))
 	  {
 	  	$stat_them = $stat_them + $zahl_themen;
 		$stat_bei = $stat_bei + $beit;
-        $ausgabe .= "<table width=100% bgcolor=#F2F2E5><tr><td width=70%><table><tr><td> $forum_stat &nbsp; </td><td><a href=forum.php?id=$fd->id><b>$fd->name</b></a> $bes<br><font size=2px>$fd->besch</font></td></tr></table></td><td>$last_beitrag</td><td width=5%>$zahl_themen</td><td width=5%>$beit</td></tr></table>";
+        $ausgabe .= "<table width=100% class=forenbg><tr><td width=70%><table><tr><td> $forum_stat &nbsp; </td><td><a href=forum.php?id=$fd->id><b>$fd->name</b></a> $bes<br><font size=2px>$fd->besch</font></td></tr></table></td><td>$last_beitrag</td><td width=5%>$zahl_themen</td><td width=5%>$beit</td></tr></table>";
 	  }
 	}
 	if($fd->guest_see == "2")
@@ -326,7 +326,7 @@ while($fr = mysql_fetch_object($foren_data))
 	  {
 	  	$stat_them = $stat_them + $zahl_themen;
 		$stat_bei = $stat_bei + $beit;
-        $ausgabe .= "<table width=100% bgcolor=#F2F2E5><tr><td width=70%><table><tr><td> $forum_stat &nbsp; </td><td><a href=forum.php?id=$fd->id><b>$fd->name</b></a> $bes<br><font size=2px>$fd->besch</font></td></tr></table></td><td>$last_beitrag</td><td width=5%>$zahl_themen</td><td width=5%>$beit</td></tr></table>";
+        $ausgabe .= "<table width=100% class=forenbg><tr><td width=70%><table><tr><td> $forum_stat &nbsp; </td><td><a href=forum.php?id=$fd->id><b>$fd->name</b></a> $bes<br><font size=2px>$fd->besch</font></td></tr></table></td><td>$last_beitrag</td><td width=5%>$zahl_themen</td><td width=5%>$beit</td></tr></table>";
 	  }
 	}
 	
@@ -399,7 +399,7 @@ if($cd->wert2 == "") { $cd->wert2 = "images/new_1.png"; }
 $userdata = mysql_query("SELECT * FROM users WHERE username LIKE '". USER ."'");
 $ud = mysql_fetch_object($userdata);
 echo "<table width=100% class=normal><tr><td><b>Statistiken</td></tr></table>";
-echo "<table width=100% bgcolor=#F2F2E5><tr><td><b>Themen:</b> $stat_them <b>Beiträge:</b> $stat_bei <b>Benutzer:</b> $stat_use<br>Wir begrüßen unser neustes Mitglied: <a href=profil.php?id=$last_use->id>$last_use->username</a></td></tr></table><br>";
+echo "<table width=100% class=forenbg><tr><td><b>Themen:</b> $stat_them <b>Beiträge:</b> $stat_bei <b>Benutzer:</b> $stat_use<br>Wir begrüßen unser neustes Mitglied: <a href=profil.php?id=$last_use->id>$last_use->username</a></td></tr></table><br>";
 if($ud->statshow == "0")
 {
   $show = "<span id=statistik><a href=\"javascript:ds()\">ausblenden</a></span>";
