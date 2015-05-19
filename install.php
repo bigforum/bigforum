@@ -1,26 +1,31 @@
-<?
+<?php
 /*
 Installations Datei
 
 Änderungen an dieser Datei vermeiden, dieses könnte die installation fehlerhaft machen!
 */
+include("includes/function_define.php");
 ?>
 <title>bigforum - Installation</title>
 <style>
 body
 {
-	background: #E1E4F2;
+	background: #FFFFFF;
 	color: #000000;
 }
-</style>
-<script>
-function schr(s)
+.install
 {
-  document.getElementById("schritt").innerHTML = s;
+     background: #E1E4F2;
 }
-</script>
-<table width="100%"><tr><td width="90%"><b>Bigforum - Installationsassistent Schritt <span id=schritt></span>/6</b></td><td><b>Version: 4.0</b></td></tr></table>
-<hr><br><br>
+input.install_button {
+	border: 4px double #0F5C8E;
+	background: #ffffff
+	color: #black;
+	font-weight: bold;
+}
+</style>
+<img src="images/install.jpg" border="0" width="25%" height="15%">
+<table class="install" width="100%" height="100%"><tr><td valign=top align=top>
 <?php
 $do = $_GET["do"];
 $s = $_GET["s"];
@@ -31,8 +36,9 @@ function schr($s)
 switch($do){
   case "":
   schr("1");
-  echo "Vielen dank, dass du bigforum installieren bzw. updaten möchtest.<br>Die Installation ist ganz einfach, dir wird ganz genau erklärt, was zu tun ist. Wenn du das Forum updaten willst, musst du die letzte Version haben.<br> Sprünge beim Update führen zu fehlern. <br>Das Update ist bereits nach einem Schritt fertig.<br><br>Sobald du das Forum installiert bzw. geupdatet hast, lösche die Datei install.php.<br><br>
-  <input type=button value='Forum installieren' onclick=\"location.href='?do=install&s=1'\"> &nbsp; &nbsp; &nbsp; <input type=button value='Forum updaten' onclick=\"location.href='?do=update'\">";
+  echo "Vielen dank, dass Du dich für bigforum als Foren-Software entschieden hast.<br><br>Du kannst hier in <b>nur ca. 5 Minuten</b> das Forum installieren. Dank des Installations-Assistenten wird dir alles genau erklärt.<br><br>
+  Bitte beachte, dass du beim Update keine Sprünge machst (Also nicht von 4.1 auf 4.3).<br><br>
+  <input type=button class=install_button value='Komplettinstalation' onclick=\"location.href='?do=install&s=1'\"> &nbsp; &nbsp; &nbsp; <input type=button class=install_button value='Forum updaten' onclick=\"location.href='?do=update'\">";
   break;
   
   case "update":
@@ -42,20 +48,10 @@ switch($do){
     mysql_connect($HOST,$USER,$PW)or die(mysql_error());
     mysql_select_db($DB)or die(mysql_error());
 	//MySQL - Datenbank änderungen	
- 	 mysql_query("CREATE TABLE IF NOT EXISTS style_all ( 
-
-      id INT(20) NOT NULL auto_increment,
-      sname varchar(500) NOT NULL,
-      link_style varchar(500) NOT NULL,
-      PRIMARY KEY (id) );
-
-      "); 
-	  mysql_query("INSERT INTO style_all (sname, link_style) VALUES ('brown', 'brownstyle.css')");
-	  mysql_query("INSERT INTO style_all (sname, link_style) VALUES ('green', 'greenstyle.css')");
-	  mysql_query("INSERT INTO style_all (sname, link_style) VALUES ('blue', 'bluestyle.css')");
-	  mysql_query("INSERT INTO style_all (sname, link_style) VALUES ('red', 'redstyle.css')");
-	//Ende
-    echo "Danke, das Forum wurde nun auf den neusten Stand gebracht.<br>Bitte lösche diese Datei, ansonsten kann jeder dieses Forum beschädigen!";
+	mysql_query("ALTER TABLE kate ADD ordn INT(5) NOT NULL");
+	//
+    echo "Danke, das Forum wurde erfolgreich auf ". VERSION ." geupdatet.<br><br>
+	Sollten Fragen und/oder Probleme auftreten, bitte im <a href=www.bfs.kilu.de>Support-Forum</a> nachfragen.";
   break;
   
   
@@ -75,7 +71,7 @@ switch($do){
 	  <tr><td>Passwort</td><td><input type=password name=pw1></td></tr>
 	  <tr><td>Passwort (wiederholung)</td><td><input type=password name=pw2></td></tr>
 	  </table>
-	  <input type=submit value='Verbindung prüfen'>
+	  <input type=submit value='Verbindung prüfen' class=install_button>
 	  </form>
 	  ";	  
 	break;
@@ -185,6 +181,7 @@ switch($do){
       id INT(20) NOT NULL auto_increment,
       name varchar(500) NOT NULL,
       besch varchar(800) NOT NULL,
+	  ordn INT(10) NOT NULL,
       PRIMARY KEY (id) );
 
       "); 
@@ -327,8 +324,23 @@ switch($do){
 
       "); 
 	  
+	   	 mysql_query("CREATE TABLE IF NOT EXISTS style_all ( 
+
+      id INT(20) NOT NULL auto_increment,
+      sname varchar(500) NOT NULL,
+      link_style varchar(500) NOT NULL,
+      PRIMARY KEY (id) );
+
+      "); 
+
+	//Ende
+	  
 	  //Ende
 	  //Einfügen in Tabellen
+	  mysql_query("INSERT INTO style_all (sname, link_style) VALUES ('brown', 'brownstyle.css')");
+	  mysql_query("INSERT INTO style_all (sname, link_style) VALUES ('green', 'greenstyle.css')");
+	  mysql_query("INSERT INTO style_all (sname, link_style) VALUES ('blue', 'bluestyle.css')");
+	  mysql_query("INSERT INTO style_all (sname, link_style) VALUES ('red', 'redstyle.css')");
 	  mysql_query("INSERT INTO config (erkennungscode, wert1, wert2, zahl1, zahl2) VALUES ('f2profs', 'j', '', '0', '1')");
 	  mysql_query("INSERT INTO config (erkennungscode, wert1, wert2, zahl1, zahl2) VALUES ('f2name2', 'Bigforum', 'Das Forum', '0', '0')");
 	  mysql_query("INSERT INTO config (erkennungscode, wert1, wert2, zahl1, zahl2) VALUES ('f2pnsignfs', 'images/logo_new.png', '', '1', '1')");
@@ -358,15 +370,15 @@ switch($do){
 	
 	case "4":
 	  schr("5");
-	  echo "Als nächsten und letzten Schritt brauchen wir deine Administrator-Gründer Daten:<br><br>
+	  echo "Als letzten Schritt benötigen wir deine Administratoren-Daten:<br><br>
 	  <form action=?do=install&s=5 method=post>
 	  <table>
 	  <tr><td>Benutzername:</td><td><input type=text name=name></td></tr>
 	  <tr><td>Passwort:</td><td><input type=password name=pw1></td></tr>
-	  <tr><td>Passwort (wiederholung)</td><td><input type=password name=pw2></td></tr>
+	  <tr><td>Passwort (Wiederholung)</td><td><input type=password name=pw2></td></tr>
 	  <tr><td>eMail-Adresse</td><td><input type=text name=mail></td></tr>
 	  </table>
-	  <input type=submit value='Administratoren Daten speichern'>
+	  <input type=submit value='Speichern' class=install_button>
 	  </table>
 	  </form>";
 	break;
@@ -386,7 +398,7 @@ switch($do){
 	  $pw = md5($_POST["pw1"]);
       $time = time();
       $eintrag = mysql_query("INSERT INTO users (username, posts, reg_dat, last_log, reg_ip, sign, group_id, pw, mail, rang, last_site, gesperrt, pn_weiter, ava_link, adm_recht) VALUES ('$_POST[name]', '0', '$time', '', '$_SERVER[REMOTE_ADDR]', '', '3', '$pw', '$_POST[mail]', 'Administrator', '', '0', '1','','6')");
-      echo "Danke $_POST[name], das du bigforum installiert hast.<br><br>Bitte lösche diese Datei nun, anderfalls kann jeder andere dieses Forum beschädigen.";
+      echo "Danke $_POST[name], dass du bigforum installiert hast.<br><br>Bitte lösche diese Datei nun, anderfalls kann jeder andere dieses Forum beschädigen.";
 	break;
 	
 	}

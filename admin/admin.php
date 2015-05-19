@@ -49,7 +49,10 @@ a:hover, a:active
 {
   background: #DE9C39;
 }
-
+.border
+{
+  border: 1px solid #DE9C39;
+}
 </style>";
 ?>
 <script>
@@ -96,13 +99,13 @@ xmlhttp.send(null);
 }
 
 </script>
-<?
+<?php
 echo "<table background=\"bgoben.png\" width=100%><tr><td><a href=?do=log_out>Aus Admin-Bereich ausloggen</a> | <a href='../index.php' target='_blank'>Foren-Übersicht</a><br>
 <center><h4><a href=\"admin.php\">Start</a> &nbsp; <a href=\"?do=ver_user\">Benutzer</a> &nbsp; <a href=\"?do=ver_foren\">Foren</a> &nbsp; <a href=\"?do=settings\">Einstellungen</a> &nbsp; <a href=?do=styles>Design</a></td></tr></table>";
 $sons = array("?do=settings|Foren-Einstellungen","?do=look_logs|Log-Einträge","?do=mods|Mods/Addons Verwaltung","?do=new_warn|Verwarnungsgründe","?do=adser|Adserver","?do=not_use|Benutzernamen / eMail-Adressen verbieten", "?do=rundbrief| Rundbrief schreiben");
 $for = array("?do=new_foren|Neues Forum","?do=ver_foren|Verwalte Foren");
 $user = array("?do=sper_user|Gesperrte","?do=ver_user|Benutzer suchen","?do=recht| Administratoren-Rechte","?do=zuruck|Rechte zurücksetzen");
-$start = array("admin.php|Start","?do=settings|Foren-Einstellungen","?do=look_logs|Log-Einträge ansehen","?do=new_foren|Neues Forum erstellen","?do=ver_user|Benutzer verwalten");
+$start = array("admin.php|Start","?do=ver_check|Version-Check","?do=settings|Foren-Einstellungen","?do=look_logs|Log-Einträge ansehen","?do=new_foren|Neues Forum erstellen","?do=ver_user|Benutzer verwalten");
 $design = array("?do=styles|Styles","?do=insert_style|Style hinzufügen","?do=design|Header-Einstellungen");
 switch ($do) {
   case "":
@@ -230,6 +233,25 @@ switch ($do) {
   break;
   
   
+  case "ver_check":
+  left_table($start);
+  admin_recht("1");
+  $akt_ver = file_get_contents(base64_decode("aHR0cDovL3d3dy5iZnMua2lsdS5kZS9taXNjLnBocD9ha3Rpb249c2hvd192ZXI="));
+  if($akt_ver == VERSION)
+  {
+    echo "<font color=green><b>Herzlichen Glückwunsch:</b> Dein Forum ist auf dem aktuellstem Stand!";
+  }
+  else
+  {
+    echo "<font color=red><b>Eine neuere Version von bigforum ist verfügbar. Du kannst diese im <a href=http://www.bfs.kilu.de/kb/>Kundenbereich</a> downloaden.";
+  }
+  echo "<br><br>
+  <table>
+  <tr><td><b>Deine Version:</b></td><td>". VERSION ."</td></tr>
+  <tr><td><b>Aktuellste Version:</b></td><td>$akt_ver</td></tr></table>";
+  break;
+  
+  
   case "pro_user":
     left_table($user);
     admin_recht("5");
@@ -301,7 +323,7 @@ switch ($do) {
 	   <tr><td><b>Darf HTML in Beiträgen benutzen</b></td><td> <input type=radio name=htmlcan value=1 $eeditr>Ja <input type=radio name=htmlcan value=2 $eeditf> Nein</td></tr>
 	   <tr><td> &nbsp; </td><td> &nbsp; </td></tr>
 	   <tr><td>	
-       <b>Gruppenzugehörigkeit</b> </td><td> Moderator: <input type=checkbox name=grup value=2 $mod_check><br>
+       <b>Gruppenzugehörigkeit</b> </td><td> Super-Moderator: <input type=checkbox name=grup value=2 $mod_check><br>
 											Administrator: <input type=checkbox name=grup value=3 $adm_check></td></tr><tr><td>
 	   <b>Signatur</b></td><td><textarea name=sign rows=6 cols=60>$uds->sign</textarea></td></tr><tr><td>	   </td></tr>
 	   </table></td></tr></table></td></tr></table>
@@ -890,14 +912,14 @@ switch ($do) {
   
   
   case "ver_foren":
-    left_table($for);
+  left_table($for);
   admin_recht("4");
   $ac = $_GET["action"];
   if($ac == "kate")
   {
     if($_GET["done"] == "save")
 	{
-	  mysql_query("UPDATE kate SET name = '$_POST[name]', besch = '$_POST[besch]' WHERE id LIKE '$_GET[id]'");
+	  mysql_query("UPDATE kate SET name = '$_POST[name]', besch = '$_POST[besch]', ordn = '$_POST[ordn]' WHERE id LIKE '$_GET[id]'");
 	  echo "Die Kategorie wurde nun geändert.<br><a href=?do=ver_foren>Zurück zur Foren-Verwaltung</a>";
 	  exit;
 	}
@@ -908,6 +930,7 @@ switch ($do) {
 	<table>
 	<tr><td>Name:</td><td><input type=text name=name value='$kd->name' size=40></td></tr>
 	<tr><td>Beschreibung:</td><td><input type=text name=besch value='$kd->besch' size=40></td></tr>
+	<tr><td>Ordnungsnummer:</td><td><input type=text name=ordn value='$kd->ordn'></td></tr>
 	</table>
 	<input type=submit value=Speichern>
 	</form>
@@ -1001,16 +1024,18 @@ switch ($do) {
 	</td></tr></table>";
 	exit;
   }
-  $foren_data = mysql_query("SELECT * FROM kate");
+  $foren_data = mysql_query("SELECT * FROM kate ORDER BY ordn");
+  echo "<table class=border border=0><tr><td><b><u>Name/Beschreibung</u></b></td><td><b><u>Ordnungsnummer</u></b></td><td><b><u>Aktion</u></b></td></tr>";
   while($fr = mysql_fetch_object($foren_data))
   {
-    echo "<b>$fr->name</b> <a href=?do=ver_foren&action=kate&id=$fr->id>[ bearbeiten ]</a> <a href=javascript:delkat($fr->id)>[ löschen ]</a><br>";
+    echo "<tr><td> &nbsp; </td></tr><tr><td><b>$fr->name</b><br>$fr->besch</td><td>$fr->ordn</td><td><a href=?do=ver_foren&action=kate&id=$fr->id>[ bearbeiten ]</a> <a href=javascript:delkat($fr->id)>[ löschen ]</a></td></tr>";
 	$for_date = mysql_query("SELECT * FROM foren WHERE kate = '$fr->id' ORDER BY sort");
     while($fd = mysql_fetch_object($for_date))
     {
-	  echo "$fd->name  <a href=?do=ver_foren&action=for&id=$fd->id>[ bearbeiten ]</a> <a href=javascript:del($fd->id)>[ löschen ]</a><br>$fd->besch<br><br>";
+	  echo "<tr><td>$fd->name<br><small>$fd->besch</small></td><td>$fd->sort</td><td>  <a href=?do=ver_foren&action=for&id=$fd->id>[ bearbeiten ]</a> <a href=javascript:del($fd->id)>[ löschen ]</a></td></tr>";
 	}
   }
+  echo "</table>";
   break;
   
   
@@ -1163,7 +1188,7 @@ switch ($do) {
     left_table($design);
     echo "<table class='braun'><tbody><tr class='besch'><td><b>Style-Verwaltung</b></td></tr><tr><td>
 	<table>
-	<tr><td><b>Style-Name</b></td><td><b>Stylelink</b></td><td><b>Aktion></b></td></tr>";
+	<tr><td><b>Style-Name</b></td><td><b>Stylelink</b></td><td><b>Aktion</b></td></tr>";
     $style_data = mysql_query("SELECT * FROM style_all");
 	while($sd = mysql_fetch_object($style_data))
 	{

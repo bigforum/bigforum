@@ -9,7 +9,7 @@ looking_page("onekat");
 if($_GET["do"] == "show_one")
 {
 //Nur eine Kategorie
-$foren_data = mysql_query("SELECT * FROM kate WHERE id LIKE '$_GET[id]'") or die(mysql_fehler(mysql_error(), __LINE__, $_SERVER["PHP_SELF"]));
+$foren_data = mysql_query("SELECT * FROM kate WHERE id LIKE '$_GET[id]' ORDER BY ordn") or die(mysql_fehler(mysql_error(), __LINE__, $_SERVER["PHP_SELF"]));
 while($fr = mysql_fetch_object($foren_data))
 {
   $ausgabe .= "<table color=snow class=hell width=100% style='-moz-border-radius:8px;-khtml-border-radius:8px;'><tr width=100%><td width=100%><b>$fr->name</b><br>$fr->besch</td></tr></table>";
@@ -204,7 +204,7 @@ $stat_them = "0";
 $stat_bei = "0";
 $user_data = mysql_query("SELECT * FROM users WHERE username LIKE '". USER ."'") or die(mysql_fehler(mysql_error(), __LINE__, $_SERVER["PHP_SELF"]));;
 $ud = mysql_fetch_object($user_data);
-$foren_data = mysql_query("SELECT * FROM kate") or die(mysql_fehler(mysql_error(), __LINE__, $_SERVER["PHP_SELF"]));
+$foren_data = mysql_query("SELECT * FROM kate ORDER BY ordn") or die(mysql_fehler(mysql_error(), __LINE__, $_SERVER["PHP_SELF"]));
 $ausgabe .= "<table color=snow width=100% class=dark><tr><td width=70%><font color=snow>Name</font></td><td><font color=snow>Letzter Beitrag</font></td><td width=5%><font color=snow>Themen</font></td><td width=5%><font color=snow>Beiträge</font></td></tr></table>";
 
 while($fr = mysql_fetch_object($foren_data))
