@@ -251,8 +251,37 @@ function looking_page($wo)
   {
     $them_dat = mysql_query("SELECT * FROM thema WHERE id LIKE '$_GET[id]'");
 	$td = mysql_fetch_object($them_dat);
-    $page = "thread.php";
-	$text = "Liest ein Thema: $td->tit";
+	if($td->guest_see == "1")
+    {
+      if(USER == "")
+      {
+        $page = "thread.php";
+	    $text = "Liest ein Thema";
+      }
+    }
+	if($fd->guest_see == "2" AND (GROUP != 2 AND GROUP != 3))
+    {
+        $page = "thread.php";
+	    $text = "Liest ein Thema";
+    }
+	if($td->dele == "")
+	{
+      $page = "thread.php";
+	  $text = "Liest ein Thema: $td->tit";
+	}
+    else
+	{
+	  if(GROUP == "2" OR GROUP == "3")
+	  {
+	    $page = "thread.php";
+	    $text = "Liest ein Thema: $td->tit";
+	  }
+	  else
+	  {
+	  	$page = "thread.php";
+	    $text = "Liest ein Thema";
+	  }
+	}	
   }
   if($wo == "newreply")
   {

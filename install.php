@@ -44,7 +44,7 @@ switch($do){
     //Auswahl wie man updaten möchte
     echo "Bitte wähle aus, welche Version du hast, also von welcher du auf die neuste Updaten möchtest.<br><br>
 	<form action=?do=update_query method=post>
-	<select name=vers><option value=2>Von 4.1 auf 4.3 updaten*</option><option value=1>Von 4.2 auf 4.3 updaten</option></select>
+	<select name=vers><option value=2>Von 4.2 auf 4.4 updaten*</option><option value=1>Von 4.3 auf 4.4 updaten</option></select>
 	<br><br>
 	<input type=submit class=install_button value='Forum updaten'><br><br><br>
 	* <b>Wichtig:</b> Bei Sprüngen bei den Updates müssen die Datein hochgeladen werden, die Installation macht lediglich die Eintragungen in die Datenbank. Oder man lädt sich die Komplettversion der aktuellsten Version hoch, ganz wichtig aber, ohne die <i> config.php </i>.
@@ -59,11 +59,12 @@ switch($do){
     mysql_select_db($DB)or die(mysql_error());
 	if($_POST["vers"] == "2")
 	{
-	  mysql_query("ALTER TABLE kate ADD ordn INT(5)"); // Änderungen für die Version 4.2
+	  mysql_query("ALTER TABLE thema ADD dele varchar(500) NOT NULL"); //Änderungen für die Version 4.3
+	  mysql_query("ALTER TABLE beitrag ADD dele varchar(500) NOT NULL"); //Änderungen für die Version 4.3
 	  $schritte++;
 	}  
-	mysql_query("ALTER TABLE thema ADD dele varchar(500) NOT NULL"); //Änderungen für die Version 4.3
-	mysql_query("ALTER TABLE beitrag ADD dele varchar(500) NOT NULL"); //Änderungen für die Version 4.3
+	mysql_query("INSERT INTO config (erkennungscode, wert1, wert2, zahl1, zahl2) VALUES ('f2admin2', '', '', '0', '0')"); //4.4
+	mysql_query("ALTER TABLE users ADD birthday int(200) NOT NULL"); //Änderungen für die Version 4.4
 	$schritte++;
 	if($schritte == $_POST["vers"])
 	{
@@ -204,6 +205,7 @@ switch($do){
       id INT(20) NOT NULL auto_increment,
       name varchar(500) NOT NULL,
       besch varchar(800) NOT NULL,
+	  ordn INT(12) NOT NULL,
       PRIMARY KEY (id) );
 
       "); 
@@ -308,6 +310,7 @@ switch($do){
 	  editrech int(2) NOT NULL,
 	  htmlcan int(2) NOT NULL,
 	  show_mail int(2) NOT NULL,
+	  birthday int(140) NOT NULL,
       PRIMARY KEY (id) );
 
       ");
@@ -366,6 +369,7 @@ switch($do){
 	  mysql_query("INSERT INTO style_all (sname, link_style) VALUES ('red', 'redstyle.css')");
 	  mysql_query("INSERT INTO config (erkennungscode, wert1, wert2, zahl1, zahl2) VALUES ('f2profs', 'j', '', '0', '1')");
 	  mysql_query("INSERT INTO config (erkennungscode, wert1, wert2, zahl1, zahl2) VALUES ('f2name2', 'Bigforum', 'Das Forum', '0', '0')");
+	  mysql_query("INSERT INTO config (erkennungscode, wert1, wert2, zahl1, zahl2) VALUES ('f2admin2', '', '', '0', '0')");
 	  mysql_query("INSERT INTO config (erkennungscode, wert1, wert2, zahl1, zahl2) VALUES ('f2pnsignfs', 'images/logo_new.png', '', '1', '1')");
 	  mysql_query("INSERT INTO config (erkennungscode, wert1, wert2, zahl1, zahl2) VALUES ('f2closefs', 'Allgemeine Arbeiten', '', '1', '0')");
 	  mysql_query("INSERT INTO config (erkennungscode, wert1, wert2, zahl1, zahl2) VALUES ('f2imgadfs', 'images/old_post.png', 'images/new_post.png', '3', '0')");

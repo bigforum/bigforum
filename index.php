@@ -378,13 +378,50 @@ else
 $time = time();
 $user_dat = mysql_query("SELECT * FROM users WHERE sptime < '$time'") or die(mysql_fehler(mysql_error(), __LINE__, $_SERVER["PHP_SELF"]));
 $stat_use = mysql_num_rows($user_dat);
-$ausgabe .=")</td></tr></table>";
+$ausgabe .=")</td></tr></table><table><tr><td><img src=images/icons/online.gif border=0></td><td>";
 echo $ausgabe;
 $ausgabe = "";
 user_online(false);
-echo "</td></tr></table><br>";
+echo "</td></tr></table></td></tr></table><br>";
 
+//Geburtstage berücksichtigen!
+$heute = time();
+$all_users = mysql_query("SELECT * FROM users WHERE sptime < '$heute'");
+$users_birthday = Array();
+$users_timestamp = Array();
+$users_id = Array();
+while($au = mysql_fetch_object($all_users))
+{
 
+  if(date("d", $au->birthday) == date("d", $heute) AND date("m", $au->birthday) == date("m", $heute))
+  {
+    $users_birthday[] = $au->username;
+	$users_timestamp[] = $au->birthday;
+	$users_id[] = $au->id;
+  }
+}
+if(count($users_birthday) != 0)
+{
+  echo "<table width=100% class=normal><tr><td><b>Heutige Geburtstage (".  count($users_birthday) .")</td></tr></table>";
+  echo "<table width=100% class=forenbg><tr><td><table><tr><td><img src=images/icons/birthday.gif border=0></td><td>";
+  for($t=0;$t<count($users_birthday);$t++)
+  {
+    $jetzt = mktime(0, 0, 0, date('m'), date('d'), date('Y')); 
+    $gebur = mktime(0, 0, 0, date('m', $users_timestamp[$t]), date('d', $users_timestamp[$t]), date('Y', $users_timestamp[$t])); 
+    $age   = intval(($jetzt - $gebur) / (3600 * 24 * 365)); 
+	if(date("Y", $users_timestamp[$t]) != "2037")
+	{
+	  $agee = "($age)";
+	}
+    echo "<a href=profil.php?id=". $users_id[$t] .">" .$users_birthday[$t]. "</a> $agee";
+	if($t+1 != count($users_birthday))
+	{
+	  echo ", ";
+	}
+  }
+  echo "</td></tr></table></td></tr></table><br>";
+}
+//Ende
 
 $time = time();
 
@@ -398,8 +435,9 @@ if($cd->wert1 == "") { $cd->wert1 = "images/old_1.png"; }
 if($cd->wert2 == "") { $cd->wert2 = "images/new_1.png"; }
 $userdata = mysql_query("SELECT * FROM users WHERE username LIKE '". USER ."'");
 $ud = mysql_fetch_object($userdata);
-echo "<table width=100% class=normal><tr><td><b>Statistiken</td></tr></table>";
-echo "<table width=100% class=forenbg><tr><td><b>Themen:</b> $stat_them <b>Beiträge:</b> $stat_bei <b>Benutzer:</b> $stat_use<br>Wir begrüßen unser neustes Mitglied: <a href=profil.php?id=$last_use->id>$last_use->username</a></td></tr></table><br>";
+echo "<table width=100% class=normal><tr><td><b>Statistiken</td></tr></table>
+<table width=100% class=forenbg><tr><td>
+<table><tr><td><img src=images/icons/stat.gif border=0></td><td><b>Themen:</b> $stat_them <b>Beiträge:</b> $stat_bei <b>Benutzer:</b> $stat_use<br>Wir begrüßen unser neustes Mitglied: <a href=profil.php?id=$last_use->id>$last_use->username</a></td></tr></table></td></tr></table><br>";
 if($ud->statshow == "0")
 {
   $show = "<span id=statistik><a href=\"javascript:ds()\">ausblenden</a></span>";

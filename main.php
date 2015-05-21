@@ -179,8 +179,24 @@ if($do == "set")
 	  {
 	    $eintrag = mysql_query("UPDATE users SET pn_weiter = '0', onlyadm = '$_POST[am]' WHERE username LIKE '". USER ."'");
 	  }
-	  mysql_query("UPDATE users SET style = '$_POST[sty]' WHERE username LIKE '". USER ."'");
-	  speicherung($eintrag, "Deine Einstellungen wurden überarbeitet.", "<b>Fehler:</b> Es gab einen Fehler bei der Speicherung der Einstellungen <a href=history.back()>Zurück</a>");
+	  $eintrag = mysql_query("UPDATE users SET style = '$_POST[sty]' WHERE username LIKE '". USER ."'");
+	  speicherung($eintrag, "Deine Einstellungen wurden überarbeitet.", "<b>Fehler:</b> Es gab einen Fehler bei der Speicherung der Einstellungen.<br> <a href=javascript:history.back()>Zurück</a>");
+      page_close_table();
+	}
+	if($ac == "insert_bd")
+	{
+	  if($_POST["year"] > date("Y", time()))
+	  {
+	    echo "Dein Geburtsdatum kann doch nicht in der Zukunft liegen ;)<br><br>";
+		page_close_table();
+	  }
+	  if($_POST["year"] == "")
+	  {
+	    $_POST["year"] = "2037";
+	  }
+	  $time = mktime(0, 0, 0, $_POST["month"], $_POST["day"], $_POST["year"]);
+	  mysql_query("UPDATE users SET birthday = '$time' WHERE username LIKE '". USER ."'");
+	  echo "Deine Daten wurden erfolgreich gespeichert.";
       page_close_table();
 	}
     include_once("includes/function_user.php");
@@ -204,8 +220,7 @@ if($do == "set")
 	<tr><td>Automatische Weiterleitung zu dem Posteingang, beim Mauskontakt, des blinkenden Textes \"Neue Nachrichten\" oben über deiner Navigationsliste.</td><td width=40%>
 	<input type=checkbox name=pn_weiter value=1 $checked></td></tr>
 	<tr><td>Private Nachrichten nur von Administratoren und Moderatoren empfangen?</td><td><input type=radio name=am value=2 $pnj>Ja <input type=radio name=am value=5 $pnn>Nein</td></tr>
-	</table>
-	</fieldset><br>
+	</table>    <input type=submit value=Speichern></form></fieldset><br>
 	<fieldset><legend>Design</legend>
 	<table><tr><td>
     Welche Farbe soll dieses Forum haben?</td><td><select name=sty>";
@@ -617,14 +632,44 @@ if($do == "profil")
 	<fieldset><legend>Profil bearbeiten</legend>
 	Hier kannst du deine Website, sowie deine Hobbys angeben. Diese werden dann im Profil zu finden sein.<br>
 	<table><tr><td>Hobbys</td><td>Website</td></tr>
-	<td><input type=text name=hob value=\"$ud->hob\" size=40  maxlength=160></td><td><input type=text name=website value=\"$ud->website\" size=40 maxlength=110></td></tr></table>
-  </fieldset>
+	<td><input type=text name=hob value=\"$ud->hob\" size=40  maxlength=160></td><td><input type=text name=website value=\"$ud->website\" size=40 maxlength=110></td></tr></table>	<input type=submit value='Speichern'>
+  </fieldset><br>
 	<fieldset><legend>Einstellungen</legend>
 	<table>
 	<tr><td>Zeige eMail-Adresse im Profil</td><td>$showing_mail</td></tr>
 	</table>
+	<input type=submit value='Speichern'>
 	</fieldset>
-	<input type=submit value='Änderungen übernehmen'>";
+</form><fieldset><legend>Geburtstag</legend>
+	<form action=main.php?do=set&aktion=insert_bd method=post>
+	<table>
+	<tr><td>Bitte gebe deinen Geburtstag ein:</td><td width=50%><select name=day><option value=0></option>";
+	$birthday_d = date("d", $ud->birthday);
+	$birthday_m = date("m", $ud->birthday);
+	for($tag = 1; $tag < 32; $tag++)
+	{
+	  if($tag == $birthday_d AND $ud->birthday != "0")
+	    echo "<option value=$tag selected=selected>$tag</option>";
+	  else	
+	  echo "<option value=$tag>$tag</option>";
+	}
+	$mo = "0";
+	$mona = "Januar,Februar,März,April,Mai,Juni,Juli,August,September,Oktober,November,Dezember";
+	$monaex = explode(",", $mona);
+	echo "</select><select name=month><option value=0></option>";
+	for($i = 1; $i < count($monaex)+1; $i++)
+	{
+	  $x = $i-1;
+	  if($i == $birthday_m AND $ud->birthday != "0")
+	    echo "<option value=$i selected=selected>$monaex[$x]</option>";
+	  echo "<option value=$i>$monaex[$x]</option>";
+	} 
+	if($ud->birthday != "0" AND date("Y", $ud->birthday) != "2037") 
+	  $y = date("Y", $ud->birthday);
+	echo "</select><input type=text name=year size=2 maxlength=4 value='$y'><a href=# onmouseover=\"Tip('Wenn du nicht möchtest, dass jemand dein Alter sieht, dann lasse dieses Feld (das letzte) einfach leer.')\" onmouseout='UnTip()'>[?]</a></b></td></tr>
+	</table>
+    <input type=submit value=Speichern></form>
+	</fieldset><br>";
 	page_close_table();
   }
   if($ac == "change")

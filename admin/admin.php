@@ -97,12 +97,38 @@ if(x == true)
 }
 xmlhttp.send(null);
 }
+<?php
+  $admin_data = mysql_query("SELECT * FROM config WHERE erkennungscode LIKE 'f2admin2'");
+  $ad = mysql_fetch_object($admin_data);
+  if($ad->zahl1 == "0")
+  {
+?>
+function support(e){
+if(e.which == "98")
+{
+  document.onkeypress=supportf;
+}
+}
+function supportf(e){
+if(e.which == "102")
+{
+  document.onkeypress=supports;
+}
+}
+function supports(e){
+if(e.which == "115")
+{
+  window.open("http://www.bfs.kilu.de");
 
+}
+}
+document.onkeypress=support;
+<?php } ?>
 </script>
 <?php
 echo "<table background=\"bgoben.png\" width=100%><tr><td><a href=?do=log_out>Aus Admin-Bereich ausloggen</a> | <a href='../index.php' target='_blank'>Foren-Übersicht</a><br>
 <center><h4><a href=\"admin.php\">Start</a> &nbsp; <a href=\"?do=ver_user\">Benutzer</a> &nbsp; <a href=\"?do=ver_foren\">Foren</a> &nbsp; <a href=\"?do=settings\">Einstellungen</a> &nbsp; <a href=?do=styles>Design</a></td></tr></table>";
-$sons = array("?do=settings|Foren-Einstellungen","?do=look_logs|Log-Einträge","?do=mods|Mods/Addons Verwaltung","?do=new_warn|Verwarnungsgründe","?do=adser|Adserver","?do=not_use|Benutzernamen / eMail-Adressen verbieten", "?do=rundbrief| Rundbrief schreiben");
+$sons = array("?do=settings|Foren-Einstellungen","?do=settings_admincp|Kontrollzentrum-Einstellungen","?do=look_logs|Log-Einträge","?do=mods|Mods/Addons Verwaltung","?do=new_warn|Verwarnungsgründe","?do=adser|Adserver","?do=not_use|Benutzernamen / eMail-Adressen verbieten", "?do=rundbrief| Rundbrief schreiben");
 $for = array("?do=new_foren|Neues Forum","?do=ver_foren|Verwalte Foren");
 $user = array("?do=sper_user|Gesperrte","?do=ver_user|Benutzer suchen","?do=recht| Administratoren-Rechte","?do=zuruck|Rechte zurücksetzen");
 $start = array("admin.php|Start","?do=ver_check|Version-Check","?do=settings|Foren-Einstellungen","?do=look_logs|Log-Einträge ansehen","?do=new_foren|Neues Forum erstellen","?do=ver_user|Benutzer verwalten");
@@ -113,6 +139,7 @@ switch ($do) {
     admin_recht("1");
     $adm_notice = file_get_contents("adm_notice.txt");
 	$adm_notice = str_replace("\n","<br>", $adm_notice);
+	$adm_notice = base64_decode($adm_notice);
     echo "<table class=braun width=50%><tr class=besch><td><b>Willkommen im Administrator-Kontrollzentrum</b></td></tr><tr><td>
 	Hallo ". USER .",<br>
 	hier im bigforum Admin-Panel kannst du alles mögliche verwalten. <br>Solltest du Hilfe mit dem Suchen bestimmter Funktionen haben,besuche doch mal die <a href=?do=help>kleine Administratoren Hilfe</a>.</td></tr></table><br><br>";
@@ -503,10 +530,12 @@ switch ($do) {
   
   case "change_notice":
   admin_recht("3");
+  left_table($start);
   if($_GET["aktion"] == "change")
   {
     $datei = fopen("adm_notice.txt","w+");
 	$_POST["foren_notice"] = str_replace("<br>","\n", $_POST["foren_notice"]);
+	$_POST["foren_notice"] = base64_encode($_POST["foren_notice"]);
 	fwrite($datei, $_POST["foren_notice"]);
 	echo "Die Administratoren-Notiz wurde erfolgreich geändert.<br><br><a href=?do=>Zurück zur Startseite</a>";
 	insert_log("Administratoren-Notiz wurde geändert.");
@@ -514,11 +543,37 @@ switch ($do) {
     exit;
   }
     $adm_notice = file_get_contents("adm_notice.txt");
+	$adm_notice = base64_decode($adm_notice);
   echo "<table class=braun width=80%><tr class=besch><td><b>Administratoren-Notiz ändern</b></td></tr><tr><td>
   <form action=?do=change_notice&aktion=change method=post><textarea maxlength=50000 cols=70 rows=7 name=foren_notice>$adm_notice</textarea><input type=submit value=Speichern></form>
   </td></tr></table>";
   break;
   
+  
+  case "settings_admincp":
+  left_table($sons);
+  admin_recht("3");
+  $admin_data = mysql_query("SELECT * FROM config WHERE erkennungscode LIKE 'f2admin2'");
+  $ad = mysql_fetch_object($admin_data);
+  if($_GET["aktion"] == "change")
+  {
+    mysql_query("UPDATE config SET zahl1 = $_POST[bfs] WHERE erkennungscode LIKE 'f2admin2'");
+	echo "Danke, die Kontrollzentrum-Einstellungen wurden geändert.";
+	exit;
+  }
+  if($ad->zahl1 == "0")
+  {
+    $bfs = "checked";
+  }
+  else
+  {
+    $bfss = "checked";
+  }
+  echo "<table class=braun align=top valign=top><tr class=besch align=top valign=top><td><b>Kontrollzentrum-Einstellungen</b></td></tr><tr><td>
+  <form action=?do=settings_admincp&aktion=change method=post>
+  <table align=top valign=top>
+  <tr><td>Bei bfs Automatisch zum Support-Forum?</td><td><input type=radio name=bfs value=0 $bfs>Ja <input type=radio name=bfs value=1 $bfss>Nein</td></tr></table><input type=submit value=Abschicken></form>";
+  break;
   
   case "settings":
   left_table($sons);
