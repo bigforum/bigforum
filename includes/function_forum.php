@@ -6,13 +6,7 @@ function forum_error($text)
 }
 function load_function($id, $adm)
 {
-  echo "<form method=post action=?id=$id&do=change><select name=fu onchange=submit()><option value=> </option><option value=close>Thema schließen</option><option value=open>Themen öffnen</option><option value=wich>Als wichtig makieren</option><option value=wich>Makierung aufheben</option>";
-  if($adm == "3")
-  {
-    //Nur Administratoren haben das Recht Themen zu löschen, und Themen als neu zu makieren.
-    echo "<option value=marknew>Thema als neu makieren</option><option value=delete>Thema löschen</option>";
-  }
-  echo "<option value=schieb>Thema verschieben</option></select></form>";
+  echo "<form method=post action=?id=$id&do=change><select name=fu onchange=submit()><option value=> </option><option value=close>Thema schließen</option><option value=open>Themen öffnen</option><option value=wich>Als wichtig makieren</option><option value=wich>Makierung aufheben</option><option value=marknew>Thema als neu makieren</option><option value=delete>Thema löschen</option><option value=schieb>Thema verschieben</option></select></form>";
 }
 function answer_button($recht, $check_adm, $id, $close)
 {

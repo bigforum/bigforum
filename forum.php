@@ -24,6 +24,11 @@ if($id == "")
 {
   erzeuge_error("Dieses Forum exestiert nicht.");
 }
+if($_GET["do"] == "new")
+{
+  mysql_query("UPDATE thema SET dele = '' WHERE id LIKE '$_GET[tid]'");
+  mysql_query("UPDATE beitrag SET dele = '' WHERE where_forum LIKE '$_GET[tid]'");
+}
 if($_GET["do"] == "change")
 {
   if($_POST["dw"] == "close")
@@ -93,7 +98,7 @@ if($_GET["do"] == "change")
 	  $time = $zwe->post_when;
 	  mysql_query("INSERT INTO beitrag (text, where_forum, verfas, post_dat, last_edit_dat, edit_by) VALUES ('$zwe->text', '$ein->id', '$zwe->verfas', '$time', '', '')");
 	  mysql_query("DELETE FROM thema WHERE id LIKE '$zwe->id'");
-	  echo "Danke, \"$zwe->tit\" wird nun als Beitrag in \"$ein->tit\" angezeigt.";
+	  echo "Danke, $zwe->tit wird nun als Beitrag in $ein->tit angezeigt.";
 	  page_footer();
 	}
   }
@@ -199,11 +204,13 @@ echo "<form method=post action=?id=$id&do=change><table width=73%><tr class=norm
 
 while($thd = mysql_fetch_object($them_dat))
 {
+  if(($thd->dele != "" AND GROUP > 1 AND GROUP < 4) OR $thd->dele == "")
+  {
   $topics++;
-  $answers = mysql_query("SELECT * FROM beitrag WHERE where_forum LIKE '$thd->id'") or die(mysql_fehler(mysql_error(), __LINE__, $_SERVER["PHP_SELF"]));
+  $answers = mysql_query("SELECT * FROM beitrag WHERE where_forum LIKE '$thd->id' AND dele = ''") or die(mysql_fehler(mysql_error(), __LINE__,  $_SERVER["PHP_SELF"]));
   $zahl = mysql_num_rows($answers);
   
-  $datas = mysql_query("SELECT * FROM read_all WHERE uname LIKE '". USER ."' AND thema_id LIKE '0' ORDER BY id DESC LIMIT 1") or die(mysql_fehler(mysql_error(), __LINE__, $_SERVER["PHP_SELF"]));
+  $datas = mysql_query("SELECT * FROM read_all WHERE uname LIKE '". USER ."' AND thema_id LIKE '0' ORDER BY id DESC LIMIT 1") or  die(mysql_fehler(mysql_error(), __LINE__, $_SERVER["PHP_SELF"]));
   $das = mysql_fetch_object($datas);
   
   $data = mysql_query("SELECT * FROM read_all WHERE uname LIKE '". USER ."' AND thema_id LIKE '$thd->id'") or die(mysql_fehler(mysql_error(), __LINE__, $_SERVER["PHP_SELF"]));
@@ -259,8 +266,9 @@ while($thd = mysql_fetch_object($them_dat))
   {
     $rechnung = "1";
   }
-  $last_beitr = mysql_query("SELECT * FROM beitrag WHERE where_forum LIKE '$thd->id' ORDER BY post_dat DESC LIMIT 1")or die(mysql_error());
+  $last_beitr = mysql_query("SELECT * FROM beitrag WHERE where_forum LIKE '$thd->id' AND dele = '' ORDER BY post_dat DESC LIMIT 1")or die(mysql_error());
   $lb = mysql_fetch_object($last_beitr);
+  $titel = $thd->tit;
   if($lb->post_dat != "")
   {
     $time_last = date("d.m.Y - H:i", $lb->post_dat);
@@ -275,13 +283,35 @@ while($thd = mysql_fetch_object($them_dat))
   {
     $checkd = "<td><input type=checkbox name=$thd->id value=1></td>";
   }
-  
-  if($da->when_look < $thd->last_post_time AND $das->when_look < $thd->last_post_time)
+  if($thd->dele != "")
   {
-    echo "<tr><td width=3%><span id=text ondblclick=\"feld('$thd->tit','$thd->id')\">$close</span></td><td width=50%><b><span id=text ondblclick=\"feld('$thd->tit','$thd->id')\">$wich <a href=thread.php?id=$thd->id&page=$rechnung>$thd->tit</a></span></b><br><span style=\"cursor: pointer;\" onclick=\"window.location.href='profil.php?id=$vd->id'\"><small>$thd->verfas</small></span></td><td width=20%>$last_answer</td><td width=10%>$zahl</td><td align=left>$checkd</td></tr>";
+    $last_answer = "Thema gelöscht von";
+	$zahl = $thd->dele;
+	$titel = "</a></span>$titel  <span><a>";
+	$close = "</span>$close<span>";
+	$checkd = "<td><input type=checkbox name=$thd->id value=1 disabled></td>";
   }
-  else
-    echo "<tr><td width=3%><span id=text ondblclick=\"feld('$thd->tit','$thd->id')\">$close</span></td><td width=50%><span id=text ondblclick=\"feld('$thd->tit','$thd->id')\">$wich <a href=thread.php?id=$thd->id&page=$rechnung>$thd->tit</a></span><br><span style=\"cursor: pointer;\" onclick=\"window.location.href='profil.php?id=$vd->id'\"><small>$thd->verfas</small></span></td><td width=20%>$last_answer</td><td width=10%>$zahl</td><td align=left>$checkd</td></tr>";
+
+    //Ausgabe der Themen Geänderte Ausgabe mit 4.3
+    $ausgabe = "<tr><td width=3%><span id=text ondblclick=\"feld('$thd->tit','$thd->id')\">$close</span></td><td width=50%><table width=100%><tr><td>";
+	if($da->when_look < $thd->last_post_time AND $das->when_look < $thd->last_post_time)
+    {
+	  $ausgabe.= "<b>";
+	}
+	$ausgabe .= "<span id=text ondblclick=\"feld('$thd->tit','$thd->id')\">$wich <a href=thread.php?id=$thd->id&page=$rechnung>$titel</a></span>";
+	if($da->when_look < $thd->last_post_time AND $das->when_look < $thd->last_post_time)
+    {
+	  $ausgabe.= "</b>";
+	}
+	$ausgabe .= "<br><span style=\"cursor: pointer;\" onclick=\"window.location.href='profil.php?id=$vd->id'\"><small>$thd->verfas</small></span>";
+	if($thd->dele != "")  //Hier kann das Thema dann angezigt werden, bzw. wiederherstellbar. 
+	{
+	  $ausgabe .= "</td><td align=right>(<a href=thread.php?id=$thd->id&page=$rechnung>Anzeigen</a>) (<a href=forum.php?id=$_GET[id]&do=new&tid=$thd->id>Wiederherstellen</a>)";
+	}  
+	$ausgabe .= "</td></tr></table></td><td width=20%>$last_answer</td><td width=10%>$zahl</td><td align=left>$checkd</td></tr>";
+    echo $ausgabe;
+	//Ende der Ausgabe
+  }
 }
 echo "</table>";
 if($topics == "0")

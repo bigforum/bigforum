@@ -606,7 +606,7 @@ function show_stat($s)
   $time = time();
   $most_user_posts = mysql_query("SELECT * FROM users ORDER BY posts DESC LIMIT 5");
   $new_user = mysql_query("SELECT * FROM users ORDER BY reg_dat DESC LIMIT 5");
-  $new_them = mysql_query("SELECT * FROM thema ORDER BY last_post_time DESC");
+  $new_them = mysql_query("SELECT * FROM thema WHERE dele = '' ORDER BY last_post_time DESC");
   $last_akt = mysql_query("SELECT * FROM users ORDER BY last_log DESC LIMIT 5");
   if($s == "j")
   {
@@ -647,7 +647,7 @@ function show_stat($s)
   while($nt = mysql_fetch_object($new_them) AND $x != 5)
   {
 
-	  $anz = mysql_query("SELECT * FROM beitrag WHERE where_forum LIKE '$nt->id'");
+	  $anz = mysql_query("SELECT * FROM beitrag WHERE where_forum LIKE '$nt->id' AND dele = ''");
 	  $anza = mysql_num_rows($anz);
 	  $forum_data = mysql_query("SELECT * FROM foren WHERE id LIKE '$nt->where_forum'");
       $fd = mysql_fetch_object($forum_data);

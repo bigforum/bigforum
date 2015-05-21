@@ -49,10 +49,7 @@ a:hover, a:active
 {
   background: #DE9C39;
 }
-.border
-{
-  border: 1px solid #DE9C39;
-}
+
 </style>";
 ?>
 <script>
@@ -99,14 +96,14 @@ xmlhttp.send(null);
 }
 
 </script>
-<?php
+<?
 echo "<table background=\"bgoben.png\" width=100%><tr><td><a href=?do=log_out>Aus Admin-Bereich ausloggen</a> | <a href='../index.php' target='_blank'>Foren-Übersicht</a><br>
-<center><h4><a href=\"admin.php\">Start</a> &nbsp; <a href=\"?do=ver_user\">Benutzer</a> &nbsp; <a href=\"?do=ver_foren\">Foren</a> &nbsp; <a href=\"?do=settings\">Einstellungen</a> &nbsp; <a href=?do=styles>Design</a></td></tr></table>";
-$sons = array("?do=settings|Foren-Einstellungen","?do=look_logs|Log-Einträge","?do=mods|Mods/Addons Verwaltung","?do=new_warn|Verwarnungsgründe","?do=adser|Adserver","?do=not_use|Benutzernamen / eMail-Adressen verbieten", "?do=rundbrief| Rundbrief schreiben");
+<center><h4><a href=\"admin.php\">Start</a> &nbsp; <a href=\"?do=ver_user\">Benutzer</a> &nbsp; <a href=\"?do=ver_foren\">Foren</a> &nbsp;<a href=\"?do=settings\">Einstellungen</a></td></tr></table>";
+$sons = array("?do=settings|Foren-Einstellungen","?do=design|Header-Einstellungen","?do=look_logs|Log-Einträge","?do=mods|Mods/Addons Verwaltung","?do=new_warn|Verwarnungsgründe","?do=adser|Adserver");
 $for = array("?do=new_foren|Neues Forum","?do=ver_foren|Verwalte Foren");
-$user = array("?do=sper_user|Gesperrte","?do=ver_user|Benutzer suchen","?do=recht| Administratoren-Rechte","?do=zuruck|Rechte zurücksetzen");
-$start = array("admin.php|Start","?do=ver_check|Version-Check","?do=settings|Foren-Einstellungen","?do=look_logs|Log-Einträge ansehen","?do=new_foren|Neues Forum erstellen","?do=ver_user|Benutzer verwalten");
-$design = array("?do=styles|Styles","?do=insert_style|Style hinzufügen","?do=design|Header-Einstellungen");
+$user = array("?do=sper_user|Gesperrte","?do=ver_user|Benutzer suchen","?do=recht| Administratoren-Rechte");
+$start = array("admin.php|Start","?do=settings|Foren-Einstellungen","?do=look_logs|Log-Einträge ansehen","?do=new_foren|Neues Forum erstellen","?do=ver_user|Benutzer verwalten");
+
 switch ($do) {
   case "":
     left_table($start);
@@ -135,7 +132,7 @@ switch ($do) {
   admin_recht("4");
   left_table($sons);
   //Mods die die funktion Admin beeinhalten
-  $mod = array("rules.php","last_posts.php","chat.php","addon_basic_modul.php");
+  $mod = array("rules.php","last_posts.php","chat.php");
   $laeng = count($mod);
   $x = "0";
   echo "Hier hast du eine Verwaltungsmöglichkeit, aller installierten Mods, dieses Systems. Sofern dieser Mod, es zuläßt sich über das Admincp verwalten zu lassen.<br>Der Titel ist gleichzeitig der Dateiname.php<br><br>";
@@ -160,7 +157,7 @@ switch ($do) {
   
   
   case "design":
-  left_table($design);
+  left_table($sons);
   admin_recht("3");
   if($_GET["action"] == "insert")
   {
@@ -182,7 +179,7 @@ switch ($do) {
   </fieldset>
   <br>
   <fieldset><legend>Header-Anzeige</legend>Hier kannst du eine Nachricht eingeben, welche bei <u>allen</u> Benutzern angezeigt wird. Sollte ein User eine alte Header-Notiz haben, wird diese mit dieser überschrieben.<br>
-  Die Benutzer können die Header-Notiz, genauwie eine persönliche Notiz, über den Persönlichen Bereich ausbleden. Bei der Userverwaltung kannst Du sehen, was ein Benutzer im Header stehen hat.<br>
+  Die Benutzer können die Header-Notiz, genauwie eine persönliche Notiz, über das Usercp ausbleden. Bei der Userverlwatung kannst du sehen, was ein Benutzer im Header stehehn hat.<br>
   <form action=?do=design&action=noti method=post>
   <input type=text size=40 name=noti><input type=submit value=Speichern></form>";
   break;
@@ -226,29 +223,10 @@ switch ($do) {
   case "ver_user":
     left_table($user);
   admin_recht("5");
-  echo "<table class=braun width=70%><tr class=besch><td><b>Benutzerverwaltung</b></td></tr><tr><td>
+  echo "<table class=braun width=50%><tr class=besch><td><b>Benutzerverwaltung</b></td></tr><tr><td>
   Bitte gebe in das nachfolgenden Feld den Benutzernamen ein, den du verwalten willst.<br><br>
-  <form action=?do=pro_user method=post>Benutzername: <input type=text name=username value=$_GET[name]><input type=submit value=Suchen></form>
+  <form action=?do=pro_user method=post>Benutzername: <input type=text name=username value=$_GET[name]><input type=submit value=Verwalten></form>
   </td></tr></table>";
-  break;
-  
-  
-  case "ver_check":
-  left_table($start);
-  admin_recht("1");
-  $akt_ver = file_get_contents(base64_decode("aHR0cDovL3d3dy5iZnMua2lsdS5kZS9taXNjLnBocD9ha3Rpb249c2hvd192ZXI="));
-  if($akt_ver == VERSION)
-  {
-    echo "<font color=green><b>Herzlichen Glückwunsch:</b> Dein Forum ist auf dem aktuellstem Stand!";
-  }
-  else
-  {
-    echo "<font color=red><b>Eine neuere Version von bigforum ist verfügbar. Du kannst diese im <a href=http://www.bfs.kilu.de/kb/>Kundenbereich</a> downloaden.";
-  }
-  echo "<br><br>
-  <table>
-  <tr><td><b>Deine Version:</b></td><td>". VERSION ."</td></tr>
-  <tr><td><b>Aktuellste Version:</b></td><td>$akt_ver</td></tr></table>";
   break;
   
   
@@ -259,18 +237,9 @@ switch ($do) {
 	 $uds = mysql_fetch_object($user_datas);
 	 if($uds->id == "")
 	 {
-	   echo "<table class=braun width=70%><tr class=besch><td><b>Fehler: Benutzername</b></td></tr><tr><td>
-       Fehler, dieser Benutzername ist leider nicht vorhanden.<br> Bitte beachte, dass dieser Benutzername vorhanden sein soll.<br><br><a href=?do=ver_user>Nochmal suchen</a><br><br>";
-	   $se_da = mysql_query("SELECT * FROM users WHERE username LIKE '%$_POST[username]%'");
-	   if(mysql_num_rows($se_da) != "0")
-	   {
-	     echo "<b>Vorschläge:</b><br><br>";
-	   }
-	   while($sd = mysql_fetch_object($se_da))
-	   {
-	     echo "<a href=?do=ver_user&name=$sd->username>$sd->username</a><br>";
-	   }
-	   echo "</td></tr></table>";
+	   echo "<table class=braun width=50%><tr class=besch><td><b>Fehler: Benutzername</b></td></tr><tr><td>
+       Fehler, dieser Benutzername ist leider nicht vorhanden.<br> Bitte beachte, dass dieser Benutzername vorhanden sein soll.<br><br><a href=?do=ver_user>Benutzernamen suchen</a>
+	   </td></tr></table>";
 	 }
 	 else {
 	   $gruppe = "Benutzer";
@@ -305,8 +274,10 @@ switch ($do) {
 	   {
 	     $eeditf = "checked";
 	   }
-	   echo "<table><tr valign=top align=top><td><table class=braun width=100%><tr class=besch><td><b>Benutzerdaten - $uds->username</b></td></tr><tr><td>
-	   <table><tr><td>
+	   echo "<table class=braun width=50%><tr class=besch><td><b>Benutzerverwaltung - $uds->username</b></td></tr><tr><td>
+	   
+	   <table>
+	   <tr><td>
 	   <form action=?do=save_userdatas method=post>
 	   <b>Benutzername:</b> </td><td> <input type=text name=username value='$uds->username'></td></tr><tr><td>
 	   <b>Rang-Titel:</b> </td><td> <input type=text name=rang value='$uds->rang'></td></tr><tr><td>
@@ -315,103 +286,28 @@ switch ($do) {
 	   <tr><td><b>Hobbys:</b></td><td><input type=text name=hob value='$uds->hob'></td></tr>
 	   <tr><td> &nbsp; </td><td>&nbsp;</td></tr><tr><td>
 	   <b>Beiträge:</b> </td><td> <input type=text name=bei value=$uds->posts></td></tr><tr><td>
-	   <b>Registriert seit (UNIX!):</b> </td><td> <input type=text name=reg value=$uds->reg_dat> (". date("d.m.Y", $uds->reg_dat).")</td></tr>
-	   <tr><td><b>Angezeigte Notiz:</b></td><td> <input type=text name=unot value='$uds->notice' </td></tr></table></td></tr></table>
-	   </td><td><table class=braun width=100%><tr class=besch><td><b>Benutzerrechte - $uds->username</b></td></tr><tr><td>
-	   <table>
+	   <b>Registriert seit (UNIX!):</b> </td><td> <input type=text name=reg value=$uds->reg_dat> (". date("d.m.Y", $uds->reg_dat).")</td></tr><tr><td>
+	   <b>Benutzergruppe(nid):</b> </td><td> $uds->group_id ( $gruppe )</td></tr><tr><td>
+	   <b>Notiz, die dem Benutzer im Header angezeigt wird:</b></td><td> <input type=text name=unot value='$uds->notice' </td></tr>
+	   &nbsp; </td></tr>
 	   <tr><td><b>Zeige Bearbeitet von... Bei Beitragsbearbeitung?</b></td><td><input type=radio name=editrech value=5 $editf>Ja <input type=radio name=editrech value=2 $editr> Nein</td></tr>
-	   <tr><td><b>Darf HTML in Beiträgen benutzen</b></td><td> <input type=radio name=htmlcan value=1 $eeditr>Ja <input type=radio name=htmlcan value=2 $eeditf> Nein</td></tr>
+	   <tr><td><b>Darf HTML in Beiträgen benutzen</b></td><td><input type=radio name=htmlcan value=1 $eeditf>Ja <input type=radio name=htmlcan value=2 $eeditr> Nein</td></tr>
 	   <tr><td> &nbsp; </td><td> &nbsp; </td></tr>
 	   <tr><td>	
-       <b>Gruppenzugehörigkeit</b> </td><td> Super-Moderator: <input type=checkbox name=grup value=2 $mod_check><br>
+       <b>Gruppenzugehörigkeit</b> </td><td> Moderator: <input type=checkbox name=grup value=2 $mod_check><br>
 											Administrator: <input type=checkbox name=grup value=3 $adm_check></td></tr><tr><td>
-	   <b>Signatur</b></td><td><textarea name=sign rows=6 cols=60>$uds->sign</textarea></td></tr><tr><td>	   </td></tr>
-	   </table></td></tr></table></td></tr></table>
+	   <b>Signatur</b></td><td><textarea name=sign rows=6 cols=60>$uds->sign</textarea></td></tr><tr><td>
 	   <input type=hidden value=$uds->id name=id>
-	   <input type=submit value='Speichern'><input type=button value='Benutzer löschen' onclick=\"window.location.href='?do=del_user&id=$uds->id'\">
+	   <input type=submit value=Speichern>
 	   </form>
-
+	   </td></tr>
+	   </table>
 	   
        </td></tr></table>";
 	 }
   break;
   
-  case "del_user":
-    left_table($user);
-    admin_recht("5");
-    if($_GET["aktion"] == "sure")
-	{
-	  mysql_query("DELETE FROM users WHERE id LIKE '$_GET[id]'");
-	  echo "Der Benutzer wurde gelöscht.";
-	  insert_log("Ein Benutzer (id: $_GET[id]) wurde gelöscht.");
-	  exit;
-	}
-    echo "<b>Möchtest du diesen Benutzer wirklich löschen? Dieser Schritt ist nichtmehr rückgänig machbar!</b><br><br>
-    <input type=button value='Ja, Benutzer löschen' onclick=\"window.location.href='?do=del_user&aktion=sure&id=$_GET[id]'\">  <input type=button value='Nein, Benutzer nicht löschen' onclick=\"window.location.href='admin.php'\">";
-  break;
-  
-  case "zuruck":
-    left_table($user);
-  echo "Wähle aus, welche Recht du bei <b>allen</b> Benutzern zurücksetzen möchtest:<br><br>
-  <li><a href=?do=change_htmlcan>HTML Benutzen => Alle auf \"nein\" setzen</a>
-  <li><a href=?do=change_headern>Header-Notiz => Alle ausblenden</a>";
-  break;
-  
-  case "change_headern":
-  	insert_log("Notiz im Header wurde bei allen Benutzern gelöscht");
-    left_table($user);
-    mysql_query("UPDATE users SET notice = ''");
-    echo "Es wird nun keinem Benutzer mehr eine Notiz im Header angezeigt.";
-  break;
-  
-  case "change_htmlcan":
-  	insert_log("Alle Benutzer dürfen kein HTML mehr benutzen");
-    left_table($user);
-    mysql_query("UPDATE users SET htmlcan = '3'");
-    echo "Es wurde nun allen Benutzern verboten HTML zu benutzen.";
-  break;
-  
-  
-  case "not_use":
-      left_table($sons);
-	  if($_GET["action"] == "del")
-	  {
-	    mysql_query("DELETE FROM verbo WHERE id LIKE '$_GET[id]'");
-	    echo "<b>Information:</b> Die angegebene Sache wurde gelöscht.<br><br>";
-	  }
-	  if($_GET["action"] == "insert")
-	  {
-	    $data = mysql_query("SELECT * FROM verbo WHERE name LIKE '$_POST[verbo]' AND benemail LIKE '$_POST[bemail]'");
-		if(mysql_num_rows($data) == "0")
-		{
-	      mysql_query("INSERT INTO verbo (name, benemail) VALUES ('$_POST[verbo]','$_POST[bemail]')");
-		  echo "Danke, $_POST[name] wurde hinzugefügt.<br> <a href=?do=not_use>Zurück zur Übersicht</a>";
-		}
-		else
-		{
-		  echo "Dieser Benutzername bzw. diese Mail-Adresse exestiert bereits.";
-		}
-	    exit;
-	  }
-	  $verho = mysql_query("SELECT * FROM verbo");
-	  echo "<table><tr><td><div style=\"overflow:auto;width:400px;height:300px;\">
-	  <table><tr><td><b>Verbot</b></td><td><b>Eigenschaft</b></td><td><b>Aktion</b></td></tr>";
-	  while($vh = mysql_fetch_object($verho))
-	  {
-	    if($vh->benemail == "1")
-		{
-		  $be = "eMail";
-		}
-		if($vh->benemail == "2")
-		{
-		  $be = "Benutzername";
-		}
-		echo "<tr><td>$vh->name</td><td>$be</td><td><a href=?do=not_use&action=del&id=$vh->id>Löschen</a></td>";
-	  }
-	  echo "</table></td></tr></table><hr>
-	  <b>Neues Verbot von Benutzernamen / eMail-Adrsse hinzufügen:<br><br>
-	  <form action=?do=not_use&action=insert method=post><input type=text name=verbo><select name=bemail><option value=1>eMail-Adresse</option><option value=2>Benutzername</option></select><br><input type=submit value=Speichern></form>";
-  break;
+ 
   
   
   case "save_userdatas":
@@ -543,12 +439,6 @@ switch ($do) {
 	  $gpackt = "images/new_1.png";
 	  $number = "3";
 	}
-	if($_POST["grafp"] == "pack4")
-	{
-	  $gpack = "images/braun_alt.png";
-	  $gpackt = "images/braun_neu.png";
-	  $number = "4";
-	}
 	$config_wert = mysql_query("SELECT * FROM config WHERE erkennungscode LIKE 'f2laengfs'");
     $con = mysql_fetch_object($config_wert); 
 	if($_POST["styl"] != $con->wert2)
@@ -592,19 +482,15 @@ switch ($do) {
   $con = mysql_fetch_object($config_wert);
   if($con->zahl1 == "1")
   {
-    $pack = "<option value=pack1 >Packet 1 - Buchstaben</option><option value=pack2>Packet 2 - Runde Buttons</option><option value=pack3 >Packet 3 - Eckige Farbige Buttons</option><option value=pack4 >Packet 4 - Braune Eckige Buttons (Papier)</option>";
+    $pack = "<option value=pack1 >Packet 1 - Buchstaben</option><option value=pack2>Packet 2 - Runde Buttons</option><option value=pack3 >Packet 3 - Eckige Farbige Buttons</option>";
   }
   if($con->zahl1 == "2")
   {
-    $pack = "<option value=pack2 >Packet 2 - Runde Buttons</option><option value=pack1 >Packet 1 - Buchstaben</option><option value=pack4 >Packet 4 - Braune Eckige Buttons (Papier)</option><option value=pack3 >Packet 3 - Eckige Farbige Buttons</option>";
+    $pack = "<option value=pack2 >Packet 2 - Runde Buttons</option><option value=pack1 >Packet 1 - Buchstaben</option><option value=pack3 >Packet 3 - Eckige Farbige Buttons</option>";
   }
   if($con->zahl1 == "3")
   {
-    $pack = "<option value=pack3 >Packet 3 - Eckige Farbige Buttons</option><option value=pack4 >Packet 4 - Braune Eckige Buttons (Papier)</option><option value=pack1 >Packet 1 - Buchstaben</option><option value=pack2 >Packet 2 - Runde Buttons</option>";
-  }
-  if($con->zahl1 == "4")
-  {
-    $pack = "<option value=pack4 >Packet 4 - Braune Eckige Buttons (Papier)</option><option value=pack3 >Packet 3 - Eckige Farbige Buttons</option><option value=pack1 >Packet 1 - Buchstaben</option><option value=pack2 >Packet 2 - Runde Buttons</option>";
+    $pack = "<option value=pack3 >Packet 3 - Eckige Farbige Buttons</option><option value=pack1 >Packet 1 - Buchstaben</option><option value=pack2 >Packet 2 - Runde Buttons</option>";
   }
   echo" ></td></tr>
   <tr><td>Information:</td><td> <span id=info></span> </td></tr>
@@ -623,20 +509,23 @@ switch ($do) {
   }
   echo "<tr><td>Smilie-Pack</td><td><select name=smilie>$packt</select>
   <tr><td> &nbsp; </td><td> &nbsp; </td></tr>";
-  echo "<tr><td>Forum-Standart Style:</td><td><select name=styl>";
-  	$style_data = mysql_query("SELECT * FROM style_all");
-	while($sd = mysql_fetch_object($style_data))
+	if($con->wert2 == "blue")
+    {
+      $sty = "<option value=blue>Blau</option><option value=red>Rot</option><option value=brown>Braun</option><option value=green>Grün</option>";
+    }
+	if($con->wert2 == "brown")
 	{
-	  if($con->wert2 == $sd->sname)
-	  {
-	    echo "<option value='$sd->sname' selected=selected>$sd->sname</option>";
-	  }
-	  else
-	  {
-	  	echo "<option value='$sd->sname'>$sd->sname</option>";
-	  }
+      $sty = "<option value=brown>Braun</option><option value=red>Rot</option><option value=blue>Blau</option><option value=green>Grün</option>";	
 	}
-  echo"</select>
+    if($con->wert2 == "green")
+    {
+     	 $sty = "<option value=green>Grün</option><option value=red>Rot</option><option value=brown>Braun</option><option value=blue>Blau</option>"; 
+    }
+	if($con->wert2 == "red")
+    {
+      $sty = "<option value=red>Rot</option><option value=green>Grün</option><option value=brown>Braun</option><option value=blue>Blau</option>"; 
+    }
+  echo "<tr><td>Forum-Standart der Farbe:</td><td><select name=styl>$sty</select>
   <tr><td> &nbsp; </td><td> &nbsp; </td></tr>  
   <tr><td> Bild-Adresse für Forum-Favicon </td><td> <input type=text name=bfav value=$con->wert1> </td></tr>  
   <tr><td> Bild-Adresse für Forum-Logo</td><td><input type=text name=logo value='". WERTZ ."'></td></tr>
@@ -741,7 +630,7 @@ switch ($do) {
 	<b>Darf Startseite sehen:</b>Der Administrator darf lediglich die Startseite und die Administratoren-Hilfe sehen<br><br>
 	<b>Darf Log-Einträge sehen:</b> Hat volle Rechte auf Log-Einträge.<br><br>
 	<b>Darf Foreneinstellungen ändern:</b> Darf alle möglichen Foreneinstellungen s.w. den Foren-Titel, Foren beschreibun usw. verändern. Desweiteren darf auch die Administratoren-Notiz ab diesem Level verändert werden.<br><br>
-	<b>Darf Foren verwalten:</b> Darf bestehenden Foren bzw. Kategorien ändern, neue hinzufügen und Rechte für diese verändern. Ab dieser Stufe dürfen auch Addons / Mods verwaltet werden.<br><br>
+	<b>Darf Foren verwalten:</b> Darf bestehenden Foren bzw. Kategorien ändern, neue hinzufügen und Rechte für diese verändern<br><br>
 	<b>Darf Benutzer verwalten:</b> Darf Benutzer verwalten, d.h. diesen Gruppen zuordnen bzw. Rang-Titel oder Beiträge ändern. Das Recht Benutzer zu verwarnen bzw. zu sperren haben auch Moderatoren!<br><br>
 	<b>Ist Gründer:</b> Benutzer darf alles ändern, d.h. Administratoren-Rechte vergeben und Serverseitige Funktionen einsehen,<br><br><br>
 	
@@ -785,9 +674,9 @@ switch ($do) {
 	  echo "<option value=$kd->id>$kd->name</option>";
 	}
 	echo "</select></td></tr>
-	<tr><td width=50%>Wer soll Zugriff auf das Forum haben?</td><td><select name=guest><option value=0>Alle dürfen es sehen</option><option value=1>Nur angemeldete Mitglieder</option><option value=2>Nur Administratoren oder Moderatoren</option></td></tr>
+	<tr><td width=50%>Dürfen Gäste das Forum sehen?</td><td><select name=guest><option value=0>Ja</option><option value=1>Nein</option></td></tr>
 	<tr><td>Nur Administratoren dürfen Themen erstellen?</td><td><select name=admin><option value=1>Nein</option><option value=0>Ja</option><option value=2>Moderatoren und Administratoren</option></td></tr>
-	<tr><td>Dürfen Benutzer/Moderatoren antworten?</td><td><select name=ansus><option value=0>Ja</option><option value=1>Nein</option></td></tr>
+	<tr><td>Dürfen Benutzer antworten?</td><td><select name=ansus><option value=0>Ja</option><option value=1>Nein</option></td></tr>
 	<tr><td>Wie viele Beiträge muss man haben, um Zugriff auf das Forum zu bekommen?</td><td><input type=text name=min_post></td></tr>
 	<tr><td>Sortierung, die Foren werden so geordnet, auf der Startseite</td><td><input type=text name=sort></td></tr>
 	</table><br>
@@ -912,14 +801,14 @@ switch ($do) {
   
   
   case "ver_foren":
-  left_table($for);
+    left_table($for);
   admin_recht("4");
   $ac = $_GET["action"];
   if($ac == "kate")
   {
     if($_GET["done"] == "save")
 	{
-	  mysql_query("UPDATE kate SET name = '$_POST[name]', besch = '$_POST[besch]', ordn = '$_POST[ordn]' WHERE id LIKE '$_GET[id]'");
+	  mysql_query("UPDATE kate SET name = '$_POST[name]', besch = '$_POST[besch]' WHERE id LIKE '$_GET[id]'");
 	  echo "Die Kategorie wurde nun geändert.<br><a href=?do=ver_foren>Zurück zur Foren-Verwaltung</a>";
 	  exit;
 	}
@@ -930,7 +819,6 @@ switch ($do) {
 	<table>
 	<tr><td>Name:</td><td><input type=text name=name value='$kd->name' size=40></td></tr>
 	<tr><td>Beschreibung:</td><td><input type=text name=besch value='$kd->besch' size=40></td></tr>
-	<tr><td>Ordnungsnummer:</td><td><input type=text name=ordn value='$kd->ordn'></td></tr>
 	</table>
 	<input type=submit value=Speichern>
 	</form>
@@ -962,20 +850,13 @@ switch ($do) {
 	}
     $for_dat = mysql_query("SELECT * FROM foren WHERE id LIKE '$_GET[id]'");
 	$fd = mysql_fetch_object($for_dat);
-	// 0 = Gäste dürfen das Forum sehen, also Alle
-	// 1 = Gäste dürfen das Forum nicht sehen Benutzer aber
-	// 2 = Nur Administratoren und Moderatoren
 	if($fd->guest_see == "0")
 	{
-	  $gast = "<option value=0>Alle dürfen es sehen</option><option value=1>Nur angemeldete Mitglieder</option><option value=2>Nur Administratoren oder Moderatoren</option>";
+	  $gast = "<option value=0>Ja</option><option value=1>Nein</option>";
 	}
-	if($fd->guest_see == "1")
+	else
 	{
-	  $gast = "<option value=1>Nur angemeldete Mitglieder</option><option value=0>Alle dürfen es sehen</option><option value=2>Nur Administratoren oder Moderatoren</option>";
-	}
-	if($fd->guest_see == "2")
-	{
-	  $gast = "<option value=2>Nur Administratoren oder Moderatoren</option><option value=1>Nur angemeldete Mitglieder</option><option value=0>Alle dürfen es sehen</option>";
+	  $gast = "<option value=1>Nein</option><option value=0>Ja</option>";
 	}
 	if($fd->admin_start_thema == "1")
 	{
@@ -1013,9 +894,9 @@ switch ($do) {
 	  echo "<option value=$ok->id>$ok->name</option>";
 	}
 	echo "</select></td></tr>
-	<tr><td>Wer darf dieses Forum sehen?</td><td><select name=guest>$gast</select></td></tr>
+	<tr><td>Dürfen Gäste das Forum sehen?</td><td><select name=guest>$gast</select></td></tr>
 	<tr><td>Nur Administratoren dürfen Themen erstellen?</td><td><select name=admin>$admth</select></td></tr>
-	<tr><td>Dürfen Benutzer/Moderatoren antworten</td><td><select name=uspo>$uspo</select></td></tr>
+	<tr><td>Dürfen Benutzer antworten</td><td><select name=uspo>$uspo</select></td></tr>
 	<tr><td>Wie viele Beiträge muss man haben, um Zugriff auf das Forum zu bekommen?</td><td><input type=text name=posts value='$fd->min_posts'></td></tr>
 	<tr><td>Sortierung, die Foren werden so geordnet, auf der Startseite</td><td><input type=text name=sort value='$fd->sort'></td></tr>
 	</table>
@@ -1024,18 +905,16 @@ switch ($do) {
 	</td></tr></table>";
 	exit;
   }
-  $foren_data = mysql_query("SELECT * FROM kate ORDER BY ordn");
-  echo "<table class=border border=0><tr><td><b><u>Name/Beschreibung</u></b></td><td><b><u>Ordnungsnummer</u></b></td><td><b><u>Aktion</u></b></td></tr>";
+  $foren_data = mysql_query("SELECT * FROM kate");
   while($fr = mysql_fetch_object($foren_data))
   {
-    echo "<tr><td> &nbsp; </td></tr><tr><td><b>$fr->name</b><br>$fr->besch</td><td>$fr->ordn</td><td><a href=?do=ver_foren&action=kate&id=$fr->id>[ bearbeiten ]</a> <a href=javascript:delkat($fr->id)>[ löschen ]</a></td></tr>";
+    echo "<b>$fr->name</b> <a href=?do=ver_foren&action=kate&id=$fr->id>[ bearbeiten ]</a> <a href=javascript:delkat($fr->id)>[ löschen ]</a><br>";
 	$for_date = mysql_query("SELECT * FROM foren WHERE kate = '$fr->id' ORDER BY sort");
     while($fd = mysql_fetch_object($for_date))
     {
-	  echo "<tr><td>$fd->name<br><small>$fd->besch</small></td><td>$fd->sort</td><td>  <a href=?do=ver_foren&action=for&id=$fd->id>[ bearbeiten ]</a> <a href=javascript:del($fd->id)>[ löschen ]</a></td></tr>";
+	  echo "$fd->name  <a href=?do=ver_foren&action=for&id=$fd->id>[ bearbeiten ]</a> <a href=javascript:del($fd->id)>[ löschen ]</a><br>$fd->besch<br><br>";
 	}
   }
-  echo "</table>";
   break;
   
   
@@ -1047,7 +926,6 @@ switch ($do) {
   $aa = mysql_fetch_object($adal);
   if($_GET["aktion"] == "save")
   {
-  	insert_log("AdServer-Einstellungen wurden geändert.");
     mysql_query("UPDATE config SET wert1 = '$_POST[notsee]', zahl1 = '$_POST[akti]' WHERE erkennungscode LIKE 'f2adser2'");
 	echo "Die AdServer-Einstellungen wurden geändert.";
 	exit;
@@ -1061,14 +939,12 @@ switch ($do) {
 	}
     mysql_query("INSERT INTO adser (bannerad, link, klicks, see) VALUES ('$_POST[bannerli]', '$_POST[link]', '0', '0')");
 	echo "Der Link wurde erfolgreich hinzugefügt.";
-	insert_log("Link im AdServer wurde hinzugefügt");
     exit;
   }
   if($_GET["del"] != "")
   {
     mysql_query("DELETE  FROM adser WHERE id LIKE '$_GET[del]'");
-    echo "Banner wurde erfolgreich gelöscht.";
-	insert_log("Banner wurde aus dem AdServer entfernt.");
+    echo "Eintrag wurde erfolgreich gelöscht.";
 	exit;
   }
   if($aa->zahl1 == "1")
@@ -1119,134 +995,6 @@ switch ($do) {
   echo "</table></td></tr></table>
   
   ";
-  break;
-  
-  
-  case "sendbrief":
-    left_table($sons);
-    admin_recht("2");
-	check_data($_POST["tit"], "", "Bitte gebe einen Titel ein.<br><a href='javascript:history.back()'>Zurück</a>", "leer");
-	check_data($_POST["mes"], "", "Bitte gebe eine Nachricht ein.<br><a href='javascript:history.back()'>Zurück</a>", "leer");
-	$time = time() - $_POST["days"];
-	$posts = $_POST["posts"];
-	if($posts == "")
-	{
-	  $posts = "0";
-	}
-	$data_hol = mysql_query("SELECT * FROM users WHERE $time < last_log AND posts >= $posts");
-	$usernamen = array("");
-	while($dh = mysql_fetch_object($data_hol))
-	{
-	  $time = time();
-	  $mes = $_POST["mes"];
-	  $mes = str_replace("[USERNAME]", $dh->username, $mes);
-	  $mes = str_replace("[BEITRAEGE]", $dh->posts, $mes);
-	  $tit = $_POST["tit"];
-	  $tit = str_replace("[USERNAME]", $dh->username, $tit);
-	  $tit = str_replace("[BEITRAEGE]", $dh->posts, $tit);
-	  mysql_query("INSERT INTO prna (abse, emp, dat, betreff, mes, gel) VALUES ('". USER . "', '$dh->username', '$time', '$tit', '$mes', '0')")or die(mysql_error());
-	  $usernamen[] = $dh->username;
-	}
-	$user = count($usernamen);
-	$user--;
-	echo "Danke, dieser Rundbrief wurde an $user Benutzer verschickt:<br><br>";
-	for($r=0;$r<count($usernamen);$r++)
-	{
-	  echo "$usernamen[$r]<br>";
-	}
-	insert_log("Rundbrief wurde an $user Benutzer versendet.");
-  break;
-  
-  case "rundbrief":
-    left_table($sons);
-    admin_recht("2");
-	echo "<table class='braun'><tbody><tr class='besch'><td><b>Rundbrief verfassen</b></td></tr><tr><td>
-	Mit den folgenden Feldern kannst du einen Rundbrief, also einen Brief an alle aktiven Mitglieder verfassen.<br>Um Datenbank-belastung auszuschließen, werden inaktive Benutzer von der Rundmail ausgeschlossen.<br>
-	<b>Variablen-Ersetzung:</b>
-	<table>
-	<tr><td>[USERNAME]</td><td>Zeigt den jeweiligen Benutzernamen an</td></tr>
-	<tr><td>[BEITRAEGE]</td><td>Zeigt die Beiträge des Benutzers an</td></tr>
-	</table><br><br>
-	<form action=?do=sendbrief method=post>
-	<small>Titel:</small><br>
-	<input type=text name=tit size=50><br><br>
-	<small>Nachricht:</small><br>
-	<textarea rows=5 cols=50 name=mes></textarea><br><br>
-	<fieldset><legend>Einstellungen</legend><table><tr><td>
-	<small>Benutzer muss aktiv in den letzten</small><br>
-	<select name=days><option value=172800>2</option><option value=432000>5</option><option value=604800>7</option><option value=864000>10</option><option value=1209600>14</option><option value=1814400>21</option></select>Tagen sein.</td><td>
-	<small>...und muss mindestens</small><br>
-	<input type=text name=posts value=0 size=3 maxlength=6> Beiträge haben.<br>
-	</td></tr></table></fieldset><br><br>
-	<input type=submit value='Nachrichten verschicken'>
-	</form>
-	";
-  break;
-  
-  
-  case "styles":
-    left_table($design);
-    echo "<table class='braun'><tbody><tr class='besch'><td><b>Style-Verwaltung</b></td></tr><tr><td>
-	<table>
-	<tr><td><b>Style-Name</b></td><td><b>Stylelink</b></td><td><b>Aktion></b></td></tr>";
-    $style_data = mysql_query("SELECT * FROM style_all");
-	while($sd = mysql_fetch_object($style_data))
-	{
-	  echo "<tr><td>$sd->sname</td><td>$sd->link_style</td><td><a href=?do=del_style&id=$sd->id>Löschen</a></tr>";
-	}
-    echo "</table>
-    </td></tr></table>";
-  break;
-  
-  
-  case "del_style":
-    left_table($design);
-    admin_recht("3");
-    $style_data = mysql_query("SELECT * FROM style_all WHERE id LIKE '$_GET[id]'");
-	$sd = mysql_fetch_object($style_data);
-    if($_GET["aktion"] == "del")
-	{
-	  mysql_Query("DELETE FROM style_all WHERE id LIKE '$_GET[id]'");
-	  unlink("../style/$sd->link_style");
-	  echo "Style wurde erfolgreich gelöscht.";
-	  exit;
-	}
-    echo "Möchtest du dieses Style wirklich löschen? Das System löscht die *.css Datei automatisch mit, damit es nicht zu Fehlern führen kann.<br>
-	Wirklich löschen?<br><br>
-	<a href=?do=del_style&aktion=del&id=$_GET[id]>Ja, Style und Datei löschen</a> &nbsp; &nbsp; <a href=?do=styles>Nein, zurück zur Übersicht</a>";
-  break;
-  
-  
-  case "insert_style":
-    left_table($design);
-	if($_GET["aktion"] == "insert")
-	{
-	  $check_style = mysql_query("SELECT * FROM style_all WHERE sname LIKE '$_POST[sname]' OR link_style LIKE '$_POST[link]'");
-	  if(mysql_num_rows($check_style) > 0)
-	  {
-	    echo "<b>Speicherung Fehlgeschlagen:</b> Entweder exestiert dieser Name schon, oder der Style zu der CSS-Datei ist schon vorhanden.";
-		exit;
-	  }
-	  $style_link = "../style/$_POST[link]";
-	  if(!file_exists($style_link))
-	  {
-	    echo "Bevor du dieses Style erstellst, schiebe bitte zuerst die .css Datei in den Ordner \"Style\". Dieses verhindert Probleme!";
-		exit;
-	  }
-	  mysql_query("INSERT INTO style_all (sname, link_style) VALUES ('$_POST[sname]','$_POST[link]')");
-	  echo "Danke, dieser Style wurde erfolgreich hinzugefügt und kann nun verwendet werden.";
-	  exit;
-	}
-	echo "<table class='braun'><tbody><tr class='besch'><td><b>Style-Verwaltung</b></td></tr><tr><td>
-    Hier kannst du einen Style hinzufügen. Bitte beachte, dass diese .css Datei exestieren muss!<br><br>
-	<form action=?do=insert_style&aktion=insert method=post>
-	<table>
-	<tr><td>Name des Styles:</td><td><input type=text name=sname></td></tr>
-	<tr><td>Link zum Style:</td><td>". $_SERVER["SERVER_NAME"] ."/style/<input type=text name=link value='.css'></td></tr>
-	</table>
-	<input type=submit value=Hinzufügen>
-	</form>
-    </td></tr></table>";
   break;
 }
 ?>

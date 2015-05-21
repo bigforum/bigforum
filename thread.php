@@ -39,11 +39,21 @@ if(!xmlhttp && typeof XMLHttpRequest != 'undefined') {
 xmlhttp = new XMLHttpRequest();
 }
 
- 
- 
+
+function anzeigen(das) {
+ if (document.getElementById(das).style.display=='none') {
+  document.getElementById(das).style.display='block';
+  document.getElementById("anzeige"+das).style.display='none';
+ }
+ else {
+  document.getElementById(das).style.display='none';
+  document.getElementById("anzeige"+das).style.display='block';
+ }
+}
+
  
 function del(id) {
-d = confirm("Möchtest du diesen Beitrag wirklich löschen? Dieser Schritt ist nichtmehr rückgängig machbar!");
+d = confirm("Möchtest du diesen Beitrag wirklich löschen?");
 if(d == true)
 {
   xmlhttp.open("GET", 'thread.php?do=del&bid='+id);
@@ -55,14 +65,14 @@ xmlhttp.send(null);
 
 </script>
 
-<?
+<?php
 }
 if($_GET["do"] == "del")
 {
-  $beitrag_data = mysql_query("SELECT * FROM beitrag WHERE id LIKE '$_GET[bid]'") or die(mysql_fehler(mysql_error(), __LINE__, $_SERVER["PHP_SELF"]));;
+  $beitrag_data = mysql_query("SELECT * FROM beitrag WHERE id LIKE '$_GET[bid]'") or die(mysql_fehler(mysql_error(), __LINE__, $_SERVER["PHP_SELF"]));
   $bed = mysql_fetch_object($beitrag_data);
   mysql_query("UPDATE users SET posts = posts-1 WHERE username LIKE '$bed->verfas'");
-  mysql_query("DELETE FROM beitrag WHERE id LIKE '$_GET[bid]'");
+  mysql_query("UPDATE beitrag SET dele = '" . USER . "' WHERE id LIKE '$_GET[bid]'");
 }
 if($id != "")
 {
@@ -79,9 +89,13 @@ if($id != "")
 	mysql_query("UPDATE read_all SET when_look = '$time' WHERE id LIKE '$da->id'");
 	}
   }
-
+  if($_GET["do"] == "resbeitrag")
+  {
+    mysql_query("UPDATE beitrag SET dele = '' WHERE id LIKE '$_GET[bid]'");
+  }
   $thema_data = mysql_query("SELECT * FROM thema WHERE id LIKE '$id'");
   $td = mysql_fetch_object($thema_data);  
+
   
   if($_GET["do"] == "change")
   {
@@ -94,8 +108,8 @@ if($id != "")
   	}
 	if($_GET["action"] == "del")
 	{
-		mysql_query("DELETE FROM thema WHERE id LIKE '$id'");
-		mysql_query("DELETE FROM beitrag WHERE where_forum LIKE '$id'");
+		mysql_query("UPDATE thema SET dele = '". USER . "' WHERE id LIKE '$id'");
+		mysql_query("UPDATE beitrag SET dele = '". USER . "' WHERE where_forum LIKE '$id'");
 	  	echo "<script>alert('Das Thema wurde gelöscht! Du wirst zur Forenübersicht weitergeleitet...'); location.href='forum.php?id=$td->where_forum';</script>";
 		page_footer();
 	}
@@ -146,16 +160,9 @@ if($id != "")
 	}
 	if($_POST["fu"] == "delete")
 	{
-	  if(GROUP == "3")
-	  {
-	    echo "<fieldset><legend>Thema löschen</legend>Möchtest du wirklich dieses Thema und alle Beiträge löschen? Dieser Schirtt ist nicht rückgäigmachbar.<br><br>
-		<a href=?id=$id&do=change&action=del>Ja, Thema und alle Beiträge löschen</a>  &nbsp;&nbsp;&nbsp;   <a href=?id=$id>Nein, Thema auf keinen Fall löschen</a></fieldset><br><br>";
-		page_footer();
-	  }
-	  else
-	  {
-	    echo "<script>alert('Nur ein Administrator kann ein Thema löschen!')</script>";
-	  }
+	  echo "<fieldset><legend>Thema löschen</legend>Möchtest du wirklich dieses Thema und alle Beiträge löschen?<br><br>
+      <a href=?id=$id&do=change&action=del>Ja, Thema und alle Beiträge löschen</a>  &nbsp;&nbsp;&nbsp;   <a href=?id=$id>Nein, Thema auf keinen Fall löschen</a></fieldset><br><br>";
+	  page_footer();
 	}
 	if($_POST["fu"] == "wich")
 	{
@@ -184,12 +191,17 @@ if($fd->min_posts > $ud->posts)
   erzeuge_error("Du hast keine Berechtigungen auf dieses Thema. Dies kann mehrere Gründe haben.");
 }
 
+
 if($fd->guest_see == "1")
 {
   if(USER == "")
   {
     erzeuge_error("Entweder du hast keine Rechte dieses Forum zu sehen, oder das Forum ist gelöscht.");
   }
+}
+if($td->dele != "" AND GROUP != "2" AND GROUP != "3")
+{
+  erzeuge_error("Entweder du hast keine Rechte dieses Forum zu sehen, oder das Forum ist gelöscht.");
 }
 if($fd->guest_see == "2" AND (GROUP != 2 AND GROUP != 3))
 {
@@ -206,8 +218,8 @@ if(GROUP == "2" OR GROUP == "3" OR USER == $td->verfas)
 }
 //Folgender Code wurde rausgenommen, da dieses mit der Version 4.0 eh wegfällt.
 /*echo "<table class=titl width=100%><tr><td><table><tr><td>Du bist hier:</td><td><a href='index.php'>". SITENAME ."</a> > <a href='forum.php?id=$fd->id'>$fd->name</a></td></tr><tr><td></td><td><big><b>$td->tit</b></big></td></tr></table></td></tr></table><br>";*/
-
-answer_button($fd->user_posts, GROUP, $id, $td->close);
+if($td->dele == "")
+  answer_button($fd->user_posts, GROUP, $id, $td->close);
 if($ws > "1")
 {
 $up = $seite - 1;
@@ -285,7 +297,10 @@ if($seite <= "1")
   $modfunk = "";
   if(GROUP == "2" OR GROUP == "3" OR USER == $td->verfas)
   {
-    $modfunk = "<td align=right valign=right class=dark><a href=thredit.php?id=$td->id><img src='images/edit.png' width=13% height=6% border=0 /></a></td>";
+    if($td->dele == "")
+	{
+      $modfunk = "<td align=right valign=right class=dark><a href=thredit.php?id=$td->id><img src='images/edit.png' width=13% height=6% border=0 /></a></td>";
+	}
   }
   echo "<tr class=dark><td><font color=snow><b>$datum, $uhrzeit</b> $edit</font></td>$modfunk</tr></table>";
   text_ausgabe($td->text, $td->tit, $td->verfas);
@@ -294,32 +309,59 @@ if($seite <= "1")
 $bei_dat = mysql_query("SELECT * FROM beitrag WHERE where_forum LIKE '$id' ORDER BY post_dat LIMIT $start, $eps");
 while($bd = mysql_fetch_object($bei_dat))
 {
-  $edit = "";
-  if($bd->edit_by != "")
+  if(($bd->dele != "" AND GROUP > 1 AND GROUP < 4) OR $bd->dele == "")
   {
-    $now = date("d.m.Y", time());
-    $datum = date("d.m.Y",$bd->last_edit_dat);
-    $uhrzeit = date("H:i",$bd->last_edit_dat);
-    if($now == $datum)
+    $edit = "";
+    if($bd->edit_by != "")
     {
-      $datum = "Heute um";
+     $now = date("d.m.Y", time());
+     $datum = date("d.m.Y",$bd->last_edit_dat);
+     $uhrzeit = date("H:i",$bd->last_edit_dat);
+      if($now == $datum)
+      {
+        $datum = "Heute um";
+      }
+      else{
+        $datum = $datum.",";
+      }
+      $edit = " &nbsp; &nbsp; &nbsp;Zuletzt bearbeitet von $bd->edit_by ($datum $uhrzeit)";
     }
-    else{
-      $datum = $datum.",";
+    $datum = date("d.m.Y",$bd->post_dat);
+    $uhrzeit = date("H:i",$bd->post_dat);
+    $mod_funk = "";
+    if(GROUP == "2" OR GROUP == "3" OR USER == $bd->verfas)
+    {
+      if($td->dele == "" AND $bd->dele == "")
+      {
+        $mod_funk = "<td align=right valign=right><a href=edit.php?id=$bd->id><img src=images/edit.png width=30% height=50% border=0></a><a href=javascript:del($bd->id)><img src=images/del.png width=30% height=50% border=0></a></td>";
+      }
     }
-    $edit = " &nbsp; &nbsp; &nbsp;Zuletzt bearbeitet von $bd->edit_by ($datum $uhrzeit)";
-}
-$datum = date("d.m.Y",$bd->post_dat);
-$uhrzeit = date("H:i",$bd->post_dat);
-$mod_funk = "";
-if(GROUP == "2" OR GROUP == "3" OR USER == $bd->verfas)
-{
-  $mod_funk = "<td align=right valign=right><a href=edit.php?id=$bd->id><img src=images/edit.png width=30% height=50% border=0></a><a href=javascript:del($bd->id)><img src=images/del.png width=30% height=50% border=0></a></td>";
-}
-echo "<br><span id='$bd->id'><table width=80% height=10%><tr class=dark><td><table width=100% height=100%><tr><td width=80%><font color=snow><b>$datum, $uhrzeit</b> $edit</font></td>$mod_funk</tr></table></td></tr></table>";
-echo "<a name=$bd->id>";
-text_ausgabe($bd->text, $td->tit, $bd->verfas);
-echo "</span></a>";
+	if($bd->dele != "")
+	{
+	  $edit = "</td><td align=right><font color=snow>(<a href=\"javascript:anzeigen('text_$bd->id');\"><font color=snow>Anzeigen</font></a>) (<a href=\"?id=$_GET[id]&do=resbeitrag&bid=$bd->id\"><font color=snow>Wiederherstellen</font></a>)</font>";
+	}
+    echo "<br><span id='$bd->id'><table width=80% height=10%><tr class=dark><td><table width=100% height=100%><tr><td width=75%><font color=snow><b>$datum, $uhrzeit</b> $edit</font></td>$mod_funk</tr></table></td></tr></table>";
+     echo "<a name=$bd->id>";
+	 if($bd->dele != "")
+	 {
+	   $verfas_data = mysql_query("SELECT * FROM users WHERE username LIKE '$bd->verfas'");
+	   $vd = mysql_fetch_object($verfas_data);
+	   if($vd->id != "")
+	   {
+	     $verfasser = "<a href=profil.php?id=$vd->id>$bd->verfas</a>";
+	   }
+	   else
+	   {
+	     $verfasser = $bd->verfas;
+	   }
+	   echo "<div style='display: block;' id='anzeigetext_$bd->id'><table border=1 width=80% class=post><tr><td>$verfasser<br>Gelöscht von $bd->dele</td></tr></table></div>";
+	   echo "<div style='display: none;' id='text_$bd->id'>";
+	 }
+     text_ausgabe($bd->text, $td->tit, $bd->verfas);
+	 if($bd->dele != "")
+	   echo "</div>";
+     echo "</span></a>";
+  }
 }
 if($ws > "1")
 {
@@ -363,8 +405,8 @@ for($a=0; $a < $wieviel; $a++)
 }
 echo " <a href=?id=$_GET[id]&page=$down>></a></td></tr></table></td></tr></table>"; 
 }
-
-answer_button($fd->user_posts, GROUP, $id, $td->close);
+if($td->dele == "")
+  answer_button($fd->user_posts, GROUP, $id, $td->close);
 
 
 }

@@ -1,20 +1,26 @@
 <?php
 //Wichtige Angaben für jede Datei!
 include("includes/functions.php");
-login();
+
 $ac = $_GET["aktion"];
 if($ac == "send")
 {
   connect_to_database();
-  include_once("includes/function_user.php");
+  include("includes/function_user.php");
   $time = time();
-  $data_beit = mysql_query("SELECT * FROM beitrag WHERE where_forum LIKE '$_GET[id]' ORDER BY id DESC LIMIT 1");
+  $data_beit = mysql_query("SELECT * FROM beitrag WHERE where_forum LIKE '$_GET[id]' AND dele = '' ORDER BY id DESC LIMIT 1");
   $db = mysql_fetch_object($data_beit);
   $rech = $time - $db->post_when;
   if($_POST["feld"] == "")
   {
      page_header();
 	 erzeuge_error("Du kannst keinen leeren Text absenden.");  
+	 page_footer();
+  }
+  if(strlen($_POST["feld"]) <= 10)
+  {
+     page_header();
+	 erzeuge_error("Du musst mindestens zehn Zeichen angeben.");  
 	 page_footer();
   }
 

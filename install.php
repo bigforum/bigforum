@@ -36,22 +36,44 @@ function schr($s)
 switch($do){
   case "":
   schr("1");
-  echo "Vielen dank, dass Du dich für bigforum als Foren-Software entschieden hast.<br><br>Du kannst hier in <b>nur ca. 5 Minuten</b> das Forum installieren. Dank des Installations-Assistenten wird dir alles genau erklärt.<br><br>
-  Bitte beachte, dass du beim Update keine Sprünge machst (Also nicht von 4.1 auf 4.3).<br><br>
+  echo "Vielen dank, dass Du dich für bigforum als Foren-Software entschieden hast.<br><br>Du kannst hier in <b>nur ca. 5 Minuten</b> das Forum installieren. Dank des Installations-Assistenten wird dir alles genau erklärt.<br><br><br><br>
   <input type=button class=install_button value='Komplettinstalation' onclick=\"location.href='?do=install&s=1'\"> &nbsp; &nbsp; &nbsp; <input type=button class=install_button value='Forum updaten' onclick=\"location.href='?do=update'\">";
   break;
   
   case "update":
+    //Auswahl wie man updaten möchte
+    echo "Bitte wähle aus, welche Version du hast, also von welcher du auf die neuste Updaten möchtest.<br><br>
+	<form action=?do=update_query method=post>
+	<select name=vers><option value=2>Von 4.1 auf 4.3 updaten*</option><option value=1>Von 4.2 auf 4.3 updaten</option></select>
+	<br><br>
+	<input type=submit class=install_button value='Forum updaten'><br><br><br>
+	* <b>Wichtig:</b> Bei Sprüngen bei den Updates müssen die Datein hochgeladen werden, die Installation macht lediglich die Eintragungen in die Datenbank. Oder man lädt sich die Komplettversion der aktuellsten Version hoch, ganz wichtig aber, ohne die <i> config.php </i>.
+	</form>";
+  break;	
+  
+  case "update_query":
     schr("6");
 	include("config.php");
-
+    $schritte = "0";
     mysql_connect($HOST,$USER,$PW)or die(mysql_error());
     mysql_select_db($DB)or die(mysql_error());
-	//MySQL - Datenbank änderungen	
-	mysql_query("ALTER TABLE kate ADD ordn INT(5) NOT NULL");
-	//
-    echo "Danke, das Forum wurde erfolgreich auf ". VERSION ." geupdatet.<br><br>
-	Sollten Fragen und/oder Probleme auftreten, bitte im <a href=www.bfs.kilu.de>Support-Forum</a> nachfragen.";
+	if($_POST["vers"] == "2")
+	{
+	  mysql_query("ALTER TABLE kate ADD ordn INT(5)"); // Änderungen für die Version 4.2
+	  $schritte++;
+	}  
+	mysql_query("ALTER TABLE thema ADD dele varchar(500) NOT NULL"); //Änderungen für die Version 4.3
+	mysql_query("ALTER TABLE beitrag ADD dele varchar(500) NOT NULL"); //Änderungen für die Version 4.3
+	$schritte++;
+	if($schritte == $_POST["vers"])
+	{
+      echo "Danke, das Forum wurde erfolgreich auf ". VERSION ." geupdatet.<br><br>
+	  Sollten Fragen und/oder Probleme auftreten, bitte im <a href=www.bfs.kilu.de>Support-Forum</a> nachfragen.";
+	}
+	else
+	{
+	  echo "<b>Fehler bei der Installation</b><br>Um den Fehler zu beheben schreibe bitte alle Fehlermeldungen, Schritte etc. im <a href=http://www.bfs.kilu.de target=_blank>Support-Forum</a>. Dort sollte dir geholfen werden.";
+	}
   break;
   
   
@@ -142,6 +164,7 @@ switch($do){
       post_dat varchar(25) NOT NULL,
       last_edit_dat varchar(30) NOT NULL,
 	  edit_by varchar(800) NOT NULL,
+	  dele varchar(500) NOT NULL,
       PRIMARY KEY (id) );
 
       "); 
@@ -181,7 +204,6 @@ switch($do){
       id INT(20) NOT NULL auto_increment,
       name varchar(500) NOT NULL,
       besch varchar(800) NOT NULL,
-	  ordn INT(10) NOT NULL,
       PRIMARY KEY (id) );
 
       "); 
@@ -249,6 +271,7 @@ switch($do){
 	  close int(3) NOT NULL,
 	  last_post_time int(50) NOT NULL,
 	  import int(5) NOT NULL,
+	  dele varchar(500) NOT NULL,
       PRIMARY KEY (id) );
 
       "); 

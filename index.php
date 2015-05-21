@@ -214,7 +214,7 @@ while($fr = mysql_fetch_object($foren_data))
   while($fd = mysql_fetch_object($for_date))
   {
     $look_see = "0";
-    $them_dat = mysql_query("SELECT * FROM thema WHERE where_forum LIKE '$fd->id'") or die(mysql_fehler(mysql_error(), __LINE__, $_SERVER["PHP_SELF"]));;
+    $them_dat = mysql_query("SELECT * FROM thema WHERE where_forum LIKE '$fd->id' AND dele = ''") or die(mysql_fehler(mysql_error(), __LINE__, $_SERVER["PHP_SELF"]));;
 	while($tda = mysql_fetch_object($them_dat))
 	{
 	  $data = mysql_query("SELECT * FROM read_all WHERE uname LIKE '". USER ."' AND thema_id LIKE '$tda->id'") or die(mysql_fehler(mysql_error(), __LINE__, $_SERVER["PHP_SELF"]));;
@@ -232,7 +232,7 @@ while($fr = mysql_fetch_object($foren_data))
         $look_see++;
 	  }
 	}
-	$config_datas = mysql_query("SELECT * FROM config WHERE erkennungscode LIKE 'f2imgadfs'") or die(mysql_fehler(mysql_error(), __LINE__, $_SERVER["PHP_SELF"]));;
+	$config_datas = mysql_query("SELECT * FROM config WHERE erkennungscode LIKE 'f2imgadfs'") or die(mysql_fehler(mysql_error(), __LINE__, $_SERVER["PHP_SELF"]));
     $cd = mysql_fetch_object($config_datas);
 	if($cd->wert1 == "") { $cd->wert1 = "images/old_1.png"; }
     if($cd->wert2 == "") { $cd->wert2 = "images/new_1.png"; }
@@ -246,20 +246,20 @@ while($fr = mysql_fetch_object($foren_data))
 	}
     $beit = "0";
 	$zahl_themen = "0";
-    $th_dat = mysql_query("SELECT * FROM thema WHERE where_forum LIKE '$fd->id'");
+    $th_dat = mysql_query("SELECT * FROM thema WHERE where_forum LIKE '$fd->id' AND dele = ''");
 	while($tda = mysql_fetch_object($th_dat))
 	{
 	  $zahl_themen++;
-	  $bei_dat = mysql_query("SELECT * FROM beitrag WHERE where_forum LIKE '$tda->id'") or die(mysql_fehler(mysql_error(), __LINE__, $_SERVER["PHP_SELF"]));;
+	  $bei_dat = mysql_query("SELECT * FROM beitrag WHERE where_forum LIKE '$tda->id' AND dele = ''") or die(mysql_fehler(mysql_error(), __LINE__, $_SERVER["PHP_SELF"]));
 	  while($bed = mysql_fetch_object($bei_dat))
 	  {
 	    $beit++;
 	  }
 	}
 	
-	$thema_dat = mysql_query("SELECT * FROM thema WHERE where_forum LIKE '$fd->id' ORDER BY last_post_time DESC LIMIT 1") or die(mysql_fehler(mysql_error(), __LINE__, $_SERVER["PHP_SELF"]));;
+	$thema_dat = mysql_query("SELECT * FROM thema WHERE where_forum LIKE '$fd->id' AND dele = '' ORDER BY last_post_time DESC LIMIT 1") or die(mysql_fehler(mysql_error(), __LINE__, $_SERVER["PHP_SELF"]));
 	$thd = mysql_fetch_object($thema_dat);
-	$beitrag_dat = mysql_query("SELECT * FROM beitrag WHERE where_forum LIKE '$thd->id' ORDER BY id DESC LIMIT 1") or die(mysql_fehler(mysql_error(), __LINE__, $_SERVER["PHP_SELF"]));;
+	$beitrag_dat = mysql_query("SELECT * FROM beitrag WHERE where_forum LIKE '$thd->id' AND dele = '' ORDER BY id DESC LIMIT 1") or die(mysql_fehler(mysql_error(), __LINE__, $_SERVER["PHP_SELF"]));
 	$bd = mysql_fetch_object($beitrag_dat);
 	
 	$beisq = $thd->tit;
@@ -285,7 +285,7 @@ while($fr = mysql_fetch_object($foren_data))
 	if($bd->verfas != "" OR $thd->verfas != "")
 	{
 	  $thd->tit = strip_tags($thd->tit);
-	  $anz = mysql_query("SELECT * FROM beitrag WHERE where_forum LIKE '$thd->id'") or die(mysql_fehler(mysql_error(), __LINE__, $_SERVER["PHP_SELF"]));;
+	  $anz = mysql_query("SELECT * FROM beitrag WHERE where_forum LIKE '$thd->id' AND dele = '' ") or die(mysql_fehler(mysql_error(), __LINE__, $_SERVER["PHP_SELF"]));
 	  $anza = mysql_num_rows($anz);
 	  $rech = ceil($anza/10);
 	  $last_beitrag = "<a href=thread.php?id=$thd->id&page=$rech#$bd->id title='$thd->tit'>$tit</a><br><small>von $bd->verfas</small>";

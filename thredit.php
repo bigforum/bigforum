@@ -22,7 +22,7 @@ if($_GET["aktion"] != "")
   }
   else
   {
-    mysql_query("UPDATE thema SET text = '$_POST[feld]', edit_from = '". USER ."', last_edit = '$time' WHERE id LIKE '$_GET[id]'");
+    mysql_query("UPDATE thema SET text = '$_POST[feld]', edit_by = '". USER ."', last_edit_dat = '$time' WHERE id LIKE '$_GET[id]'");
   }
   echo "Danke, der Beitrag wurde überarbeitet.<br><br><a href=thread.php?id=$ed->id>Zurück zum Thema</a><br><br>";
   page_footer();

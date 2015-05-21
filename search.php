@@ -14,9 +14,9 @@ if($_GET["do"] == "send")
 	$sea = $_GET["action"];
 	$lim = "500";
 	if($sea == "thema")
-      $search_res = mysql_query("SELECT * FROM thema WHERE verfas LIKE '$aut' ORDER BY id")or die(mysql_error());
+      $search_res = mysql_query("SELECT * FROM thema WHERE verfas LIKE '$aut' AND dele = '' ORDER BY id")or die(mysql_error());
     else
-      $search_res = mysql_query("SELECT * FROM beitrag WHERE verfas LIKE '$aut' ORDER BY id")or die(mysql_error());
+      $search_res = mysql_query("SELECT * FROM beitrag WHERE verfas LIKE '$aut' AND dele = '' ORDER BY id")or die(mysql_error());
   }
   if(($_POST["auth"] == "" AND $_POST["schlu"] == "") AND $f != "3")
   {
@@ -32,9 +32,9 @@ if($_GET["do"] == "send")
   if($f != "3")
   {
     if($sea == "thema")
-      $search_res = mysql_query("SELECT * FROM thema WHERE verfas LIKE '%$aut%' AND text LIKE '%$_POST[schlu]%' ORDER BY id $fi LIMIT $lim")or die(mysql_error());
+      $search_res = mysql_query("SELECT * FROM thema WHERE verfas LIKE '%$aut%' AND text LIKE '%$_POST[schlu]%' AND dele = '' ORDER BY id $fi LIMIT $lim")or die(mysql_error());
     else
-      $search_res = mysql_query("SELECT * FROM beitrag WHERE verfas LIKE '%$aut%' AND text LIKE '%$_POST[schlu]%' ORDER BY id $fi LIMIT $lim")or die(mysql_error());
+      $search_res = mysql_query("SELECT * FROM beitrag WHERE verfas LIKE '%$aut%' AND text LIKE '%$_POST[schlu]%' AND dele = '' ORDER BY id $fi LIMIT $lim")or die(mysql_error());
   }
   $anz = mysql_num_rows($search_res);
   if($anz == "0")

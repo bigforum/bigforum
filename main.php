@@ -419,7 +419,6 @@ if($do == "read_pn" AND $ac != "")
   $datum = date("d.m.Y",$pr->dat);
   $uhrzeit = date("H:i",$pr->dat);
   echo "<table width=81%><tr class=normal><td><font color=snow>$datum, $uhrzeit</font></td></tr></table>";
-  $from = str_replace("|del","",$from);
   text_ausgabe($text, $betreff, $from);
   $betreff = str_replace(" ", "_", $betreff);
   $betreff = str_replace("AW:_","", $betreff);
