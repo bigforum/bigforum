@@ -150,7 +150,7 @@ $ac = $_GET["action"];
   
   <br><br>
   <?php
-  if($udp->onlyadm == "2")
+  if($udp->onlyadm == "2" AND $udp->darf_pn == "0")
   {
     if(GROUP == "2" OR GROUP == "3")
 	{
@@ -159,7 +159,10 @@ $ac = $_GET["action"];
   }
   else
   {
-    echo "<a href=\"main.php?do=make_pn&amp;to=$udp->username\"><img src=\"images/pn.png\" border='0' height='16px' width='30px'> Private Nachricht schicken</a>";
+    if($udp->darf_pn == "0")
+	{
+      echo "<a href=\"main.php?do=make_pn&amp;to=$udp->username\"><img src=\"images/pn.png\" border='0' height='16px'  width='30px'> Private Nachricht schicken</a>";
+	}
   }
   if($udp->show_mail == "0")
   {
@@ -189,6 +192,15 @@ $ac = $_GET["action"];
   <b>Über <? echo $udp->username; ?></b></td></tr>
   <tr><td width="40%">Hobbys:</td><td> <? echo $udp->hob; ?></td></tr>
   <tr><td width="40%">Website:</td><td><a href="<? if(str_replace("http://www.", "www.", $udp->website))echo "http://$udp->website";  else echo $udp->website;?>" target="_blank"><? echo $udp->website; ?></a></td></tr>
+  <?php
+  $jetzt = mktime(0, 0, 0, date('m'), date('d'), date('Y')); 
+  $gebur = mktime(0, 0, 0, date('m', $udp->birthday), date('d', $udp->birthday), date('Y', $udp->birthday)); 
+  $age   = intval(($jetzt - $gebur) / (3600 * 24 * 365)); 
+  if(date("Y", $udp->birthday) != "2037")
+  {
+	echo "<tr><td>Alter:</td><td>$age</td></tr>";
+  }
+  ?>
   <tr><td>
   <b>Andere Informationen</b></td></tr>
     <?php

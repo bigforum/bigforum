@@ -332,6 +332,14 @@ switch ($do) {
 	   {
 	     $eeditf = "checked";
 	   }
+	   if($uds->darf_pn == "0")
+	   {
+	     $pnr = "checked";
+	   }
+	   else
+	   {
+	     $pnf = "checked";
+	   }
 	   echo "<table><tr valign=top align=top><td><table class=braun width=100%><tr class=besch><td><b>Benutzerdaten - $uds->username</b></td></tr><tr><td>
 	   <table><tr><td>
 	   <form action=?do=save_userdatas method=post>
@@ -346,20 +354,22 @@ switch ($do) {
 	   <tr><td><b>Angezeigte Notiz:</b></td><td> <input type=text name=unot value='$uds->notice' </td></tr></table></td></tr></table>
 	   </td><td><table class=braun width=100%><tr class=besch><td><b>Benutzerrechte - $uds->username</b></td></tr><tr><td>
 	   <table>
-	   <tr><td><b>Zeige Bearbeitet von... Bei Beitragsbearbeitung?</b></td><td><input type=radio name=editrech value=5 $editf>Ja <input type=radio name=editrech value=2 $editr> Nein</td></tr>
+	   <tr><td><b>Zeige Bearbeitet von... Bei Beitragsbearbeitung?</b></td><td width=40%><input type=radio name=editrech value=5 $editf>Ja <input type=radio name=editrech value=2 $editr> Nein</td></tr>
+	   <tr><td><b>Darf das Private Nachrichten System nutzen?</b></td><td><input type=radio name=pncan value=0 $pnr>Ja <input type=radio name=pncan value=1 $pnf> Nein</td></tr>
 	   <tr><td><b>Darf HTML in Beiträgen benutzen</b></td><td> <input type=radio name=htmlcan value=1 $eeditr>Ja <input type=radio name=htmlcan value=2 $eeditf> Nein</td></tr>
 	   <tr><td> &nbsp; </td><td> &nbsp; </td></tr>
 	   <tr><td>	
-       <b>Gruppenzugehörigkeit</b> </td><td> Super-Moderator: <input type=checkbox name=grup value=2 $mod_check><br>
+       <b>Gruppenzugehörigkeit</b> </td><td>Super-Moderator: <input type=checkbox name=grup value=2 $mod_check><br>
 											Administrator: <input type=checkbox name=grup value=3 $adm_check></td></tr><tr><td>
-	   <b>Signatur</b></td><td><textarea name=sign rows=6 cols=60>$uds->sign</textarea></td></tr><tr><td>	   </td></tr>
+	   </td></tr>	   
 	   </table></td></tr></table></td></tr></table>
-	   <input type=hidden value=$uds->id name=id>
+	   <table class=braun width=100%><tr class=besch><td><b>Signatur ändern</b></td></tr><tr><td><table><tr><td>
+	   <textarea name=sign rows=6 cols=60>$uds->sign</textarea>
+	   </td></tr>
+	   </td></tr></table>  
+       </td></tr></table>	   <input type=hidden value=$uds->id name=id>
 	   <input type=submit value='Speichern'><input type=button value='Benutzer löschen' onclick=\"window.location.href='?do=del_user&id=$uds->id'\">
-	   </form>
-
-	   
-       </td></tr></table>";
+	   </form>";
 	 }
   break;
   
@@ -467,6 +477,7 @@ switch ($do) {
 			hob       = '$_POST[hob]',
 			editrech  = '$_POST[editrech]',
 			htmlcan   = '$_POST[htmlcan]',
+			darf_pn   = '$_POST[pncan]',
 			adm_recht = '$uds->adm_recht' WHERE id LIKE '$_POST[id]'");
 	insert_log("Profil von $_POST[username] wurde geändert.");
   echo "Danke,<br> das Profil von $_POST[username] wurde erfolgreich überarbeitet.<br><br><a href=admin.php>Zurück zur Administratorern-Übersicht</a>";

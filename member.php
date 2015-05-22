@@ -85,7 +85,14 @@ while($ur = mysql_fetch_object($users))
     $num = "-1";
 	$bg = "bgcolor='#F4F4F4'";
   }
-  echo "<tr $bg><td> $number </td><td><a href=profil.php?id=$ur->id>$ur->username</a><br><small>$ur->rang</small></td><td>$ur->posts</td><td>$datum</td><td>$website <a href=main.php?do=make_pn&to=$ur->username><img src=images/pn.png border=0 width=60px height=32px alt=\"$ur->username eine Private Nachricht schreiben\"></a></td></tr>
+  echo "<tr $bg><td> $number </td><td><a href=profil.php?id=$ur->id>$ur->username</a><br><small>$ur->rang</small></td><td>$ur->posts</td><td>$datum</td><td>$website";
+  $config_datas = mysql_query("SELECT * FROM config WHERE erkennungscode LIKE 'f2pnsignfs'");
+  $cd = mysql_fetch_object($config_datas);
+  if($ur->darf_pn == "0" AND $cd->zahl2 == "1")
+  {
+    echo "<a href=main.php?do=make_pn&to=$ur->username><img src=images/pn.png border=0 width=60px height=32px alt=\"$ur->username eine Private Nachricht schreiben\"></a>";
+  }
+  echo "</td></tr>
 ";
   $bg = "";
   $num++;

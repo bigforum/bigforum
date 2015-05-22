@@ -183,10 +183,11 @@ if($status != true)
 echo "</td></tr></table><br>";
 if(USER != "")
 {
-  echo "<table class=titl width=100%><tr><td><table width=100%><tr><td>Hallo ". USER ." (<a href=\"javascript:logout()\">Abmelden</a>).<br> <b>Private Nachrichten:</b> ";
-
-
+  echo "<table class=titl width=100%><tr><td><table width=100%><tr><td>Hallo ". USER ." (<a href=\"javascript:logout()\">Abmelden</a>).<br>";
+if($ud->darf_pn == "0"){
+  echo"<b>Private Nachrichten:</b> ";
   pn_zahl("header");
+  }
   echo "</td><td valign=right align=right>";
   $datum = date("d.m.Y");
   $uhrzeit = date("H:i");

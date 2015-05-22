@@ -378,7 +378,7 @@ else
 $time = time();
 $user_dat = mysql_query("SELECT * FROM users WHERE sptime < '$time'") or die(mysql_fehler(mysql_error(), __LINE__, $_SERVER["PHP_SELF"]));
 $stat_use = mysql_num_rows($user_dat);
-$ausgabe .=")</td></tr></table><table><tr><td><img src=images/icons/online.gif border=0></td><td>";
+$ausgabe .=")</td></tr></table><table><tr><td><img src=images/icons/online.gif border=0 title='Aktive Benutzer'></td><td>";
 echo $ausgabe;
 $ausgabe = "";
 user_online(false);
@@ -403,7 +403,7 @@ while($au = mysql_fetch_object($all_users))
 if(count($users_birthday) != 0)
 {
   echo "<table width=100% class=normal><tr><td><b>Heutige Geburtstage (".  count($users_birthday) .")</td></tr></table>";
-  echo "<table width=100% class=forenbg><tr><td><table><tr><td><img src=images/icons/birthday.gif border=0></td><td>";
+  echo "<table width=100% class=forenbg><tr><td><table><tr><td><img src=images/icons/birthday.gif border=0 title='Heutige Geburtstage'></td><td>";
   for($t=0;$t<count($users_birthday);$t++)
   {
     $jetzt = mktime(0, 0, 0, date('m'), date('d'), date('Y')); 
@@ -437,7 +437,7 @@ $userdata = mysql_query("SELECT * FROM users WHERE username LIKE '". USER ."'");
 $ud = mysql_fetch_object($userdata);
 echo "<table width=100% class=normal><tr><td><b>Statistiken</td></tr></table>
 <table width=100% class=forenbg><tr><td>
-<table><tr><td><img src=images/icons/stat.gif border=0></td><td><b>Themen:</b> $stat_them <b>Beiträge:</b> $stat_bei <b>Benutzer:</b> $stat_use<br>Wir begrüßen unser neustes Mitglied: <a href=profil.php?id=$last_use->id>$last_use->username</a></td></tr></table></td></tr></table><br>";
+<table><tr><td><img src=images/icons/stat.gif border=0 title='Forum-Statistik'></td><td><b>Themen:</b> $stat_them <b>Beiträge:</b> $stat_bei <b>Benutzer:</b> $stat_use<br>Wir begrüßen unser neustes Mitglied: <a href=profil.php?id=$last_use->id>$last_use->username</a></td></tr></table></td></tr></table><br>";
 if($ud->statshow == "0")
 {
   $show = "<span id=statistik><a href=\"javascript:ds()\">ausblenden</a></span>";

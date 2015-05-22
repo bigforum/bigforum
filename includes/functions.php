@@ -259,7 +259,7 @@ function looking_page($wo)
 	    $text = "Liest ein Thema";
       }
     }
-	if($fd->guest_see == "2" AND (GROUP != 2 AND GROUP != 3))
+	if($fd->guest_see == "2")
     {
         $page = "thread.php";
 	    $text = "Liest ein Thema";
@@ -269,19 +269,6 @@ function looking_page($wo)
       $page = "thread.php";
 	  $text = "Liest ein Thema: $td->tit";
 	}
-    else
-	{
-	  if(GROUP == "2" OR GROUP == "3")
-	  {
-	    $page = "thread.php";
-	    $text = "Liest ein Thema: $td->tit";
-	  }
-	  else
-	  {
-	  	$page = "thread.php";
-	    $text = "Liest ein Thema";
-	  }
-	}	
   }
   if($wo == "newreply")
   {

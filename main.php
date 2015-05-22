@@ -15,7 +15,7 @@ $do = $_GET["do"];
 $ac = $_GET["aktion"];
 $config_datas = mysql_query("SELECT * FROM config WHERE erkennungscode LIKE 'f2pnsignfs'");
 $cd = mysql_fetch_object($config_datas);
-if($cd->zahl2 == "1")
+if($cd->zahl2 == "1" AND $ud->darf_pn == "0")
 {
   $pn_anzeige = '<tr><td><a href="?do=pn_ein">Eingang</a></td></tr>
 <tr><td><a href="?do=pn_aus">Ausgang</a></td></tr>
@@ -220,7 +220,7 @@ if($do == "set")
 	<tr><td>Automatische Weiterleitung zu dem Posteingang, beim Mauskontakt, des blinkenden Textes \"Neue Nachrichten\" oben über deiner Navigationsliste.</td><td width=40%>
 	<input type=checkbox name=pn_weiter value=1 $checked></td></tr>
 	<tr><td>Private Nachrichten nur von Administratoren und Moderatoren empfangen?</td><td><input type=radio name=am value=2 $pnj>Ja <input type=radio name=am value=5 $pnn>Nein</td></tr>
-	</table>    <input type=submit value=Speichern></form></fieldset><br>
+	</table>    <input type=submit value=Speichern></fieldset><br>
 	<fieldset><legend>Design</legend>
 	<table><tr><td>
     Welche Farbe soll dieses Forum haben?</td><td><select name=sty>";
@@ -276,7 +276,7 @@ if($do == "set")
 	  <a href="javascript:delnotice();">Notiz, die im Header angezeigt wird, ausbleden</a></fieldset><br></span>
 <?php
 	}
-	echo "<input type=submit value=Speichern>";
+	echo "<input type=submit value=Speichern></form>";
 	page_close_table();
 
 
@@ -562,6 +562,10 @@ if($ac == "change")
 	{
 	    erzeuge_error("Dieser Benutzer hat angegeben Private Nachrichten nur von  Administratoren bzw. Moderatoren zu empfangen.");
 	}	
+  }
+  if($th->darf_pn != "0")
+  {
+    erzeuge_error("Für diesen Benutzer wurde das Private Nachrichten System deaktiviert.</td></tr></table> ");
   }
   error_reporting(E_ALL);
   $to = $_POST["to"];
