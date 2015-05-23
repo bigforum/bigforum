@@ -829,7 +829,7 @@ switch ($do) {
 	  }
 	  else
 	  {
-	    mysql_query("INSERT INTO foren (name, besch, kate, guest_see, min_posts, admin_start_thema, user_posts, sort) VALUES ('$_POST[fname]', '$_POST[besch]', '$_POST[kat]', '$_POST[guest]', '$_POST[min_post]', '$_POST[admin]', '$_POST[ansus]', '$_POST[sort]')");
+	    mysql_query("INSERT INTO foren (name, besch, kate, guest_see, min_posts, admin_start_thema, user_posts, sort, beitrag_plus) VALUES ('$_POST[fname]', '$_POST[besch]', '$_POST[kat]', '$_POST[guest]', '$_POST[min_post]', '$_POST[admin]', '$_POST[ansus]', '$_POST[sort]', '$_POST[hoch])");
 	    echo "Das Forum wurde hinzugefügt.";
 		insert_log("Es wurde ein neues Forum hinzugefügt");
 	  }
@@ -856,6 +856,7 @@ switch ($do) {
 	<tr><td>Dürfen Benutzer/Moderatoren antworten?</td><td><select name=ansus><option value=0>Ja</option><option value=1>Nein</option></td></tr>
 	<tr><td>Wie viele Beiträge muss man haben, um Zugriff auf das Forum zu bekommen?</td><td><input type=text name=min_post></td></tr>
 	<tr><td>Sortierung, die Foren werden so geordnet, auf der Startseite</td><td><input type=text name=sort></td></tr>
+	<tr><td>Beitragszähler wird bei Beitrag erhöht?</td><td><input type=radio name=hoch value=0 checked>Ja <input type=radio name=hoch value=1> Nein</td></tr>
 	</table><br>
 	<input type=submit value='Forum erstellen'>
 	</form>
@@ -1022,7 +1023,7 @@ switch ($do) {
   {
     if($_GET["done"] == "save")
 	{
-	  mysql_query("UPDATE foren SET name = '$_POST[name]', besch = '$_POST[besch]', kate = '$_POST[kate]', guest_see = '$_POST[guest]', admin_start_thema = '$_POST[admin]', user_posts = '$_POST[uspo]', min_posts = '$_POST[posts]', sort = '$_POST[sort]' WHERE id LIKE '$_GET[id]'");
+	  mysql_query("UPDATE foren SET name = '$_POST[name]', besch = '$_POST[besch]', kate = '$_POST[kate]', guest_see = '$_POST[guest]', admin_start_thema = '$_POST[admin]', user_posts = '$_POST[uspo]', min_posts = '$_POST[posts]', sort = '$_POST[sort]', beitrag_plus = '$_POST[hoch]' WHERE id LIKE '$_GET[id]'");
 	  echo "Die Kategorie wurde nun geändert.<br><a href=?do=ver_foren>Zurück zur Foren-Verwaltung</a>";
 	  exit;
 	}
@@ -1063,6 +1064,14 @@ switch ($do) {
 	{
 	  $uspo = "<option value=0>Ja</option><option value=1>Nein</option>";
 	}
+	if($fd->beitrag_plus == "0")
+	{
+	  $up1 = "checked";
+	}
+	else
+	{
+	  $up2 = "checked";
+	}
     echo "<table class=braun width=80%><tr class=besch><td><b>Forum verwalten - $fd->name</b></td></tr><tr><td>
 	<form action=?do=ver_foren&action=for&done=save&id=$_GET[id] method=post>
 	<table>
@@ -1084,6 +1093,7 @@ switch ($do) {
 	<tr><td>Dürfen Benutzer/Moderatoren antworten</td><td><select name=uspo>$uspo</select></td></tr>
 	<tr><td>Wie viele Beiträge muss man haben, um Zugriff auf das Forum zu bekommen?</td><td><input type=text name=posts value='$fd->min_posts'></td></tr>
 	<tr><td>Sortierung, die Foren werden so geordnet, auf der Startseite</td><td><input type=text name=sort value='$fd->sort'></td></tr>
+	<tr><td>Beitragszähler wird bei Beitrag erhöht?</td><td><input type=radio name=hoch value=0 $up1>Ja <input type=radio name=hoch value=1 $up2>Nein</td></tr>
 	</table>
 	<input type=submit value=Speichern>
 	</form>

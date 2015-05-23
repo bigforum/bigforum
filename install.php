@@ -44,7 +44,7 @@ switch($do){
     //Auswahl wie man updaten möchte
     echo "Bitte wähle aus, welche Version du hast, also von welcher du auf die neuste Updaten möchtest.<br><br>
 	<form action=?do=update_query method=post>
-	<select name=vers><option value=2>Von 4.3 auf 4.5 updaten*</option><option value=1>Von 4.4 auf 4.5 updaten</option></select>
+	<select name=vers><option value=2>Von 4.4 auf 4.6 updaten*</option><option value=1>Von 4.5 auf 4.6 updaten</option></select>
 	<br><br>
 	<input type=submit class=install_button value='Forum updaten'><br><br><br>
 	* <b>Wichtig:</b> Bei Sprüngen bei den Updates müssen die Datein hochgeladen werden, die Installation macht lediglich die Eintragungen in die Datenbank. Oder man lädt sich die Komplettversion der aktuellsten Version hoch, ganz wichtig aber, ohne die <i> config.php </i>.
@@ -59,11 +59,10 @@ switch($do){
     mysql_select_db($DB)or die(mysql_error());
 	if($_POST["vers"] == "2")
 	{
-     	mysql_query("INSERT INTO config (erkennungscode, wert1, wert2, zahl1, zahl2) VALUES ('f2admin2', '', '', '0', '0')"); //4.4
-    	mysql_query("ALTER TABLE users ADD birthday int(200) NOT NULL"); //Änderungen für die Version 4.4
+      mysql_query("ALTER TABLE users ADD darf_pn int(2) NOT NULL");  // Änderungen für 4.5
 	  $schritte++;
 	}  
-		mysql_query("ALTER TABLE users ADD darf_pn int(2) NOT NULL");  // Änderungen für 4.5
+    mysql_query("ALTER TABLE foren ADD beitrag_plus int(2) NOT NULL");
 	$schritte++;
 	if($schritte == $_POST["vers"])
 	{
@@ -194,6 +193,7 @@ switch($do){
 	  admin_start_thema int(10) NOT NULL,
 	  user_posts int(8) NOT NULL,
 	  sort int(50) NOT NULL,
+	  beitrag_plus int(2) NOT NULL,
       PRIMARY KEY (id) );
 
       "); 

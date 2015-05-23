@@ -31,7 +31,12 @@ if($ac == "send")
 	  $imp = "1";
 	}
   $eintrag = mysql_query("INSERT INTO thema (tit, text, verfas, last_edit, edit_from, post_when, where_forum, close, last_post_time,  import) VALUES ('$_POST[bet]', '$_POST[feld]', '". USER ."', '', '', '$time', '$_GET[id]', '$close', '$time', '$imp')");
-  mysql_query("UPDATE users SET posts = posts+1 WHERE username LIKE '". USER ."'");
+  $fo_da = mysql_query("SELECT * FROM foren WHERE id LIKE '$_GET[id]'");
+  $fd = mysql_fetch_object($fo_da);
+  if($da->beitrag_plus == "0")
+  {
+    mysql_query("UPDATE users SET posts = posts+1 WHERE username LIKE '". USER ."'");
+  }
   header("Location: forum.php?id=$_GET[id]");
 }
 page_header();

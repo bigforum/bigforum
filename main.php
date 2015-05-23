@@ -190,11 +190,18 @@ if($do == "set")
 	    echo "Dein Geburtsdatum kann doch nicht in der Zukunft liegen ;)<br><br>";
 		page_close_table();
 	  }
-	  if($_POST["year"] == "")
+	  if($_POST["month"] == "0" OR $_POST["day"] == "0")
 	  {
-	    $_POST["year"] = "2037";
+	    $time = "0";
 	  }
-	  $time = mktime(0, 0, 0, $_POST["month"], $_POST["day"], $_POST["year"]);
+     else
+     {	 
+	    if($_POST["year"] == "")
+	    {
+	      $_POST["year"] = "2037";
+	    }
+	    $time = mktime(0, 0, 0, $_POST["month"], $_POST["day"], $_POST["year"]);
+	 }
 	  mysql_query("UPDATE users SET birthday = '$time' WHERE username LIKE '". USER ."'");
 	  echo "Deine Daten wurden erfolgreich gespeichert.";
       page_close_table();

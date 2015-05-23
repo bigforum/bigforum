@@ -40,7 +40,14 @@ if($ac == "send")
   else
   {
     $eintrag = mysql_query("INSERT INTO beitrag (text, where_forum, verfas, post_dat, last_edit_dat, edit_by) VALUES ('$_POST[feld]', '$_GET[id]', '". USER ."', '$time', '', '')");
-    mysql_query("UPDATE users SET posts = posts+1 WHERE username LIKE '". USER ."'");
+	$thema_data = mysql_query("SELECT * FROM thema WHERE id LIKE '$_GET[id]'");
+    $td = mysql_fetch_object($thema_data);
+    $fo_da = mysql_query("SELECT * FROM foren WHERE id LIKE '$td->where_forum'");
+    $fd = mysql_fetch_object($fo_da);
+	if($fd->beitrag_plus == "0")
+	{
+      mysql_query("UPDATE users SET posts = posts+1 WHERE username LIKE '". USER ."'");
+	}  
     mysql_query("UPDATE thema SET last_post_time = '$time' WHERE id LIKE '$_GET[id]'");
 	if($_POST["close"] == "1")
 	{

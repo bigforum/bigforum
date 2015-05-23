@@ -196,7 +196,7 @@ $ac = $_GET["action"];
   $jetzt = mktime(0, 0, 0, date('m'), date('d'), date('Y')); 
   $gebur = mktime(0, 0, 0, date('m', $udp->birthday), date('d', $udp->birthday), date('Y', $udp->birthday)); 
   $age   = intval(($jetzt - $gebur) / (3600 * 24 * 365)); 
-  if(date("Y", $udp->birthday) != "2037")
+  if(date("Y", $udp->birthday) != "2037" AND $udp->birthday != "0")
   {
 	echo "<tr><td>Alter:</td><td>$age</td></tr>";
   }
