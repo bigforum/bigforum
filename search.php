@@ -77,14 +77,14 @@ if($_GET["do"] == "send")
 	  {
 	    if($td->tit != "")
 		{
-	      echo "<tr><td>$close</td><td><a href=thread.php?id=$sr->where_forum#$sr->id>$td->tit</a><br><small>$sr->verfas</small></td><td>$last_answer</td><td>$zahl</td></tr>";
+	      echo "<tr><td>$close</td><td><a href=thread.php?id=$td->id>$td->tit</a><br><small>$sr->verfas</small></td><td>$last_answer</td><td>$zahl</td></tr>";
 		}
 	  }
 	  elseif($fd->guest_see != "2")
 	  {
 	    if($td->tit != "")
 		{
-	      echo "<tr><td>$close</td><td><a href=thread.php?id=$sr->where_forum#$sr->id>$td->tit</a><br><small>$sr->verfas</small></td><td>$last_answer</td><td>$zahl</td></tr>";
+	      echo "<tr><td>$close</td><td><a href=thread.php?id=$td->id>$td->tit</a><br><small>$sr->verfas</small></td><td>$last_answer</td><td>$zahl</td></tr>";
 		}
 	  }
 	}
@@ -114,18 +114,18 @@ if($_GET["do"] == "send")
       {
         $close = "<img src=images/th_open.png title='Thema ist geöffnet' width=80% height=80%>";
       }
-	  if($sr->guest_see == "2" AND (GROUP == 2 OR GROUP == 3))
+	  if($fd->guest_see == "2" AND (GROUP == 2 OR GROUP == 3))
 	  {
 	  	if($sr->tit != "")
 		{
-	      echo "<tr><td>$close</td><td><a href=thread.php?id=$sr->where_forum#$sr->id>$sr->tit</a><br><small>$sr->verfas</small></td><td>$last_answer</td><td>$zahl</td></tr>";
+	      echo "<tr><td>$close</td><td><a href=thread.php?id=$sr->id>$sr->tit</a><br><small>$sr->verfas</small></td><td>$last_answer</td><td>$zahl</td></tr>";
         } 
 	  }
 	  elseif($fd->guest_see != "2")
 	  {
 	  	if($sr->tit != "")
 		{
-	  	  echo "<tr><td>$close</td><td><a href=thread.php?id=$sr->where_forum#$sr->id>$sr->tit</a><br><small>$sr->verfas</small></td><td>$last_answer</td><td>$zahl</td></tr>";
+	  	  echo "<tr><td>$close</td><td><a href=thread.php?id=$sr->id>$sr->tit</a><br><small>$sr->verfas</small></td><td>$last_answer</td><td>$zahl</td></tr>";
 	    }
 	  }
 	}

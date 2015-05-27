@@ -9,6 +9,7 @@ if($_GET["do"] == "login")
   if($dr->pw == $pw)
   {
     setcookie ("username", $dr->username, time() +60*60*24*365);  
+	setcookie ("passwort", $pw, time() +60*60*24*365);  
 	setcookie ("last_login", "1", time() + 3600);
 	header("Location: index.php");
   }

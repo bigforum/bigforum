@@ -18,7 +18,6 @@ Bitte stimme den Nutzungsbedingungen des Forums zu, um einen Foren-Account zu er
 <textarea cols=70 rows=7><?php
 $ausgabe = file_get_contents("rules.txt");
 echo $ausgabe;
-fclose($datei);
 ?></textarea><br>
 <input type=button value="Ich halte mich an die Regeln" onclick="javascript:anzeigen();"> <input type=button value="Ich bin mit den Regeln nicht einverstanden" onclick="window.location.href='index.php'">
 </div>
