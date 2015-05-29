@@ -34,6 +34,7 @@ switch ($do) {
   user_online(true);
   break;
   
+  
   case "mail_adr":
   echo "<form action=?do=ma method=post>Gebe hier eine eMail-Adresse ein, und es werden dir alle Benutzer mit dieser eMail angezeigt.<br>
   <input type=text name=mail><input type=submit value=Prüfen></form>";

@@ -577,7 +577,10 @@ if($ac == "change")
   error_reporting(E_ALL);
   $to = $_POST["to"];
   $text = $_POST["feld"];
-
+  if(USER == $to)
+  {
+    erzeuge_error("Du kannst dir nicht selber eine Nachricht senden, dieses würde nur zu Problemen führen.</td></tr></table>");
+  }
   check_data($text, "", "Du hast vergessen etwas anzugeben", "leer");
   check_data($_POST["bet"], "", "Du hast vergessen etwas anzugeben", "leer");
   check_data($to, "", "Du hast keinen Empfänger angegeben", "leer");
@@ -586,7 +589,7 @@ if($ac == "change")
   $eintrag = mysql_query("INSERT INTO prna (abse, emp, dat, betreff, mes, gel) VALUES ('". USER . "', '$to', '$time', '$_POST[bet]', '$_POST[feld]', '0')")or die(mysql_error());
   speicherung($eintrag, "Danke, deine Nachricht wurde versendet.", "<b>Fehler:</b> Es gab einen Fehler bei der Speicherung.");
   page_close_table();
-  }
+}
 editor("pn", $_GET["to"], $_GET["bet"]);
 page_close_table();
 

@@ -701,6 +701,214 @@ function show_stat($s)
     echo "</div>";
   }
 }
+function diagramm($typ, $abstand, $daten, $einheit, $breite, $hoehe) {
+
+  $schrift = 3;
+  $legende_abstand = 10;
+
+  $daten = explode(", ", $daten);
+  $werte = array();
+  $bezeichnungen = array();
+  $farben = array();
+
+  for($i=0; $i<sizeof($daten); $i++) {
+    $temp = explode(":", $daten[$i]);
+    array_push($bezeichnungen, $temp[0]);
+    array_push($werte, $temp[1]);
+    array_push($farben, $temp[2]);
+    if($abstand_text < imagefontwidth($schrift)
+* strlen($temp[0])) $abstand_text = imagefontwidth($schrift) *
+strlen($temp[0]);
+  }
+    $abstand_text_h = imagefontheight($schrift);
+
+  $bild = imagecreatetruecolor($breite, $hoehe);
+
+  $farbe_hintergrund = imagecolorexact($bild, 245, 245, 245);
+  $farbe_hintergrund = imagecolortransparent($bild,$farbe_hintergrund);
+  $farbe_text = imagecolorexact($bild, 0, 0, 0);
+  $farbe_zwischen = imagecolorexact($bild, 220, 220, 220);
+
+  $farbe_rot = imagecolorexact($bild, 255, 0, 0);
+  $farbe_gruen = imagecolorexact($bild, 0, 255, 0);
+  $farbe_schwarz = imagecolorexact($bild, 0, 0, 0);
+  $farbe_gelb = imagecolorexact($bild, 255, 255, 0);
+  $farbe_lila = imagecolorexact($bild, 255, 0, 255);
+
+  imagefill($bild, 0, 0, $farbe_hintergrund);
+    if($typ == "kreis") { //!//
+
+    $diagramm_durchmesser = $hoehe - 2 * $abstand;
+    $diagramm_x = $diagramm_durchmesser / 2 +
+$abstand;
+    $diagramm_y = $diagramm_x;
+    $diagramm_winkel1 = 0;
+
+    $legende_x = $diagramm_durchmesser + 3 *
+$abstand;
+    $legende_y = $hoehe - $abstand -
+$legende_abstand;
+    $legende_b = $legende_x + $legende_abstand;
+    $legende_h = $legende_y + $legende_abstand;
+    $legende_versatz = 0;
+	    for($i=0; $i<sizeof($werte); $i++) {
+
+      $prozent = 100 / array_sum($werte)
+* $werte[$i];
+      $grad = 360 / 100 * $prozent;
+      $diagramm_winkel2 = $grad +
+$diagramm_winkel1;
+
+      $wert = $werte[$i]." ".$einheit;
+
+      $farbe = "farbe_".$farben[$i];
+
+      imagefilledarc($bild, $diagramm_x,
+$diagramm_y, $diagramm_durchmesser, $diagramm_durchmesser,
+$diagramm_winkel1, $diagramm_winkel2, ${$farbe}, IMG_ARC_PIE);
+
+      imagefilledrectangle($bild,
+$legende_x, $legende_y - $legende_versatz, $legende_b, $legende_h -
+$legende_versatz, ${$farbe});
+      imagestring($bild, $schrift,
+$legende_x + 2 * $legende_abstand, $legende_y - $legende_versatz,
+$bezeichnungen[$i], $farbe_text);
+      imagestring($bild, $schrift,
+$legende_x + 3 * $legende_abstand + $abstand_text, $legende_y -
+$legende_versatz, $wert, $farbe_text);
+
+      $diagramm_winkel1 =
+$diagramm_winkel1 + $grad;
+      $legende_versatz = $legende_versatz
++ 2 * $legende_abstand;
+
+    }
+
+
+
+ } else if($typ == "balken") {  //!//
+
+    $balken_x = $abstand;
+    $balken_y = $hoehe - $abstand;
+    $balken_b = 2 * $abstand;
+    $diagramm_h = $hoehe - 2 * $abstand;
+    $balken_versatz = 0;
+
+    $legende_x = $balken_x + sizeof($werte) *
+$balken_b + (sizeof($werte) - 1) * $abstand + 2 * $abstand;
+    $legende_y = $hoehe - $abstand -
+$legende_abstand;
+    $legende_b = $legende_x + $legende_abstand;
+    $legende_h = $legende_y + $legende_abstand;
+    $legende_versatz = 0;
+
+    for($i=0; $i<sizeof($werte); $i++) {
+
+      $prozent = 100 / array_sum($werte)
+* $werte[$i];
+      $balken_h = $diagramm_h / 100 *
+$prozent;
+
+      $wert = $werte[$i]." ".$einheit;
+
+      $farbe = "farbe_".$farben[$i];
+
+      imagefilledrectangle($bild,
+$balken_x + $balken_versatz, $abstand, $balken_x + $balken_versatz +
+$balken_b, $hoehe - $abstand, $farbe_zwischen);
+      imagefilledrectangle($bild,
+$balken_x + $balken_versatz, $balken_y - $balken_h, $balken_x +
+$balken_versatz + $balken_b, $balken_y, ${$farbe});
+      imagestring($bild, $schrift,
+$balken_x + $balken_versatz + 2, $balken_y - $balken_h -
+$abstand_text_h, $werte[$i], $farbe_text);
+
+      imagefilledrectangle($bild,
+$legende_x, $legende_y - $legende_versatz, $legende_b, $legende_h -
+$legende_versatz, ${$farbe});
+      imagestring($bild, $schrift,
+$legende_x + 2 * $legende_abstand, $legende_y - $legende_versatz,
+$bezeichnungen[$i], $farbe_text);
+      imagestring($bild, $schrift,
+$legende_x + 3 * $legende_abstand + $abstand_text, $legende_y -
+$legende_versatz, $wert, $farbe_text);
+
+      $balken_versatz = $balken_versatz +
+3 * $abstand;
+      $legende_versatz = $legende_versatz
++ 2 * $legende_abstand;
+
+    }
+	  } else if($typ == "verlauf") { //!//
+
+    $linie_x = $abstand;
+    $linie_b = ($breite - 2 * $abstand) /
+(sizeof($werte) - 1);
+    $linie_h = $hoehe - 2 * $abstand;
+    $linie_versatz = 0;
+
+    $punkte = array();
+
+    for($i=0; $i<sizeof($werte); $i++) {
+
+      $hoechstwert = $werte;
+      rsort($hoechstwert, SORT_NUMERIC);
+      $hoechstwert = $hoechstwert[0];
+
+      $prozent = 100 / $hoechstwert *
+$werte[$i];
+      $linie_y = $linie_h / 100 *
+$prozent;
+
+      $farbe = "farbe_".$farben[$i];
+
+      array_push($punkte, $linie_x +
+$linie_versatz, $linie_h - $linie_y + $abstand);
+
+      $linie_versatz = $linie_versatz +
+$linie_b;
+
+    }
+
+    array_push($punkte, $breite - $abstand, $hoehe
+- $abstand, $abstand, $hoehe - $abstand);
+
+    $farbe = "farbe_".$farben[0];
+    imagefilledpolygon($bild, $punkte,
+sizeof($punkte) / 2, ${$farbe});
+
+    imageline($bild, $abstand, $abstand, $abstand,
+$hoehe - $abstand, $farbe_text);
+    imageline($bild, $abstand, $hoehe - $abstand,
+$breite - $abstand, $hoehe - $abstand, $farbe_text);
+    imagestring($bild, $schrift, $abstand + 4,
+$abstand, $einheit, $farbe_text);
+
+    for($i=100; $i>=0; $i=$i-10) {
+      $prozent = 100 / $hoechstwert * $i;
+      $y = $linie_h - round($linie_h /
+100 * $prozent);
+      imageline($bild, $abstand, $abstand
++ $y, $abstand + 10, $abstand + $y, $farbe_text);
+    }
+
+    $linie_versatz = 0;
+
+    for($i=0; $i<sizeof($werte); $i++) {
+      imageline($bild, $linie_x +
+$linie_versatz, $hoehe - $abstand - 10, $linie_x + $linie_versatz,
+$hoehe - $abstand, $farbe_text);
+      if($i < sizeof($werte) - 1)
+imagestring($bild, $schrift, $linie_x + $linie_versatz + 2, $hoehe -
+$abstand - 10 - 2, $bezeichnungen[$i], $farbe_text);
+      $linie_versatz = $linie_versatz +
+$linie_b;
+    }
+
+  }
+  header("Content-type: image/gif");
+  imagegif($bild);
+}
 // Ende der Funktionen, Abrufe wichtiger Arrays!
 $warn_dauer = Array("86400","172800","432000","604800","864000","1209600","2678400","5097600","15638400","31536000","63072000");
 $warn_text = Array("1 Tag","2 Tage","5 Tage","7 Tage","10 Tage","2 Wochen","1 Monat","2 Monate","6 Monate","1 Jahr","2 Jahre");

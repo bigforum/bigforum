@@ -623,6 +623,7 @@ switch ($do) {
 	}
     check_data($_POST["fn"], "", "Bitte gebe einen Forum-Name ein.", "leer");
 	check_data($_POST["besch"], "", "Bitte gebe einen Foren-Beschreibung ein.", "leer");
+	mysql_query("UPDATE config SET wert1 = '$_POST[diagr]' WHERE erkennungscode LIKE 'f2adser2'");
     mysql_query("UPDATE config SET wert1 = '$_POST[fn]', wert2 = '$_POST[besch]' WHERE erkennungscode LIKE 'f2name2'");
     mysql_query("UPDATE config SET wert2 = '$_POST[logo]', zahl1 = '$_POST[sign]', zahl2 = '$_POST[pn]' WHERE erkennungscode LIKE 'f2pnsignfs'");
     mysql_query("UPDATE config SET wert1 = '$gpack', wert2 = '$gpackt', zahl1 = '$number' WHERE erkennungscode LIKE 'f2imgadfs'");   
@@ -725,9 +726,21 @@ switch ($do) {
   {
     $st = "<input type=radio name=st value=j>Ja <input type=radio name=st value=n checked>Nein";
   }
+  $config_wert = mysql_query("SELECT * FROM config WHERE erkennungscode LIKE 'f2adser2'");
+  $con = mysql_fetch_object($config_wert); 
+  if($con->wert1 == "kreis")
+  {
+    $stad = "<input type=radio name=diagr value=kreis checked>Kreisdiagramm <input type=radio name=diagr value=balken>Balkendiagramm ";
+  }
+  else
+  {
+      $stad = "<input type=radio name=diagr value=kreis>Kreisdiagramm <input type=radio name=diagr value=balken checked>Balkendiagramm ";
+  }
   echo "
   <tr><td>Gäste dürfen Profile sehen?</td><td>$prof_pack</td></tr>
   <tr><td>Zeige erweiterte Statistik auf der Startseite?</td><td>$st</td></tr>
+  <tr><td> &nbsp; </td><td> &nbsp </td></tr>
+  <tr><td>Anzeige der Statistik-Diagramme</td><td>$stad</td></tr>
   <tr><td> &nbsp; </td><td> &nbsp </td></tr>";
   
   $config_wert = mysql_query("SELECT * FROM config WHERE erkennungscode LIKE 'f2closefs'");
