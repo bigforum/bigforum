@@ -17,6 +17,8 @@ if($ac == "send")
 	 erzeuge_error("Du kannst keinen leeren Text absenden.");  
 	 page_footer();
   }
+  $_POST["feld"] = str_replace("  ","",$_POST["feld"]);
+
   if(strlen($_POST["feld"]) <= 10)
   {
      page_header();
@@ -72,7 +74,20 @@ if($ac == "" AND GROUP > 0)
 {
   if($td->close != "1")
   {
+    echo "
+    <table width=70%><tr class=dark><td><font color=snow><b>Auf ein Thema antworten</b></font></td></tr></table><table width=70% class=editorbg><tr><td>";
     editor("ant","","?id=$_GET[id]");
+    echo "</table><br>";
+	$ant_sear = mysql_query("SELECT * FROM beitrag WHERE where_forum LIKE '$_GET[id]' ORDER BY id DESC LIMIT 5");
+	$antwort = mysql_num_rows($ant_sear);
+	/*echo "<table width=70%><tr class=dark><td><font color=snow><b>Letzten $antwort Antworten</b></font></td></tr></table>
+	<table width=70% class=editorbg><tr><td class=editorbg><b>Username</b></td><td class=editorbg><b>Nachricht</b></td></tr>";*/
+	while($aa = mysql_fetch_object($ant_sear))
+	{
+	 // echo "<tr><td class=editorbg>$aa->verfas</td><td class=editorbg>$aa->text</td></tr>";
+	   text_ausgabe($aa->text, $aa->tit, $aa->verfas);
+	}
+	echo "</td></tr></table>";
   }
   else
   {
@@ -82,7 +97,17 @@ if($ac == "" AND GROUP > 0)
 	 {
 	   echo "<b>Information:</b> Dieses Thema ist geschloﬂen! Nur noch ein Moderator bzw. Administrator kann antworten.<br><br>";
 	 }
-     editor("ant","","?id=$_GET[id]");
+    echo "
+    <table width=70%><tr class=dark><td><font color=snow><b>Auf ein Thema antworten</b></font></td></tr></table><table width=70% class=editorbg><tr><td>";
+    editor("ant","","?id=$_GET[id]");
+    echo "</table><br>";    
+	$ant_sear = mysql_query("SELECT * FROM beitrag WHERE where_forum LIKE '$_GET[id]' ORDER BY id DESC LIMIT 5");
+	echo "<table width=70%><tr class=dark><td><font color=snow><b>Letzte Antworten</b></font></td></tr></table><table width=87%><tr><td>";
+	while($aa = mysql_fetch_object($ant_sear))
+	{
+	   text_ausgabe($aa->text, $aa->tit, $aa->verfas);
+	}
+	echo "</td></tr></table>";
    }
    else
      erzeuge_error("Dieses Thema ist geschlossen. Du kannst nicht mehr antworten");

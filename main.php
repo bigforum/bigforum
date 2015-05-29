@@ -49,6 +49,7 @@ else
 <tr><td class=normal color="snow">
 <b><a href="profil.php?id=<? echo $ud->id;?>"><font color=black>Profil</font></a></b></td></tr>
 <tr><td><a href="?do=profil">Mein Profil</a></td></tr>
+<tr><td><a href="?do=friends">Meine Freunde/Kontakte</a></td></tr>
 <tr><td><a href="?do=ava">Avatar</a></td></tr>
 <?php echo $sign; ?>
 <tr><td class=normal color="snow"><b>Private Nachricht</b></td></tr>
@@ -166,7 +167,49 @@ if($ud->ava_link != "")
 page_close_table();
 }
 
-
+if($do == "friends")
+{
+  if($_GET["action"] == "add")
+  {
+    $fr_da = mysql_query("SELECT * FROM users WHERE username LIKE '$_POST[user]'");
+	if(mysql_num_rows($fr_da) == "0")
+	{
+	  echo "Leider ist dieser Benutzername nicht vorhanden; bitte überprüfe deine Eingabe.";
+	  page_close_table();
+	}
+	$fd = mysql_fetch_object($fr_da);
+	$time = time();
+	mysql_query("INSERT INTO kontakt (user_id, friend_id, when_time) VALUES ('$ud->id', '$fd->id', '$time')");
+	echo "Deine Freundes-/ Kontaktliste wurde erfolgreich überarbeitet.";
+    page_close_table();
+  }
+  $friends_hol = mysql_query("SELECT * FROM kontakt WHERE user_id LIKE '$ud->id'");
+  if(mysql_num_rows($friends_hol) == "0")
+  {
+    echo "Du hast noch keine Kontakte. Im unterem Feld kannst du welche hinzufügen.";
+  }
+  else
+  {
+    echo "<table><tr><td><b>Username</b></td><td><b>Kontakt</b></td></tr>";
+	while($fh = mysql_fetch_object($friends_hol))
+	{
+	  $users_ids = mysql_query("SELECT * FROM users WHERE id LIKE '$fh->friend_id'");
+	  $usi = mysql_fetch_object($users_ids);
+	  echo "<tr><td><a href=profil.php?id=$usi->id>$usi->username</a></td><td>";
+	  $config_datas = mysql_query("SELECT * FROM config WHERE erkennungscode LIKE 'f2pnsignfs'");
+      $cd = mysql_fetch_object($config_datas);
+      if($usi->darf_pn == "0" AND $cd->zahl2 == "1")
+      {
+        echo "<a href=main.php?do=make_pn&to=$usi->username><img src=images/pn.png border=0 width=60px height=32px alt=\"$usi->username eine Private Nachricht schreiben\"></a>";
+      }
+	  echo "</td></tr>";
+	}
+    echo "</table>";
+  }
+  echo "<br><br><fieldset><legend>Neuen Kontakt hinzufügen</legend>
+  <form action=?do=friends&action=add method=post>Benutzername: <input type=text name=user><input type=submit value=Hinzufügen></fieldset>";
+  page_close_table();
+}
 if($do == "set")
 {   
     if($ac == "insert")
@@ -581,6 +624,7 @@ if($ac == "change")
   {
     erzeuge_error("Du kannst dir nicht selber eine Nachricht senden, dieses würde nur zu Problemen führen.</td></tr></table>");
   }
+  $_POST["bet"] = str_replace(" ","",$_POST["bet"]);
   check_data($text, "", "Du hast vergessen etwas anzugeben", "leer");
   check_data($_POST["bet"], "", "Du hast vergessen etwas anzugeben", "leer");
   check_data($to, "", "Du hast keinen Empfänger angegeben", "leer");

@@ -177,7 +177,7 @@ $ac = $_GET["action"];
   </tr>
   </table>
   
-  </td><td><table><tr><td><b>Beiträge</b></td></tr>
+  </td><td><table><tr><td width="45%"><b>Beiträge</b></td></tr>
   <tr><td width="40%">Beiträge:</td><td><?php echo $udp->posts; ?></td></tr>
   <tr><td width="40%">&#216; Beiträge/Tag:</td><td><? 
   $tag = time() - $udp->reg_dat;

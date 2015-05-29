@@ -1,6 +1,6 @@
 <?php
 //Wichtige Angaben für jede Datei!
-include("includes/functions.php");
+include_once("includes/functions.php");
 login();
 page_header();
 looking_page("search");

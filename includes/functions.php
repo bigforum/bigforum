@@ -12,13 +12,13 @@ function page_header()
   config("f2name2", true, "function_define");
   if(str_replace("kilu", "", $HTTP_REFERER))
   {
-    include("includes/function_user.php");
+    include_once("includes/function_user.php");
   }
   else
   {
     include_once("includes/function_user.php"); 
   }
-  include("style/header.php");   
+  include_once("style/header.php");   
 }
 function page_close_table()
 {
@@ -27,14 +27,14 @@ function page_close_table()
 }
 function page_footer()
 {
-  include("style/footer.php");
+  include_once("style/footer.php");
   exit;
 }
 function check_text()
 {
-  $text = preg_replace('/\[b\](.*?)\[\/b\]/', '<b>$1</b>', $text);  
-  $text = preg_replace('/\[k\](.*?)\[\/k\]/', '<i>$1</i>', $text);  
-  $text = preg_replace('/\[u\](.*?)\[\/u\]/', '<u>$1</u>', $text);  
+  $text = preg_replace('/\[b\](.*?)\[\/b\]/s', '<b>$1</b>', $text);  
+  $text = preg_replace('/\[k\](.*?)\[\/k\]/s', '<i>$1</i>', $text);  
+  $text = preg_replace('/\[u\](.*?)\[\/u\]/s', '<u>$1</u>', $text);  
   $text = eregi_replace("\[url\]([^\[]+)\[/url\]","<a href=\"\\1\" target=\"_blank\">\\1</a>",$text);
   $text = str_replace("\n", "<br />", $text);
   $text = strip_tags($text);
@@ -57,16 +57,16 @@ if($di == "ant")
   <input type=text name=bet><br><br>
   Nachricht:";
 }
-echo "<table bgcolor=silver><tr><td>
-<input type=button style='background-color:silver;font-weight:bold' value=b onclick=\"insert('[b]', '[/b]')\"><input type=button style=\"background-color:silver;text-decoration:underline\" value=u onclick=\"insert('[u]', '[/u]')\"><input type=button style=\"background-color:silver;font-style:italic\" value=k onclick=\"insert('[k]', '[/k]')\">
-<input type=button style='background-color:silver;' value=Link onclick=\"insert('[url]', '[/url]')\"><input type=button style='background-color:silver;' value=Code onclick=\"insert('[code]', '[/code]')\"><input type=button style='background-color:silver;' value=Bild onclick=\"insert('[img]', '[/img]')\"><input type=button style='background-color:silver;' value=Zitat onclick=\"u = prompt('Welchen Benutzer möchtest du zitieren?'); insert('[zitat='+u+']', '[/zitat]')\"><br>
+echo "<table class=editorbgc><tr><td>
+<input type=button class=editorbgco style='font-weight:bold' value=b onclick=\"insert('[b]', '[/b]')\"><input type=button class=editorbgco style=\"text-decoration:underline\" value=u onclick=\"insert('[u]', '[/u]')\"><input type=button class=editorbgco style=\"font-style:italic\" value=k onclick=\"insert('[k]', '[/k]')\">
+<input type=button  class=editorbgco value=Link onclick=\"insert('[url]', '[/url]')\"><input type=button  class=editorbgco value=Code onclick=\"insert('[code]', '[/code]')\"><input type=button class=editorbgco value=Bild onclick=\"insert('[img]', '[/img]')\"><input type=button class=editorbgco value='Zitat' onclick=\"u = prompt('Welchen Benutzer möchtest du zitieren?'); insert('[zitat='+u+']', '[/zitat]')\"><br>
 <textarea cols=70 rows=7 name=feld>";
 if($di == "sign")
 {
   echo $value;
 }
 echo "</textarea><br>
-<input type=submit value=Absenden style=background-color:silver;>";
+<input type=submit value=Absenden  class=editorbgco>";
 if((GROUP > "1" AND GROUP != "4") AND $di == "ant")
 {
   echo "<br><br><fieldset><legend>Moderator-Optionen</legend>
@@ -110,11 +110,11 @@ An:<br>
 Betreff:<br>
 <input type=text name=bet value='$extra'><br><br>
 Nachricht:
-<table bgcolor=silver><tr><td>
-<input type=button style='background-color:silver;font-weight:bold' value=b onclick=\"document.feld.feld.value += '[b][/b]'\"><input type=button style=\"background-color:silver;text-decoration:underline\" value=u onclick=\"document.feld.feld.value += '[u][/u]'\"><input type=button style=\"background-color:silver;font-style:italic\" value=k onclick=\"document.feld.feld.value += '[k][/k]'\">
-<input type=button style='background-color:silver;' value=Link onclick=\"document.feld.feld.value += '[url][/url]'\"><input type=button style='background-color:silver;' value=Code onclick=\"document.feld.feld.value += '[code][/code]'\"><input type=button style='background-color:silver;' value=Bild onclick=\"document.feld.feld.value += '[img][/img]'\"><br>
+<table class=editorbgc><tr><td>
+<input type=button class=editorbgco style='font-weight:bold' value=b onclick=\"document.feld.feld.value += '[b][/b]'\"><input type=button class=editorbgco style=\"text-decoration:underline\" value=u onclick=\"document.feld.feld.value += '[u][/u]'\"><input type=button class=editorbgco style=\"font-style:italic\" value=k onclick=\"document.feld.feld.value += '[k][/k]'\">
+<input type=button class=editorbgco value=Link onclick=\"document.feld.feld.value += '[url][/url]'\"><input type=button class=editorbgco value=Code onclick=\"document.feld.feld.value += '[code][/code]'\"><input type=button class=editorbgco value=Bild onclick=\"document.feld.feld.value += '[img][/img]'\"><br>
 <textarea cols=70 rows=7 name=feld></textarea><br>
-<input type=submit value=Absenden style=background-color:silver;>
+<input type=submit value=Absenden class=editorbgco>
 </td><td valign=top><br>";
 $drei = "0";
 $config_wert = mysql_query("SELECT * FROM config WHERE erkennungscode LIKE 'f2laengfs'");
@@ -247,6 +247,13 @@ function looking_page($wo)
     $page = "newtopic.php";
 	$text = "Erstellt ein Thema: $fd->name";
   }
+  if($wo == "newtopic")
+  {
+    $foda = mysql_query("SELECT * FROM foren WHERE id LIKE '$_GET[id]'");
+	$fd = mysql_fetch_object($foda);
+    $page = "kontakt.php";
+	$text = "Benutzt das Kontaktformular";
+  }
   if($wo == "readthema")
   {
     $them_dat = mysql_query("SELECT * FROM thema WHERE id LIKE '$_GET[id]'");
@@ -331,8 +338,15 @@ function looking_page($wo)
 function erzeuge_error($text)
 {
   echo "<center><table class=bord width=50% height=50%>  
-<tr class=normal><td><font color=snow><b>". SITENAME ." - Fehlermeldung</b></td></tr>
-	<tr><td align=center>$text</td></tr></table></center><br><br>";
+  <tr class=normal><td><font color=snow><b>". SITENAME ." - Fehlermeldung</b></td></tr>
+  <tr><td align=center>$text";
+  $config_data = mysql_query("SELECT * FROM config WHERE erkennungscode LIKE 'f2mf2'");
+  $cd = mysql_fetch_object($config_data);
+  if($cd->zahl2 == "1")
+  {
+    echo "<br><br><a href=kontakt.php>Kontaktformular</a>";
+  }
+  echo "</td></tr></table></center><br><br>";
   page_footer();
 }
 function erzeuge_mysql_error($text)
@@ -344,15 +358,15 @@ function erzeuge_mysql_error($text)
 function connect_to_database()
 {
 
-  include("includes/function_define.php");
-  include("config.php");
+  include_once("includes/function_define.php");
+  include_once("config.php");
 
   mysql_connect($HOST,$USER,$PW)or die(mysql_error());
   mysql_select_db($DB)or die(mysql_error());
 }
 function backup()
 {
-  include("../config.php");
+  include_once("../config.php");
   $time = date("dMY", time());
   system(" -u$USER -p$PW -h $HOST $DB > ".dirname(__FILE__)."/backup_$time.sql", $fp); 
 }
@@ -360,11 +374,11 @@ function config($erken, $clude_true, $what)
 {
   if($clude_true == false)
   {
-    include("../config.php");
+    include_once("../config.php");
   }
   else
   {
-    include("./config.php");
+    include_once("./config.php");
   }
 
   mysql_connect($HOST,$USER,$PW)or die(mysql_error());
@@ -378,11 +392,11 @@ function config($erken, $clude_true, $what)
   if($what != "")
   {
     $clude_path = "$what.php";
-    include($clude_path);
+    include_once($clude_path);
   }
   if($clude_true == false)
   {
-    include("../includes/function_user.php");
+    include_once("../includes/function_user.php");
   }
 }
 function check_data($wert1, $wert2, $fehlertext, $method)
@@ -450,7 +464,7 @@ function login()
   include_once("function_user.php");
   if(USER == "")
   {
-    include("login.php");
+    include_once("login.php");
     exit;
   }
 }
@@ -484,10 +498,10 @@ function text_ausgabe($text, $betreff, $from)
     // Wenn der Benutzer laut Admincp HTML benutzen darf, wird es in Beiträgen deaktiviert. Funktion wird nur Administratoren empfohlen, die dieses wirklich brauchen!
     $text = htmlspecialchars($text);
   }
-  $text = preg_replace('/\[b\](.*?)\[\/b\]/', '<b>$1</b>', $text);  
-  $text = preg_replace('/\[k\](.*?)\[\/k\]/', '<i>$1</i>', $text);  
-  $text = preg_replace('/\[u\](.*?)\[\/u\]/', '<u>$1</u>', $text);  
-  $text = preg_replace('/\[code\](.*?)\[\/code\]/', "<small style='display:block;'>Code:</small><table width=80% bgcolor=snow><tr><td>$1</td></tr></table>", $text);  
+  $text = preg_replace('/\[b\](.*?)\[\/b\]/s', '<b>$1</b>', $text);  
+  $text = preg_replace('/\[k\](.*?)\[\/k\]/s', '<i>$1</i>', $text);  
+  $text = preg_replace('/\[u\](.*?)\[\/u\]/s', '<u>$1</u>', $text);  
+  $text = preg_replace('/\[code\](.*?)\[\/code\]/s', "<small style='display:block;'>Code:</small><table width=80% bgcolor=snow><tr><td>$1</td></tr></table>", $text);  
   $text = eregi_replace("\[url\]([^\[]+)\[/url\]","<a href=\"http://\\1\" target=\"_blank\">\\1</a>",$text);
   $text = preg_replace('/\[url=([^ ]+).*\](.*)\[\/url\]/', '<a href="http://$1" target=\"_blank\">$2</a>', $text);  
   $text = eregi_replace("\[img\]([^\[]+)\[/img\]","<img src=\"\\1\" border=0>",$text);
@@ -551,9 +565,9 @@ if($fd->sign != "" AND $cd->zahl1 == "1")
 {
   $text = $fd->sign;
   $text = strip_tags($text);
-  $text = preg_replace('/\[b\](.*?)\[\/b\]/', '<b>$1</b>', $text);  
-  $text = preg_replace('/\[k\](.*?)\[\/k\]/', '<i>$1</i>', $text);  
-  $text = preg_replace('/\[u\](.*?)\[\/u\]/', '<u>$1</u>', $text);  
+  $text = preg_replace('/\[b\](.*?)\[\/b\]/s', '<b>$1</b>', $text);  
+  $text = preg_replace('/\[k\](.*?)\[\/k\]/s', '<i>$1</i>', $text);  
+  $text = preg_replace('/\[u\](.*?)\[\/u\]/s', '<u>$1</u>', $text);  
   $text = eregi_replace("\[url\]([^\[]+)\[/url\]","<a href=\"http://\\1\" target=\"_blank\">\\1</a>",$text);
   $text = preg_replace('/\[url=([^ ]+).*\](.*)\[\/url\]/', '<a href="http://$1" target=\"_blank\">$2</a>', $text);  
   $text = str_replace("\n", "<br />", $text);

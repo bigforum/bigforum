@@ -26,12 +26,12 @@ function set_tab($code)
 }
 function left_table($an)
 {
-  echo "<table valign=top align=top><tr><td valign=top align=top style=\"background-image:url(bglinks.png); background-repeat:no-repeat;\" bgcolor=\"cc9e4e  \">";
+  echo "<table valign=top align=top bgcolor=#d8b284 width=100%><tr><td valign=top align=top width=20%>";
   for($i=0;$i<count($an);$i++)
   {
     $e = explode("|",$an[$i]);
     echo "<a href=$e[0]>$e[1]</a><br>";
   }
-  echo "</td><td width=80%>";
+  echo "</td><td width=80% style=\"border-left:3px solid #ae8b61\">";
 }
 ?>

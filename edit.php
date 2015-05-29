@@ -11,6 +11,10 @@ if($_GET["id"] == "")
 }
 if($_GET["aktion"] != "")
 {
+  if($_POST["feld"] == "")
+  {
+	erzeuge_error("Du hast keinen Text angegeben.");
+  }
   $user_data = mysql_query("SELECT * FROM users WHERE username LIKE '". USER ."'");
   $ud = mysql_fetch_object($user_data);
   $time = time();

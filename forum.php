@@ -97,6 +97,7 @@ if($_GET["do"] == "change")
 	  $zwe = mysql_fetch_object($zwei);
 	  $time = $zwe->post_when;
 	  mysql_query("INSERT INTO beitrag (text, where_forum, verfas, post_dat, last_edit_dat, edit_by) VALUES ('$zwe->text', '$ein->id', '$zwe->verfas', '$time', '', '')");
+	  mysql_query("UPDATE beitrag SET where_forum = '$ein->id' WHERE id = '$zwe->id'") or die(mysql_fehler(mysql_error(), __LINE__, $_SERVER["PHP_SELF"]));
 	  mysql_query("DELETE FROM thema WHERE id LIKE '$zwe->id'");
 	  echo "Danke, $zwe->tit wird nun als Beitrag in $ein->tit angezeigt.";
 	  page_footer();
@@ -399,7 +400,83 @@ else
     echo "<a href=newtopic.php?id=$fd->id><img src=images/newtopic.png border=0 title=\"Neues Thema\" width=105 height=60></a>";
   }
 }
-
+if($fd->admin_start_thema == "2")
+{
+  if(GROUP == "2" OR GROUP == "3")
+  {
+    $th = "Ja";
+  }
+  else
+  {
+    $th = "Nein";
+  }
+}
+if($fd->admin_start_thema == "1")
+{
+  IF(USER != "")
+  {
+    $th = "Ja";
+  }
+  else
+  {
+    $th = "Nein";
+  }
+}
+if($fd->admin_start_thema == "0")
+{
+  if(GROUP == "3")
+  {
+    $th = "Ja";
+  }
+  else
+  {
+    $th = "Nein";
+  }
+}
+if($fd->user_posts == "1")
+{
+  if(GROUP == "3")
+  {
+    $ta = "Ja";
+  }
+  else
+  {
+    $ta = "Nein";
+  }
+}
+else
+{
+  if(GROUP == "3" OR GROUP == "2")
+  {
+    $ta = "Ja";
+  }
+  else
+  {
+    $ta = "Nein";
+  }
+}
+if($fd->beitrag_plus == "0")
+{
+  $tp = "Ja";
+} 
+else
+{
+  $tp = "Nein";
+} 
+$config_data = mysql_query("SELECT * FROM config WHERE erkennungscode LIKE 'f2mf2'");
+$cd = mysql_fetch_object($config_data);
+if($cd->zahl1 == "1")
+{
+  echo "<table><tr class=dark><td><font color=snow>Regeln</font></td></tr>
+  <tr><td>
+  <table>
+  <tr><td>Du darfst Themen erstellen?</td><td>$th</td></tr>
+  <tr><td>Du darfst auf Themen antworten?</td><td>$ta</td></tr>
+  <tr><td>Dein Beitragszähler wird erhöht?</td><td>$tp</td></tr>
+  <tr><td>Benötigte Mindestbeiträge:</td><td>$fd->min_posts</td></tr>
+  </table>
+  </td></tr></table>";
+}
 //Wichtige Datein für den Footer
 page_footer();
 ?>

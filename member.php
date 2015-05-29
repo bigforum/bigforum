@@ -1,6 +1,6 @@
 <?php
 //Wichtige Angaben für jede Datei!
-include("includes/functions.php");
+include_once("includes/functions.php");
 login();
 page_header();
 if($_GET["do"] == "groups")
@@ -36,6 +36,19 @@ if($_GET["do"] == "groups")
   echo "</table>";
   page_footer();
 }
+$id = $_GET["id"];
+$seite = $_GET["page"];
+if(!isset($seite) OR $seite == "0")
+{
+  $seite = 1;
+} 
+$eps = "10";
+$time = time();
+$start = $seite * $eps - $eps;
+$cou = mysql_query("SELECT * FROM users WHERE sptime < '$time'");
+$menge = mysql_num_rows($cou);
+$wieviel = $menge / $eps;
+$ws = ceil($wieviel);
 looking_page("list_member");
 ?>
 <table width="100%">
@@ -43,29 +56,28 @@ looking_page("list_member");
 <td color=snow>
 <b><font color="snow">Benutzerliste - Die Benutzer des Forums</font></b>
 </td></tr></table><table width="100%" class=bord>
-<tr bgcolor="#E1E4F9" style="font-weight: bold;"><td> # </td><td><a href="?ord=user">Benutzername</a></td><td><a href="?ord=posts">Beiträge</a></td><td><a href="?ord=reg">Registrierungsdatum</a></td><td>Sonstiges</td></tr>
+<tr bgcolor="#E1E4F9" style="font-weight: bold;"><td> # </td><td><a href="?ord=user&page=<?php echo $seite;?>">Benutzername</a></td><td><a href="?ord=posts&page=<?php echo $seite;?>">Beiträge</a></td><td><a href="?ord=reg&page=<?php echo $seite;?>">Registrierungsdatum</a></td><td>Sonstiges</td></tr>
 <?php
 $ord = $_GET["ord"];
 $xs = "0";
-$time = time();
 if($ord == "posts")
 {
   $xs = "1";
-  $users = mysql_query("SELECT * FROM users WHERE sptime < '$time' ORDER BY posts DESC");
+  $users = mysql_query("SELECT * FROM users WHERE sptime < '$time' ORDER BY posts DESC LIMIT $start, $eps");
 }
 if($ord == "reg")
 {
   $xs = "1";
-  $users = mysql_query("SELECT * FROM users WHERE sptime < '$time' ORDER BY reg_dat");
+  $users = mysql_query("SELECT * FROM users WHERE sptime < '$time' ORDER BY reg_dat LIMIT $start, $eps");
 }
 if($ord == "user")
 {
   $xs = "1";
-  $users = mysql_query("SELECT * FROM users WHERE sptime < '$time' ORDER BY username");
+  $users = mysql_query("SELECT * FROM users WHERE sptime < '$time' ORDER BY username LIMIT $start, $eps");
 }
 if($xs == "0")
 {
-  $users = mysql_query("SELECT * FROM users WHERE sptime < '$time' ORDER BY id");
+  $users = mysql_query("SELECT * FROM users WHERE sptime < '$time' ORDER BY id LIMIT $start, $eps");
 }
 
 $number = "0";
@@ -75,6 +87,9 @@ while($ur = mysql_fetch_object($users))
   $datum = date("d.m.Y",$ur->reg_dat);
   $website = "";
   $number++;
+  $ten = $seite - 1;
+  $ten = $ten * 10;
+  $number = $number + $ten;
   if($ur->website != "")
   {
     $website = "<a href=http://$ur->website target=_blank><img src=images/hp.png border=0 width=60px height=35px></a>";
@@ -96,6 +111,61 @@ while($ur = mysql_fetch_object($users))
 ";
   $bg = "";
   $num++;
+}
+if($ws > "1")
+{
+$up = $seite - 1;
+$down = $seite + 1;
+if($ws == $seite)
+{
+  $down--;
+}
+//Welche Seiten sollen angezeigt werden?
+$seiten = "0,1,2,3,5,10,25,50,100,150,250,500,750";
+$pa = array();
+//
+
+
+$z = explode(",", $seiten);
+echo "<table width=80%><tr><td align=right valign=right><table class=navi><tr><td>";
+echo "<font color=snow>Seite $seite von $ws &nbsp <a href=?page=$up><</a>";
+$wvpe = $wieviel+1;
+for($a=0; $a < $wieviel; $a++)
+{
+  $b = $a + 1;
+  $q = "0";
+    while($q < count($z))
+	{
+	  $pa[] = $b;
+	  if($z[$q] == $b OR $seite == $b)
+	  {
+
+        if($seite == $b AND $q == "0")
+        {
+		  $min = $b - 1;
+		  $plu = $b + 1;
+		  if(!in_array($min,$z) AND $q == "0")
+		  {
+		    echo "  <a href=\"?page=$min\">$min</a> ";
+		  }
+          echo " <b>$b</b> </font>";
+		  if(!in_array($plu,$z) AND $q == "0" AND $ws != $seite)
+		  {
+		    echo "  <a href=\"?page=$plu\">$plu</a> ";
+		  }
+        }
+        else
+        {
+		  if($seite != $b)
+		  {
+            echo "  <a href=\"?page=$b\">$b</a> ";
+		  }
+        }
+	  }
+	$q++;
+	}
+}
+echo " <a href=?page=$down>></a></td></tr></table></td></tr></table>"; 
 }
 ?>
 </table>

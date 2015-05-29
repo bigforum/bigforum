@@ -1,0 +1,57 @@
+body{
+background: #ce7d2e;
+}
+.besch
+{
+  background: #DE8418;
+}
+.braun{
+  border: 1px solid #C37B18;
+}
+a:link
+{
+	color: #363636;
+}
+a:visited
+{
+	color: #363636;
+}
+a:hover, a:active
+{
+	color: #767676;
+}
+.navi
+{
+  background: #DE9C39;
+}
+.border
+{
+  border: 1px solid #DE9C39;
+}
+A.menulink {
+        display: inline-block;
+        width: 150px;
+        height: 50px;
+        text-align: center;
+        text-decoration: none;
+        font-family: Arial;
+        font-size: 20px;
+        color: black;
+        background-image:url(button.png);
+ }
+ 
+ A.menulink:hover {
+        text-decoration: underline;
+		color: black;
+        background-image:url(button.png);
+ }
+ legend
+{
+	color: #C37B18;
+	font-size: 12px;
+    font-weight: bold;
+}
+fieldset
+{
+  border: 1px solid #C37B18;
+}

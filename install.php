@@ -4,7 +4,6 @@ Installations Datei
 
 Änderungen an dieser Datei vermeiden, dieses könnte die installation fehlerhaft machen!
 */
-include("includes/function_define.php");
 ?>
 <title>bigforum - Installation</title>
 <style>
@@ -44,7 +43,7 @@ switch($do){
     //Auswahl wie man updaten möchte
     echo "Bitte wähle aus, welche Version du hast, also von welcher du auf die neuste Updaten möchtest.<br><br>
 	<form action=?do=update_query method=post>
-	<select name=vers><option value=2>Von 4.6 auf ". VERSION ." updaten*</option><option value=1>Von 4.7 auf ". VERSION ." updaten</option></select>
+	<select name=vers><option value=2>Von 4.7 auf 5.0 updaten*</option><option value=1>Von 4.8 auf 5.0 updaten</option></select>
 	<br><br>
 	<input type=submit class=install_button value='Forum updaten'><br><br><br>
 	* <b>Wichtig:</b> Bei Sprüngen bei den Updates müssen die Datein hochgeladen werden, die Installation macht lediglich die Eintragungen in die Datenbank. Oder man lädt sich die Komplettversion der aktuellsten Version hoch, ganz wichtig aber, ohne die <i> config.php </i>.
@@ -59,10 +58,40 @@ switch($do){
     mysql_select_db($DB)or die(mysql_error());
 	if($_POST["vers"] == "2")
 	{
-      mysql_query("ALTER TABLE foren ADD beitrag_plus int(2) NOT NULL");  // Änderungen für 4.6	
-	  $schritte++;
+      mysql_query("UPDATE config SET wert1 = 'kreis' WHERE erkennungscode LIKE 'f2adser2'"); // Version 4.8
 	}  
-    mysql_query("UPDATE config SET wert1 = 'kreis' WHERE erkennungscode LIKE 'f2adser2'");
+	  mysql_query("INSERT INTO config (erkennungscode, wert1, wert2, zahl1, zahl2) VALUES ('f2mf2', '', '', '1', '0')"); // Für Forenstatistik, und ob das Forum(z1) den eMail-Versand(z2) unterstüzt. 1=Ja 0 = Nein
+	  mysql_query("INSERT INTO config (erkennungscode, wert1, wert2, zahl1, zahl2) VALUES ('f2bl2', '', '', '3', '20')"); // Benutzernamenlänge (w1) = Minimale Länge (w2) Maximale Länge
+      mysql_query("CREATE TABLE IF NOT EXISTS passwort_verg ( 
+      id INT(20) NOT NULL auto_increment,
+      mail varchar(500) NOT NULL,
+      time int(100) NOT NULL,
+      passwort varchar(500) NOT NULL,
+      PRIMARY KEY (id) );
+      "); 
+      mysql_query("CREATE TABLE IF NOT EXISTS kontakt ( 
+      id INT(20) NOT NULL auto_increment,
+      user_id int(10) NOT NULL,
+      friend_id int(10) NOT NULL,
+      when_time int(50) NOT NULL,
+      PRIMARY KEY (id) );
+      "); 
+	  mysql_query("CREATE TABLE IF NOT EXISTS addons ( 
+      id INT(20) NOT NULL auto_increment,
+      kurz varchar(300) NOT NULL,
+      admin_link varchar(1000) NOT NULL,
+      wert1 varchar(1000) NOT NULL,
+      wert2 varchar(1000) NOT NULL,
+	  wert3 varchar(1000) NOT NULL,
+	  wert4 varchar(1000) NOT NULL,
+      zahl1 int(50) NOT NULL,
+      zahl2 int(50) NOT NULL,
+      zahl3 int(50) NOT NULL,
+      zahl4 int(50) NOT NULL,	  
+	  PRIMARY KEY (id)
+	  );
+
+      "); 
 	$schritte++;
 	if($schritte == $_POST["vers"])
 	{
@@ -169,6 +198,15 @@ switch($do){
       "); 
 	  
 	  
+	  mysql_query("CREATE TABLE IF NOT EXISTS passwort_verg ( 
+      id INT(20) NOT NULL auto_increment,
+      mail varchar(500) NOT NULL,
+      time int(100) NOT NULL,
+      passwort varchar(500) NOT NULL,
+      PRIMARY KEY (id) );
+      "); 
+	  
+	  
 	  mysql_query("CREATE TABLE IF NOT EXISTS config ( 
 
       erkennungscode varchar(300) NOT NULL,
@@ -195,6 +233,23 @@ switch($do){
 	  sort int(50) NOT NULL,
 	  beitrag_plus int(2) NOT NULL,
       PRIMARY KEY (id) );
+
+      "); 
+	  
+	  	  mysql_query("CREATE TABLE IF NOT EXISTS addons ( 
+      id INT(20) NOT NULL auto_increment,
+      kurz varchar(300) NOT NULL,
+      admin_link varchar(1000) NOT NULL,
+      wert1 varchar(1000) NOT NULL,
+      wert2 varchar(1000) NOT NULL,
+	  wert3 varchar(1000) NOT NULL,
+	  wert4 varchar(1000) NOT NULL,
+      zahl1 int(50) NOT NULL,
+      zahl2 int(50) NOT NULL,
+      zahl3 int(50) NOT NULL,
+      zahl4 int(50) NOT NULL,	  
+	  PRIMARY KEY (id)
+	  );
 
       "); 
 	  
@@ -258,6 +313,15 @@ switch($do){
       "); 
 	  
 	  
+	  mysql_query("CREATE TABLE IF NOT EXISTS kontakt ( 
+      id INT(20) NOT NULL auto_increment,
+      user_id int(10) NOT NULL,
+      friend_id int(10) NOT NULL,
+      when_time int(50) NOT NULL,
+      PRIMARY KEY (id) );
+      "); 
+	  
+	  
 	  
 	  mysql_query("CREATE TABLE IF NOT EXISTS thema ( 
 
@@ -308,6 +372,7 @@ switch($do){
 	  provi int(50) Not NULL,
 	  editrech int(2) NOT NULL,
 	  htmlcan int(2) NOT NULL,
+	  darf_pn int(5) NOT NULL,
 	  show_mail int(2) NOT NULL,
 	  birthday int(140) NOT NULL,
       PRIMARY KEY (id) );
@@ -373,7 +438,9 @@ switch($do){
 	  mysql_query("INSERT INTO config (erkennungscode, wert1, wert2, zahl1, zahl2) VALUES ('f2closefs', 'Allgemeine Arbeiten', '', '1', '0')");
 	  mysql_query("INSERT INTO config (erkennungscode, wert1, wert2, zahl1, zahl2) VALUES ('f2imgadfs', 'images/old_post.png', 'images/new_post.png', '3', '0')");
 	  mysql_query("INSERT INTO config (erkennungscode, wert1, wert2, zahl1, zahl2) VALUES ('f2laengfs', 'images/bfav.ico', 'brown', '10', '1')");
-	  mysql_query("INSERT INTO config (erkennungscode, wert1, wert2, zahl1, zahl2) VALUES ('f2adser2', 'kreis', '', '1', '0')");
+	  mysql_query("INSERT INTO config (erkennungscode, wert1, wert2, zahl1, zahl2) VALUES ('f2adser2', 'kreis', '', '0', '0')");
+	  mysql_query("INSERT INTO config (erkennungscode, wert1, wert2, zahl1, zahl2) VALUES ('f2mf2', '', '', '1', '0')"); // Für Forenstatistik, und ob das Forum(z1) den eMail-Versand(z2) unterstüzt. 1=Ja 0 = Nein
+	  mysql_query("INSERT INTO config (erkennungscode, wert1, wert2, zahl1, zahl2) VALUES ('f2bl2', '', '', '3', '20')"); // Benutzernamenlänge (w1) = Minimale Länge (w2) Maximale Länge
 	  mysql_query("INSERT INTO smilie (packet, images_path, abk1, abk2) VALUES ('1', 'brille.png', '8-)', '8)')");
 	  mysql_query("INSERT INTO smilie (packet, images_path, abk1, abk2) VALUES ('1', 'grine.png', ':)', ':-)')");
 	  mysql_query("INSERT INTO smilie (packet, images_path, abk1, abk2) VALUES ('1', 'lache.png', ':D', ':-D')");

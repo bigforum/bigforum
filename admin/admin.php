@@ -21,39 +21,12 @@ if($_SESSION["admin_login"] != "login_true")
   header("Location: index.php");
   exit;
 }
-echo "<title>$title</title>
-<style>
-body{
-background: #f2f2e5
-}
-.besch
-{
-  background: #DE8418;
-}
-.braun{
-  border: 1px solid #C37B18;
-}
-a:link
-{
-	color: #363636;
-}
-a:visited
-{
-	color: #363636;
-}
-a:hover, a:active
-{
-	color: #767676;
-}
-.navi
-{
-  background: #DE9C39;
-}
-.border
-{
-  border: 1px solid #DE9C39;
-}
-</style>";
+echo "<head>
+
+<title>$title</title>
+<link rel='stylesheet' type='text/css' href='style.css'>
+
+</head>";
 ?>
 <script>
 function info(text)
@@ -126,8 +99,17 @@ document.onkeypress=support;
 <?php } ?>
 </script>
 <?php
-echo "<table background=\"bgoben.png\" width=100%><tr><td><a href=?do=log_out>Aus Admin-Bereich ausloggen</a> | <a href='../index.php' target='_blank'>Foren-Übersicht</a><br>
-<center><h4><a href=\"admin.php\">Start</a> &nbsp; <a href=\"?do=ver_user\">Benutzer</a> &nbsp; <a href=\"?do=ver_foren\">Foren</a> &nbsp; <a href=\"?do=settings\">Einstellungen</a> &nbsp; <a href=?do=styles>Design</a></td></tr></table>";
+echo "<div align='right'>
+<b><font size=5>Administratoren-Kontrollzentrum</font></b><br>
+<p><a href=?do=log_out>Aus Admin-Bereich ausloggen</a> | <a href='../index.php' target='_blank'>Foren-Übersicht</a></p>
+</div>
+<a href=\"admin.php\" class=menulink>Start</a> &nbsp; <a href=\"?do=ver_user\" class=menulink>Benutzer</a> &nbsp; <a href=\"?do=ver_foren\" class=menulink>Foren</a> &nbsp; <a href=\"?do=settings\" class=menulink>Einstellungen</a> &nbsp; <a href='?do=styles' class=menulink>Design</a>";
+$add_data = mysql_query("SELECT * FROM addons WHERE admin_link != ''");
+$ad = mysql_fetch_object($add_data);
+if(mysql_num_rows($add_data) != "0")
+{
+  echo "&nbsp; <a href=?do=ver_mods class=menulink>Addons</a>";
+}
 $sons = array("?do=settings|Foren-Einstellungen","?do=settings_admincp|Kontrollzentrum-Einstellungen","?do=look_logs|Log-Einträge","?do=mods|Mods/Addons Verwaltung","?do=new_warn|Verwarnungsgründe","?do=adser|Adserver","?do=not_use|Benutzernamen / eMail-Adressen verbieten", "?do=rundbrief| Rundbrief schreiben");
 $for = array("?do=new_foren|Neues Forum","?do=ver_foren|Verwalte Foren");
 $user = array("?do=sper_user|Gesperrte","?do=ver_user|Benutzer suchen","?do=recht| Administratoren-Rechte","?do=zuruck|Rechte zurücksetzen");
@@ -158,10 +140,38 @@ switch ($do) {
   break;
   
   
+  case "ver_mods":
+    $add_data = mysql_query("SELECT * FROM addons WHERE admin_link != ''");
+	$mods = array();
+	while($ad = mysql_fetch_object($add_data))
+	{
+	   $mods[] = "?do=ver_mods&id=$ad->admin_link|$ad->kurz";
+	}
+	left_table($mods);
+    if($_GET["id"] != "")
+	{
+	  $path = "../includes/plugins/$_GET[id]";
+	  include($path);
+	  plugin_admin();
+	  exit;
+	}
+
+	echo "Hier in diesem Bereich ist es möglich Addons zu Verwalten.<br> um welche zu installieren musst du <a href=?do=mods>hier</a> klicken.<br><br>Addons findest du bspw. im <a href=http://www.bfs.kilu.de target=_blank>Support-Forum</a>";
+  break;
+  
+  
   case "mods":
   admin_recht("4");
   left_table($sons);
   //Mods die die funktion Admin beeinhalten
+  if($_GET["aktion"] == "install")
+  {
+    $path = "../includes/plugins/$_GET[datei]";
+    include($path);
+    plugin_install($kurzc, $_GET["datei"]);
+    echo "Danke, der Mod wurde erfolgreich installiert.";
+    exit;
+  }
   $mod = array("rules.php","last_posts.php","chat.php","addon_basic_modul.php");
   $laeng = count($mod);
   $x = "0";
@@ -179,6 +189,29 @@ switch ($do) {
 	$x = "5";
 	}
   }
+  $handle = opendir ("../includes/plugins");
+  while ($datei = readdir ($handle)) {
+    if($datei != "." AND $datei != ".." AND $datei != "...")
+    {
+	  $path = "../includes/plugins/$datei";
+	  $short = str_replace(".php","",$datei);
+	  include($path);
+	  echo "<fieldset><legend>$name_plug</legend>
+	  Bitte wähle eine der folgende Aktion aus, was mit dem Addon passieren soll:<br><br>";
+	  $add_data = mysql_query("SELECT * FROM addons WHERE kurz = '$kurzc'");
+      $ad = mysql_fetch_object($add_data);
+	  if(mysql_num_rows($add_data) == "0")
+	  {
+	    echo "<a href=?do=mods&aktion=install&datei=$datei>Aktivieren & installieren</a>";
+	  }
+	  else
+	  {
+	    echo "Plugin ist bereits aktiviert.";
+	  }
+	  echo "</fieldset>";
+	  $x++;
+    }
+  }
   if($x == "0")
   {
     echo "Keine Mods installiert, oder keine unterstützten eine Verwaltung über das Admincp.";
@@ -191,7 +224,10 @@ switch ($do) {
   admin_recht("3");
   if($_GET["action"] == "insert")
   {
-    mysql_query("UPDATE config SET wert2 = '$_POST[link]' WHERE erkennungscode LIKE 'f2closefs'");
+    $config_data = mysql_query("SELECT * FROM config WHERE erkennungscode LIKE 'f2closefs'");
+    $cd = mysql_fetch_object($config_data);
+	$hl = "$cd->wert2 | $_POST[link]";
+    mysql_query("UPDATE config SET wert2 = '$hl' WHERE erkennungscode LIKE 'f2closefs'")or die(mysql_error());
 	echo "<b>Information:</b> Der Header-Link wurde erfolgreich überarbeitet.";
   }
   if($_GET["action"] == "noti")
@@ -199,15 +235,62 @@ switch ($do) {
     mysql_query("UPDATE users SET notice = '$_POST[noti]'");
 	echo "<b>Information:</b> Die Benutzernotizen wurden erfolgreich überarbeitet."; 
   }
+  if($_GET["action"] == "del_link")
+  {
+    $config_data = mysql_query("SELECT * FROM config WHERE erkennungscode LIKE 'f2closefs'");
+    $cd = mysql_fetch_object($config_data);
+    $links = explode("|", $cd->wert2);
+	$up = $cd->wert2;
+    $up = str_replace($links[$_GET["id"]],"",$up);
+	$up = str_replace(" |","", $up);
+	mysql_query("UPDATE config SET wert2 = '$up' WHERE erkennungscode LIKE 'f2closefs'")or die(mysql_error());
+    echo "Danke, wurde gelöscht.";
+    exit;
+  }
   $config_data = mysql_query("SELECT * FROM config WHERE erkennungscode LIKE 'f2closefs'");
   $cd = mysql_fetch_object($config_data);
-  echo "<fieldset><legend>Link in die Navigation</legend>
-  Hier kannst du einen weiteren individuellen Link in der Navigation hinzufügen, ob fett, ob in einem neuem Fenster, es steht alles frei. Du kannst nur diesen Link in die Navi machen, d.h. wenn das Textfeld leer ist, wird auch kein Link angezeigt. Bitte verwende HTML, also:<br> <i>&#60;a href=http://blablabla.de target=_blank&#62;Angezeigter Text&#60;/a&#62;</i>:<br>
+  // $cd->wert2 => NaviLinks
+  echo "
+  <script>
+  function new_link()
+  {
+    x = prompt('Bitte gebe die Link-Adresse ein:','http://');
+	y = prompt('Bitte gebe den Titel an:','');
+	z = confirm('Soll es sich in einem neuem Fenster öffnen (OK) oder in diesem bleiben (Abbrechen)','')
+	a = '<a href=\"'+x+'\"'
+	if(z == true)
+	{
+	  a += ' target=_blank';
+	}
+	a += '>'+y+'</a>'
+	document.feld.link.value = a;
+  }
+  </script>
+  <fieldset><legend>Link in die Navigation</legend>
+  Hier kannst du einen neuen Link zur Navigation hinzufügen, bitte drücke dazu auf \"Link hinzufügen\". Bitte nur Links angeben und keine Tabellen etc. Pro 'Bestätigen Drücken' bitte nur einen Link. Drücke anschließend bitte bestätigen.<br>
   <form action=?do=design&action=insert method=post name=feld>
-  <input type=text name=link value='$cd->wert2' size=40><input type=submit value=Bestätigen><input type=button value='Textfeld leeren' onclick=\"feld.link.value=''\">
-  </form>
-  </fieldset>
+  <input type=text name='link' size=40><input type=submit value='Bestätigen'><input type=button onclick=new_link() value='Link hinzufügen'>
+  </form>";
+  $links = explode("|", $cd->wert2);
+  for($c=0;$c<count($links);$c++)
+  {
+    if($links[$c] != "" AND $links[$c] != " ")
+	{
+      $l = $links[$c];
+	  $l = str_replace("<td>","",$l);
+      $l = str_replace("</td>","",$l);
+	  $l = str_replace("<tr>","",$l);
+      $l = str_replace("</tr>","",$l);
+	  $l = str_replace("|","",$l);
+      echo "$l <a href=?do=design&action=del_link&id=$c>(Löschen)</a><br>";
+	}
+  }
+  echo "  </fieldset>
+  
+  
   <br>
+  
+  
   <fieldset><legend>Header-Anzeige</legend>Hier kannst du eine Nachricht eingeben, welche bei <u>allen</u> Benutzern angezeigt wird. Sollte ein User eine alte Header-Notiz haben, wird diese mit dieser überschrieben.<br>
   Die Benutzer können die Header-Notiz, genauwie eine persönliche Notiz, über den Persönlichen Bereich ausbleden. Bei der Userverwaltung kannst Du sehen, was ein Benutzer im Header stehen hat.<br>
   <form action=?do=design&action=noti method=post>
@@ -615,11 +698,21 @@ switch ($do) {
 	  $gpackt = "images/braun_neu.png";
 	  $number = "4";
 	}
+	if($_POST["grafp"] == "pack5")
+	{
+	  $gpack = "images/old_red.png";
+	  $gpackt = "images/new_green.png";
+	  $number = "5";
+	}
 	$config_wert = mysql_query("SELECT * FROM config WHERE erkennungscode LIKE 'f2laengfs'");
     $con = mysql_fetch_object($config_wert); 
 	if($_POST["styl"] != $con->wert2)
 	{
 	  mysql_query("UPDATE users SET style = '$_POST[styl]'");
+	}
+	if($_POST["logo"] == "other")
+	{
+	  $_POST["logo"] = $_POST["logon"];
 	}
     check_data($_POST["fn"], "", "Bitte gebe einen Forum-Name ein.", "leer");
 	check_data($_POST["besch"], "", "Bitte gebe einen Foren-Beschreibung ein.", "leer");
@@ -628,8 +721,10 @@ switch ($do) {
     mysql_query("UPDATE config SET wert2 = '$_POST[logo]', zahl1 = '$_POST[sign]', zahl2 = '$_POST[pn]' WHERE erkennungscode LIKE 'f2pnsignfs'");
     mysql_query("UPDATE config SET wert1 = '$gpack', wert2 = '$gpackt', zahl1 = '$number' WHERE erkennungscode LIKE 'f2imgadfs'");   
     mysql_query("UPDATE config SET wert1 = '$_POST[clos_text]', zahl1 = '$_POST[close]' WHERE erkennungscode LIKE 'f2closefs'");   
+    mysql_query("UPDATE config SET zahl1 = '$_POST[fstat]', zahl2 = '$_POST[email]' WHERE erkennungscode LIKE 'f2mf2'");   //Forenstat/Mail
     mysql_query("UPDATE config SET wert1 = '$_POST[bfav]', wert2 = '$_POST[styl]', zahl1 = '7', zahl2 = '$_POST[smilie]' WHERE erkennungscode LIKE 'f2laengfs'");   
     mysql_query("UPDATE config SET wert1 = '$_POST[st]', zahl2 = '$_POST[pro]' WHERE erkennungscode LIKE 'f2profs'");   
+	mysql_query("UPDATE config SET zahl1 = '$_POST[bmin]', zahl2 = '$_POST[bmax]' WHERE erkennungscode LIKE 'f2bl2'");   //Benutzername (minimal/maximal)
 	echo "Danke, die Foreneinstellungen wurden geändert!";
 	insert_log("Die Foreneinstellungen wurden überarbeitet.");
 	exit;
@@ -659,19 +754,23 @@ switch ($do) {
   $con = mysql_fetch_object($config_wert);
   if($con->zahl1 == "1")
   {
-    $pack = "<option value=pack1 >Packet 1 - Buchstaben</option><option value=pack2>Packet 2 - Runde Buttons</option><option value=pack3 >Packet 3 - Eckige Farbige Buttons</option><option value=pack4 >Packet 4 - Braune Eckige Buttons (Papier)</option>";
+    $pack = "<option value=pack1 >Packet 1 - Buchstaben</option><option value=pack5 >Packet 5 - Sprechblasen Grün/Rot</option><option value=pack2>Packet 2 - Runde Buttons</option><option value=pack3 >Packet 3 - Eckige Farbige Buttons</option><option value=pack4 >Packet 4 - Braune Eckige Buttons (Papier)</option>";
   }
   if($con->zahl1 == "2")
   {
-    $pack = "<option value=pack2 >Packet 2 - Runde Buttons</option><option value=pack1 >Packet 1 - Buchstaben</option><option value=pack4 >Packet 4 - Braune Eckige Buttons (Papier)</option><option value=pack3 >Packet 3 - Eckige Farbige Buttons</option>";
+    $pack = "<option value=pack2 >Packet 2 - Runde Buttons</option><option value=pack5 >Packet 5 - Sprechblasen Grün/Rot</option><option value=pack1 >Packet 1 - Buchstaben</option><option value=pack4 >Packet 4 - Braune Eckige Buttons (Papier)</option><option value=pack3 >Packet 3 - Eckige Farbige Buttons</option>";
   }
   if($con->zahl1 == "3")
   {
-    $pack = "<option value=pack3 >Packet 3 - Eckige Farbige Buttons</option><option value=pack4 >Packet 4 - Braune Eckige Buttons (Papier)</option><option value=pack1 >Packet 1 - Buchstaben</option><option value=pack2 >Packet 2 - Runde Buttons</option>";
+    $pack = "<option value=pack3 >Packet 3 - Eckige Farbige Buttons</option><option value=pack5 >Packet 5 - Sprechblasen Grün/Rot</option><option value=pack4 >Packet 4 - Braune Eckige Buttons (Papier)</option><option value=pack1 >Packet 1 - Buchstaben</option><option value=pack2 >Packet 2 - Runde Buttons</option>";
   }
   if($con->zahl1 == "4")
   {
-    $pack = "<option value=pack4 >Packet 4 - Braune Eckige Buttons (Papier)</option><option value=pack3 >Packet 3 - Eckige Farbige Buttons</option><option value=pack1 >Packet 1 - Buchstaben</option><option value=pack2 >Packet 2 - Runde Buttons</option>";
+    $pack = "<option value=pack4 >Packet 4 - Braune Eckige Buttons (Papier)</option><option value=pack5 >Packet 5 - Sprechblasen Grün/Rot</option><option value=pack3 >Packet 3 - Eckige Farbige Buttons</option><option value=pack1 >Packet 1 - Buchstaben</option><option value=pack2 >Packet 2 - Runde Buttons</option>";
+  }
+  if($con->zahl1 == "5")
+  {
+    $pack = "<option value=pack5 >Packet 5 - Sprechblasen Grün/Rot</option><option value=pack4 >Packet 4 - Braune Eckige Buttons (Papier)</option><option value=pack3 >Packet 3 - Eckige Farbige Buttons</option><option value=pack1 >Packet 1 - Buchstaben</option><option value=pack2 >Packet 2 - Runde Buttons</option>";
   }
   echo" ></td></tr>
   <tr><td>Information:</td><td> <span id=info></span> </td></tr>
@@ -703,10 +802,31 @@ switch ($do) {
 	  	echo "<option value='$sd->sname'>$sd->sname</option>";
 	  }
 	}
+	if(WERTZ == "images/logo_new.png")
+	{
+	  $logo = "<input type=radio name=logo value=images/logo_new.png checked>Alternatives Logo<br>
+	  <input type=radio name=logo value=images/bf_stars.png>Logo mit Sternen<br>
+	  <input type=radio name=logo value=other>Anderer<br>
+	  <input type=text name=logon value=''>";
+	}
+	if(WERTZ == "images/bf_stars.png")
+	{
+	  $logo = "<input type=radio name=logo value=images/logo_new.png>Alternatives Logo<br>
+	  <input type=radio name=logo value=images/bf_stars.png checked>Logo mit Sternen<br>
+	  <input type=radio name=logo value=other>Anderer<br>
+	  <input type=text name=logon value=''>";
+	}
+	else
+	{
+	  $logo = "<input type=radio name=logo value=images/logo_new.png>Alternatives Logo<br>
+	  <input type=radio name=logo value=images/bf_stars.png>Logo mit Sternen<br>
+	  <input type=radio name=logo value=other checked>Anderer<br>
+	  <input type=text name=logon value ='". WERTZ ."'>";
+	}
   echo"</select>
   <tr><td> &nbsp; </td><td> &nbsp; </td></tr>  
   <tr><td> Bild-Adresse für Forum-Favicon </td><td> <input type=text name=bfav value=$con->wert1> </td></tr>  
-  <tr><td> Bild-Adresse für Forum-Logo</td><td><input type=text name=logo value='". WERTZ ."'></td></tr>
+  <tr><td> Bild-Adresse für Forum-Logo</td><td>$logo</td></tr>
   <tr><td> &nbsp; </td><td> &nbsp; </td></tr>  ";
   $config_wert = mysql_query("SELECT * FROM config WHERE erkennungscode LIKE 'f2profs'");
   $con = mysql_fetch_object($config_wert); 
@@ -736,12 +856,37 @@ switch ($do) {
   {
       $stad = "<input type=radio name=diagr value=kreis>Kreisdiagramm <input type=radio name=diagr value=balken checked>Balkendiagramm ";
   }
+  $config_wert = mysql_query("SELECT * FROM config WHERE erkennungscode LIKE 'f2mf2'");
+  $con = mysql_fetch_object($config_wert); 
+  if($con->zahl1 == "1")
+  {
+    $fstat = "<input type=radio name=fstat value=1 checked>Ja <input type=radio name=fstat value=0>Nein ";
+  }
+  else
+  {
+    $fstat = "<input type=radio name=fstat value=1>Ja <input type=radio name=fstat value=0 checked>Nein ";
+  }
+  if($con->zahl2 == "1")
+  {
+    $email = "<input type=radio name=email value=1 checked>Ja <input type=radio name=email value=0>Nein ";
+  }
+  else
+  {
+    $email = "<input type=radio name=email value=1>Ja <input type=radio name=email value=0 checked>Nein ";
+  }
+  $config_wert = mysql_query("SELECT * FROM config WHERE erkennungscode LIKE 'f2bl2'");
+  $con = mysql_fetch_object($config_wert); 
   echo "
   <tr><td>Gäste dürfen Profile sehen?</td><td>$prof_pack</td></tr>
   <tr><td>Zeige erweiterte Statistik auf der Startseite?</td><td>$st</td></tr>
   <tr><td> &nbsp; </td><td> &nbsp </td></tr>
+  <tr><td> Minimale Benutzernamenlänge </td><td> <input type=text name=bmin value='$con->zahl1'> </td></tr>
+  <tr><td> Maximale Benutzernamenlänge </td><td> <input type=text name=bmax value='$con->zahl2'> </td></tr>
+  <tr><td> &nbsp; </td><td> &nbsp </td></tr>
   <tr><td>Anzeige der Statistik-Diagramme</td><td>$stad</td></tr>
-  <tr><td> &nbsp; </td><td> &nbsp </td></tr>";
+  <tr><td> &nbsp; </td><td> &nbsp </td></tr>
+  <tr><td>Anzeige der 'Du darfst..'-Regeln bei der Forenübersicht</td><td>$fstat</td></tr>
+  <tr><td>eMail-Versand vom Forum aus?</td><td>$email</td></tr>  <tr><td> &nbsp; </td><td> &nbsp </td></tr>";
   
   $config_wert = mysql_query("SELECT * FROM config WHERE erkennungscode LIKE 'f2closefs'");
   $con = mysql_fetch_object($config_wert); 
@@ -842,7 +987,7 @@ switch ($do) {
 	  }
 	  else
 	  {
-	    mysql_query("INSERT INTO foren (name, besch, kate, guest_see, min_posts, admin_start_thema, user_posts, sort, beitrag_plus) VALUES ('$_POST[fname]', '$_POST[besch]', '$_POST[kat]', '$_POST[guest]', '$_POST[min_post]', '$_POST[admin]', '$_POST[ansus]', '$_POST[sort]', '$_POST[hoch])");
+	    mysql_query("INSERT INTO foren (name, besch, kate, guest_see, min_posts, admin_start_thema, user_posts, sort, beitrag_plus) VALUES ('$_POST[fname]', '$_POST[besch]', '$_POST[kat]', '$_POST[guest]', '$_POST[min_post]', '$_POST[admin]', '$_POST[ansus]', '$_POST[sort]', '$_POST[hoch]')") or die(mysql_error());
 	    echo "Das Forum wurde hinzugefügt.";
 		insert_log("Es wurde ein neues Forum hinzugefügt");
 	  }
@@ -1224,6 +1369,8 @@ switch ($do) {
 	}
 	$data_hol = mysql_query("SELECT * FROM users WHERE $time < last_log AND posts >= $posts");
 	$usernamen = array("");
+	$user_data = mysql_query("SELECT * FROM users WHERE username LIKE '". USER ."'");
+    $ud = mysql_fetch_object($user_data);
 	while($dh = mysql_fetch_object($data_hol))
 	{
 	  $time = time();
@@ -1233,7 +1380,22 @@ switch ($do) {
 	  $tit = $_POST["tit"];
 	  $tit = str_replace("[USERNAME]", $dh->username, $tit);
 	  $tit = str_replace("[BEITRAEGE]", $dh->posts, $tit);
-	  mysql_query("INSERT INTO prna (abse, emp, dat, betreff, mes, gel) VALUES ('". USER . "', '$dh->username', '$time', '$tit', '$mes', '0')")or die(mysql_error());
+	  if($_POST["send_by"] == "pn")
+	  {
+	    mysql_query("INSERT INTO prna (abse, emp, dat, betreff, mes, gel) VALUES ('". USER . "', '$dh->username', '$time', '$tit', '$mes', '0')")or die(mysql_error());
+	  }
+	  elseif($_POST["send_by"] == "mail")
+	  {
+	    $mail_empfaenger= $dh->mail;
+        $mail_absender= $ud->mail;
+        $betreff= $tit;
+        $header  = "MIME-Version: 1.0\r\n";
+        $header .= "Content-type: text/html; charset=iso-8859-1\r\n";
+        $header .= "From: $mail_absender\r\n";
+        $header .= "Reply-To: $mail_empfaenger\r\n";
+        $text = $mes;
+        mail($mail_empfaenger, $betreff, $text, $header);
+	  }
 	  $usernamen[] = $dh->username;
 	}
 	$user = count($usernamen);
@@ -1257,7 +1419,15 @@ switch ($do) {
 	<tr><td>[BEITRAEGE]</td><td>Zeigt die Beiträge des Benutzers an</td></tr>
 	</table><br><br>
 	<form action=?do=sendbrief method=post>
-	<small>Titel:</small><br>
+	<small>Senden per:</small><br>
+	<select name=send_by><option value=pn>Privaten Nachricht</option>";
+	$config_datad = mysql_query("SELECT * FROM config WHERE erkennungscode LIKE 'f2mf2'");
+    $cdd = mysql_fetch_object($config_datad);
+    if($cdd->zahl2 == "1")
+    {
+	  echo "<option value=mail>eMail</option>";
+	}
+	echo "</select><br><small>Titel:</small><br>
 	<input type=text name=tit size=50><br><br>
 	<small>Nachricht:</small><br>
 	<textarea rows=5 cols=50 name=mes></textarea><br><br>
@@ -1277,7 +1447,7 @@ switch ($do) {
     left_table($design);
     echo "<table class='braun'><tbody><tr class='besch'><td><b>Style-Verwaltung</b></td></tr><tr><td>
 	<table>
-	<tr><td><b>Style-Name</b></td><td><b>Stylelink</b></td><td><b>Aktion></b></td></tr>";
+	<tr><td><b>Style-Name</b></td><td><b>Stylelink</b></td><td><b>Aktion</b></td></tr>";
     $style_data = mysql_query("SELECT * FROM style_all");
 	while($sd = mysql_fetch_object($style_data))
 	{

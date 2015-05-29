@@ -76,7 +76,17 @@ Willkommen, <span style="cursor: pointer;" onclick="window.location.href='profil
 <p></p><form action="login.php?do=login" method="post"><table>
 <tr><td>Benutzername:</td><td><input type="text" name="user"></td></tr>
 <tr><td>Passwort:</td><td><input type="password" name="pw"></td></tr>
-</table><input type=submit value="Login"></form><?php 
+</table><input type=submit value="Login"></form>
+<br>
+<?php
+$config_data = mysql_query("SELECT * FROM config WHERE erkennungscode LIKE 'f2mf2'");
+$cd = mysql_fetch_object($config_data);
+if($cd->zahl2 == "1")
+{
+?>
+<a href="misc.php?aktion=lost_pw">Passwort vergessen</a>
+<?php 
+}
 }
 
  else {
@@ -92,7 +102,10 @@ Willkommen, <span style="cursor: pointer;" onclick="window.location.href='profil
   }
   $time = time();
   $us_ver = mysql_query("SELECT * FROM user_verwarn WHERE user_id LIKE '$ud->id' AND dauer > '$time'");
-  echo "<br><br><b>Aktive Verwarnungen:</b> ". mysql_num_rows($us_ver) ."";
+  if(mysql_num_rows($us_ver) != "0")
+  {
+    echo "<br><br><b>Aktive Verwarnungen:</b> ". mysql_num_rows($us_ver) ."";
+  }
 $config_datas = mysql_query("SELECT * FROM config WHERE erkennungscode LIKE 'f2pnsignfs'");
 $cd = mysql_fetch_object($config_datas);
  }
@@ -116,7 +129,10 @@ $config_data = mysql_query("SELECT * FROM config WHERE erkennungscode LIKE 'f2cl
 $cd = mysql_fetch_object($config_data);
 if($cd->wert2 != "")
 {
-  echo "<td>$cd->wert2</td>";
+  $links = $cd->wert2;
+  $links = str_replace("||","",$links);
+  $links = str_replace("|","</td><td>",$links);
+  echo "$links </td>";
 }
 if(GROUP == "3") echo "<td><a href=admin/><b>Administrator-Kontrollzentrum</b></a></td>"; 
 

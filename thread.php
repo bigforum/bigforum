@@ -67,12 +67,34 @@ xmlhttp.send(null);
 
 <?php
 }
+if($_GET["do"] == "del_post")
+{
+	  echo "<fieldset>
+	  <legend>Beitrag löschen</legend>
+	  Möchtest du den Beitrag wirklich löschen?<br>
+	  <form action=?id=$_GET[id]&do=del&bid=$_GET[bid] method=post>
+	  <input type=radio name=del value=1 checked>Beitrag wiederherstellbar löschen";
+	  if(GROUP == 3)
+	  {
+	    echo "<br><input type=radio name=del value=2>Beitrag endgültig löschen";
+	  }
+	  echo "<br><input type=submit value='Beitrag löschen'></form>
+	  </fieldset>";
+	  page_footer();
+}
 if($_GET["do"] == "del")
 {
   $beitrag_data = mysql_query("SELECT * FROM beitrag WHERE id LIKE '$_GET[bid]'") or die(mysql_fehler(mysql_error(), __LINE__, $_SERVER["PHP_SELF"]));
   $bed = mysql_fetch_object($beitrag_data);
   mysql_query("UPDATE users SET posts = posts-1 WHERE username LIKE '$bed->verfas'");
-  mysql_query("UPDATE beitrag SET dele = '" . USER . "' WHERE id LIKE '$_GET[bid]'");
+  if($_POST["del"] == "1")
+  {
+    mysql_query("UPDATE beitrag SET dele = '" . USER . "' WHERE id LIKE '$_GET[bid]'");
+  }
+  if($_POST["del"] == "2")
+  {
+    mysql_query("DELETE FROM beitrag WHERE id LIKE '$_GET[bid]'");
+  }
 }
 if($id != "")
 {
@@ -95,6 +117,10 @@ if($id != "")
   }
   $thema_data = mysql_query("SELECT * FROM thema WHERE id LIKE '$id'");
   $td = mysql_fetch_object($thema_data);  
+  if($td->text == "" AND $td->tit == "")
+  {
+    erzeuge_error("Dieses Thema exestiert nicht.<br> Solltest du einem Link gefolgt sein, so wende dich bitte an den Administrator.");
+  }
 
   
   if($_GET["do"] == "change")
@@ -333,7 +359,7 @@ while($bd = mysql_fetch_object($bei_dat))
     {
       if($td->dele == "" AND $bd->dele == "")
       {
-        $mod_funk = "<td align=right valign=right><a href=edit.php?id=$bd->id><img src=images/edit.png width=30% height=50% border=0></a><a href=javascript:del($bd->id)><img src=images/del.png width=30% height=50% border=0></a></td>";
+        $mod_funk = "<td align=right valign=right><a href=edit.php?id=$bd->id><img src=images/edit.png width=30% height=50% border=0></a><a href=?id=$_GET[id]&do=del_post&bid=$bd->id><img src=images/del.png width=30% height=50% border=0></a></td>";
       }
     }
 	if($bd->dele != "")
