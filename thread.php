@@ -86,7 +86,14 @@ if($_GET["do"] == "del")
 {
   $beitrag_data = mysql_query("SELECT * FROM beitrag WHERE id LIKE '$_GET[bid]'") or die(mysql_fehler(mysql_error(), __LINE__, $_SERVER["PHP_SELF"]));
   $bed = mysql_fetch_object($beitrag_data);
-  mysql_query("UPDATE users SET posts = posts-1 WHERE username LIKE '$bed->verfas'");
+  $thema_data = mysql_query("SELECT * FROM thema WHERE id LIKE '$id'");
+  $td = mysql_fetch_object($thema_data);  
+  $forum_data = mysql_query("SELECT * FROM foren WHERE id LIKE '$td->where_forum'");
+  $fd = mysql_fetch_object($forum_data);
+  if($fd->beitrag_plus == "0")
+  {
+    mysql_query("UPDATE users SET posts = posts-1 WHERE username LIKE '$bed->verfas'");
+  }
   if($_POST["del"] == "1")
   {
     mysql_query("UPDATE beitrag SET dele = '" . USER . "' WHERE id LIKE '$_GET[bid]'");
@@ -114,7 +121,17 @@ if($id != "")
   if($_GET["do"] == "resbeitrag")
   {
     mysql_query("UPDATE beitrag SET dele = '' WHERE id LIKE '$_GET[bid]'");
-  }
+	$poster_beitrag = mysql_query("SELECT * FROM beitrag WHERE id LIKE '$_GET[bid]'");
+	$pb = mysql_fetch_object($poster_beitrag);
+    $thema_data = mysql_query("SELECT * FROM thema WHERE id LIKE '$id'");
+    $td = mysql_fetch_object($thema_data);  
+    $forum_data = mysql_query("SELECT * FROM foren WHERE id LIKE '$td->where_forum'");
+    $fd = mysql_fetch_object($forum_data);
+    if($fd->beitrag_plus == "0")
+    {
+	  mysql_query("UPDATE users SET posts = posts+1 WHERE username LIKE '$pb->verfas'");
+    }
+  }	
   $thema_data = mysql_query("SELECT * FROM thema WHERE id LIKE '$id'");
   $td = mysql_fetch_object($thema_data);  
   if($td->text == "" AND $td->tit == "")

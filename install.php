@@ -43,7 +43,7 @@ switch($do){
     //Auswahl wie man updaten möchte
     echo "Bitte wähle aus, welche Version du hast, also von welcher du auf die neuste Updaten möchtest.<br><br>
 	<form action=?do=update_query method=post>
-	<select name=vers><option value=2>Von 4.7 auf 5.0 updaten*</option><option value=1>Von 4.8 auf 5.0 updaten</option></select>
+	<select name=vers><option value=2>Von 4.7 auf 5.1 updaten*</option><option value=1>Von 4.8 auf 5.1 updaten</option></select>
 	<br><br>
 	<input type=submit class=install_button value='Forum updaten'><br><br><br>
 	* <b>Wichtig:</b> Bei Sprüngen bei den Updates müssen die Datein hochgeladen werden, die Installation macht lediglich die Eintragungen in die Datenbank. Oder man lädt sich die Komplettversion der aktuellsten Version hoch, ganz wichtig aber, ohne die <i> config.php </i>.
@@ -95,7 +95,7 @@ switch($do){
 	$schritte++;
 	if($schritte == $_POST["vers"])
 	{
-      echo "Danke, das Forum wurde erfolgreich auf ". VERSION ." geupdatet.<br><br>
+      echo "Danke, du hast das Forum erfolgreich geupdatet..<br><br>
 	  Sollten Fragen und/oder Probleme auftreten, bitte im <a href=www.bfs.kilu.de>Support-Forum</a> nachfragen.";
 	}
 	else

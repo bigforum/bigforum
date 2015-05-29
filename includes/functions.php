@@ -12,13 +12,13 @@ function page_header()
   config("f2name2", true, "function_define");
   if(str_replace("kilu", "", $HTTP_REFERER))
   {
-    include_once("includes/function_user.php");
+    include("includes/function_user.php");
   }
   else
   {
     include_once("includes/function_user.php"); 
   }
-  include_once("style/header.php");   
+  include("style/header.php");   
 }
 function page_close_table()
 {
@@ -27,7 +27,7 @@ function page_close_table()
 }
 function page_footer()
 {
-  include_once("style/footer.php");
+  include("style/footer.php");
   exit;
 }
 function check_text()
@@ -204,7 +204,7 @@ function looking_page($wo)
     $proid = mysql_query("SELECT * FROM users WHERE id LIKE '$_GET[id]'");
 	$pi = mysql_fetch_object($proid);
     $page = "profil.php";
-	$text = "Betrachtet das Benutzerprofi von $pi->username";
+	$text = "Betrachtet das Benutzerprofil von $pi->username";
   }
   if($wo == "main")
   {
@@ -358,15 +358,15 @@ function erzeuge_mysql_error($text)
 function connect_to_database()
 {
 
-  include_once("includes/function_define.php");
-  include_once("config.php");
+  include("includes/function_define.php");
+  include("config.php");
 
   mysql_connect($HOST,$USER,$PW)or die(mysql_error());
   mysql_select_db($DB)or die(mysql_error());
 }
 function backup()
 {
-  include_once("../config.php");
+  include("../config.php");
   $time = date("dMY", time());
   system(" -u$USER -p$PW -h $HOST $DB > ".dirname(__FILE__)."/backup_$time.sql", $fp); 
 }
@@ -374,11 +374,11 @@ function config($erken, $clude_true, $what)
 {
   if($clude_true == false)
   {
-    include_once("../config.php");
+    include("../config.php");
   }
   else
   {
-    include_once("./config.php");
+    include("./config.php");
   }
 
   mysql_connect($HOST,$USER,$PW)or die(mysql_error());
@@ -392,11 +392,11 @@ function config($erken, $clude_true, $what)
   if($what != "")
   {
     $clude_path = "$what.php";
-    include_once($clude_path);
+    include($clude_path);
   }
   if($clude_true == false)
   {
-    include_once("../includes/function_user.php");
+    include("../includes/function_user.php");
   }
 }
 function check_data($wert1, $wert2, $fehlertext, $method)
@@ -464,7 +464,7 @@ function login()
   include_once("function_user.php");
   if(USER == "")
   {
-    include_once("login.php");
+    include("login.php");
     exit;
   }
 }

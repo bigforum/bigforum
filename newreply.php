@@ -78,7 +78,7 @@ if($ac == "" AND GROUP > 0)
     <table width=70%><tr class=dark><td><font color=snow><b>Auf ein Thema antworten</b></font></td></tr></table><table width=70% class=editorbg><tr><td>";
     editor("ant","","?id=$_GET[id]");
     echo "</table><br>";
-	$ant_sear = mysql_query("SELECT * FROM beitrag WHERE where_forum LIKE '$_GET[id]' ORDER BY id DESC LIMIT 5");
+	$ant_sear = mysql_query("SELECT * FROM beitrag WHERE where_forum LIKE '$_GET[id]' AND dele = '' ORDER BY id DESC LIMIT 5");
 	$antwort = mysql_num_rows($ant_sear);
 	/*echo "<table width=70%><tr class=dark><td><font color=snow><b>Letzten $antwort Antworten</b></font></td></tr></table>
 	<table width=70% class=editorbg><tr><td class=editorbg><b>Username</b></td><td class=editorbg><b>Nachricht</b></td></tr>";*/
@@ -101,7 +101,7 @@ if($ac == "" AND GROUP > 0)
     <table width=70%><tr class=dark><td><font color=snow><b>Auf ein Thema antworten</b></font></td></tr></table><table width=70% class=editorbg><tr><td>";
     editor("ant","","?id=$_GET[id]");
     echo "</table><br>";    
-	$ant_sear = mysql_query("SELECT * FROM beitrag WHERE where_forum LIKE '$_GET[id]' ORDER BY id DESC LIMIT 5");
+	$ant_sear = mysql_query("SELECT * FROM beitrag WHERE where_forum LIKE '$_GET[id]' AND dele = '' ORDER BY id DESC LIMIT 5");
 	echo "<table width=70%><tr class=dark><td><font color=snow><b>Letzte Antworten</b></font></td></tr></table><table width=87%><tr><td>";
 	while($aa = mysql_fetch_object($ant_sear))
 	{
