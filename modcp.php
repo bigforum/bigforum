@@ -8,6 +8,8 @@ $tab = "</td></tr></table>";
 if(GROUP != "3" AND GROUP != "2")
 {
   echo "Ein Zugriff auf das Moderatoren-Kontrollzentrum ist nur für Moderatoren möglich!";
+  page_footer();
+  exit;
 }
 ?>
 <table width="100%">
