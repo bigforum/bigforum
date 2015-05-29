@@ -431,7 +431,7 @@ if($do == "read_pn" AND $ac != "")
   {
     erzeuge_error("Angegebene Nachricht exestiert leider nicht. Bitte überprüfe, ob du einen richtigen Link angegeben hast.");
   }
-  if($pr->emp == USER)
+  if(strtolower($pr->emp) == strtolower(USER))
   {
     mysql_query("UPDATE prna SET gel = '1' WHERE id LIKE '$ac'");
   }

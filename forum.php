@@ -135,7 +135,7 @@ if($fd->min_posts != "0")
 {
   if(USER != "")
   {
-    if($fd->min_posts >= $ud->posts)
+    if($fd->min_posts > $ud->posts)
     {
       $how = $fd->min_posts - $ud->posts;
       erzeuge_error("Leider hast du nicht genügend Beiträge. Dir fehlen noch $how Beiträge, um Zugriff auf das Forum zu bekommen.");
@@ -200,7 +200,7 @@ else
 
 echo "<table width=73% height=10% border=0 cellpadding=6 cellspacing=0><tr class=dark height=10%><td height=10%><font color=snow> <center> <b><big>$fd->name</big> - Themenübersicht</b> </center> </font></td></tr></table>";
 
-echo "<form method=post action=?id=$id&do=change><table width=73%><tr class=normal style='font-weight:bold;'><td width=3%></td><td width=40% valign=center>Title</td><td width=20% valign=center>Letzter Beitrag</td><td width=10% valign=center>Antworten</td></tr>";
+echo "<form method=post action=?id=$id&do=change><table width=73%><tr class=normal style='font-weight:bold;'><td width=3%></td><td width=40% valign=center>Titel</td><td width=20% valign=center>Letzter Beitrag</td><td width=10% valign=center>Antworten</td></tr>";
 
 while($thd = mysql_fetch_object($them_dat))
 {
