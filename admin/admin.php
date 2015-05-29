@@ -172,7 +172,7 @@ switch ($do) {
     echo "Danke, der Mod wurde erfolgreich installiert.";
     exit;
   }
-  $mod = array("rules.php","last_posts.php","chat.php","addon_basic_modul.php");
+  /*$mod = array("rules.php","last_posts.php","chat.php","addon_basic_modul.php");
   $laeng = count($mod);
   $x = "0";
   echo "Hier hast du eine Verwaltungsmöglichkeit, aller installierten Mods, dieses Systems. Sofern dieser Mod, es zuläßt sich über das Admincp verwalten zu lassen.<br>Der Titel ist gleichzeitig der Dateiname.php<br><br>";
@@ -188,7 +188,7 @@ switch ($do) {
 	echo "</fieldset>";
 	$x = "5";
 	}
-  }
+  }*/
   $handle = opendir ("../includes/plugins");
   while ($datei = readdir ($handle)) {
     if($datei != "." AND $datei != ".." AND $datei != "...")
