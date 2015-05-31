@@ -110,7 +110,7 @@ if(mysql_num_rows($add_data) != "0")
 {
   echo "&nbsp; <a href=?do=ver_mods class=menulink>Addons</a>";
 }
-$sons = array("?do=settings|Foren-Einstellungen","?do=settings_admincp|Kontrollzentrum-Einstellungen","?do=look_logs|Log-Einträge","?do=mods|Mods/Addons Verwaltung","?do=new_warn|Verwarnungsgründe","?do=adser|Adserver","?do=not_use|Benutzernamen / eMail-Adressen verbieten", "?do=rundbrief| Rundbrief schreiben");
+$sons = array("?do=settings|Foren-Einstellungen","?do=settings_admincp|Kontrollzentrum-Einstellungen","?do=raenge|Ränge-Einstellungen","?do=look_logs|Log-Einträge","?do=mods|Mods/Addons Verwaltung","?do=new_warn|Verwarnungsgründe","?do=adser|Adserver","?do=not_use|Benutzernamen / eMail-Adressen verbieten", "?do=rundbrief| Rundbrief schreiben");
 $for = array("?do=new_foren|Neues Forum","?do=ver_foren|Verwalte Foren");
 $user = array("?do=sper_user|Gesperrte","?do=ver_user|Benutzer suchen","?do=recht| Administratoren-Rechte","?do=zuruck|Rechte zurücksetzen");
 $start = array("admin.php|Start","?do=ver_check|Version-Check","?do=settings|Foren-Einstellungen","?do=look_logs|Log-Einträge ansehen","?do=new_foren|Neues Forum erstellen","?do=ver_user|Benutzer verwalten");
@@ -1505,6 +1505,49 @@ switch ($do) {
 	</table>
 	<input type=submit value=Hinzufügen>
 	</form>
+    </td></tr></table>";
+  break;
+  
+  
+  case "raenge":
+    left_table($sons);
+	if($_GET["aktion"] == "insert")
+	{
+	  if($_POST["name"] != "" AND $_POST["mpz"] != "")
+	  {
+	    mysql_query("INSERT INTO range (name, min_post) VALUES ('$_POST[name]', '$_POST[mpz]')");
+	    echo "Danke, der neue Rang wurde hinzugefügt und ist nun verfügbar.";
+	  }
+	  else
+	  {
+	    echo "Bitte gebe sowohl einen Rangnamen als auch die Mindestpostzahl an.";
+	  }
+	  exit;
+	}
+	if($_GET["delete"] != "")
+	{
+	  mysql_query("DELETE FROM range WHERE id LIKE '$_GET[delete]'");
+	  echo "Der Rang wurde erfolgreich gelöscht.";
+	  exit;
+	}
+	echo "<table class='braun' width=90%><tbody><tr class='besch'><td><b>Rang hinzufügen</b></td></tr><tr><td>
+    Hier kannst Du Ränge hinzufügen, gebe bitte den Rangnamen und die Mindestpostzahl an.<br><br>
+	<form action=?do=raenge&aktion=insert method=post>
+	<table>
+	<tr><td>Rangname:</td><td><input type=text name=name></td></tr>
+	<tr><td>Mindestpostzahl:</td><td><input type=text name=mpz></td></tr>
+	</table>
+	<input type=submit value=Hinzufügen>
+	</form>
+    </td></tr></table><br><br>
+	<table class='braun' width=90%><tbody><tr class='besch'><td><b>Ränge-Verwaltung</b></td></tr><tr><td>
+    <table><tr><td width=10%><b>Name</b></td><td width=5%><b>Beiträge</b></td><td width=5%><b>Aktion</b></td></tr>";
+	$rang_data = mysql_query("SELECT * FROM range");
+	while($rg = mysql_fetch_object($rang_data))
+	{
+	  echo "<tr><td>$rg->name</td><td>$rg->min_post</td><td><a href=?do=raenge&delete=$rg->id><img src=kreuz.gif border=0 title=Löschen></a></td></tr>";
+	}
+	echo "</table>
     </td></tr></table>";
   break;
 }

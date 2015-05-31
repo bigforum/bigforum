@@ -108,7 +108,7 @@ $ac = $_GET["action"];
 	
 	<table width=100%><tr style=font-weight:bold>
 	<td></td><td>Grund</td><td>Punkte</td><td>Dauer</td></tr>";
-	$gr_ho = mysql_query("SELECT * FROM verwarn_gruend ORDER BY punkte DESC");
+	$gr_ho = mysql_query("SELECT * FROM verwarn_gruend ORDER BY grund");
     while($gh = mysql_fetch_object($gr_ho))
     {
       $zeit = $gh->zeit;
@@ -142,7 +142,7 @@ $ac = $_GET["action"];
   <table width="100%"><tr><td class="bord" width="30%" valign=top style="padding: 5px; -moz-border-radius:15px;-khtml-border-radius:15px;">
   <b><?php echo $udp->username; echo "</b>  ";
   show_online($udp->last_log, $udp->username);
-  ?><br><?php echo $udp->rang; ?><br>
+  ?><br><?php show_rang($udp->posts, $udp->rang); ?><br>
   <?if($udp->ava_link != "")
   {
     echo "<img src=$udp->ava_link title=\"$udp->username's Avatar\" width=100 height=100>";

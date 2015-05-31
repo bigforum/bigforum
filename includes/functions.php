@@ -557,7 +557,9 @@ if(mysql_num_rows($from_data) > 0)
   show_online($fd->last_log, $fd->username);
 }
 echo "<br>
-$rang</br><br>
+";
+show_rang($fd->posts, $fd->rang);
+echo"</br><br>
 </td></tr></table>
 
 $beitr
@@ -929,6 +931,19 @@ $linie_b;
   }
   header("Content-type: image/gif");
   imagegif($bild);
+}
+function show_rang($post, $user_rang)
+{
+  if($user_rang != "Benutzer")
+  {
+    echo $user_rang;
+  }
+  else
+  {
+     $rang_hol =  mysql_query("SELECT * FROM range WHERE min_post <= '$post' ORDER BY min_post DESC LIMIT 1") or die(mysql_error());
+	 $rh = mysql_fetch_object($rang_hol);
+	 echo $rh->name;
+  }
 }
 // Ende der Funktionen, Abrufe wichtiger Arrays!
 $warn_dauer = Array("86400","172800","432000","604800","864000","1209600","2678400","5097600","15638400","31536000","63072000");

@@ -43,7 +43,7 @@ switch($do){
     //Auswahl wie man updaten möchte
     echo "Bitte wähle aus, welche Version du hast, also von welcher du auf die neuste Updaten möchtest.<br><br>
 	<form action=?do=update_query method=post>
-	<select name=vers><option value=2>Von 4.7 auf 5.1 updaten*</option><option value=1>Von 4.8 auf 5.1 updaten</option></select>
+	<select name=vers><option value=2>Von 4.8 auf 5.2 updaten*</option><option value=1>Von 5.0 auf 5.2 updaten</option></select>
 	<br><br>
 	<input type=submit class=install_button value='Forum updaten'><br><br><br>
 	* <b>Wichtig:</b> Bei Sprüngen bei den Updates müssen die Datein hochgeladen werden, die Installation macht lediglich die Eintragungen in die Datenbank. Oder man lädt sich die Komplettversion der aktuellsten Version hoch, ganz wichtig aber, ohne die <i> config.php </i>.
@@ -58,8 +58,6 @@ switch($do){
     mysql_select_db($DB)or die(mysql_error());
 	if($_POST["vers"] == "2")
 	{
-      mysql_query("UPDATE config SET wert1 = 'kreis' WHERE erkennungscode LIKE 'f2adser2'"); // Version 4.8
-	}  
 	  mysql_query("INSERT INTO config (erkennungscode, wert1, wert2, zahl1, zahl2) VALUES ('f2mf2', '', '', '1', '0')"); // Für Forenstatistik, und ob das Forum(z1) den eMail-Versand(z2) unterstüzt. 1=Ja 0 = Nein
 	  mysql_query("INSERT INTO config (erkennungscode, wert1, wert2, zahl1, zahl2) VALUES ('f2bl2', '', '', '3', '20')"); // Benutzernamenlänge (w1) = Minimale Länge (w2) Maximale Länge
       mysql_query("CREATE TABLE IF NOT EXISTS passwort_verg ( 
@@ -92,6 +90,18 @@ switch($do){
 	  );
 
       "); 
+	}  
+    // Updates für die aktuellste
+	  mysql_query("CREATE TABLE IF NOT EXISTS range ( 
+      id INT(20) NOT NULL auto_increment,
+      name varchar(300) NOT NULL,
+      min_post INT(20) NOT NULL,
+	  PRIMARY KEY (id)
+	  );
+
+      "); 
+	  mysql_query("INSERT INTO range (name, min_post) VALUES ('Benutzer', '0')");
+	
 	$schritte++;
 	if($schritte == $_POST["vers"])
 	{

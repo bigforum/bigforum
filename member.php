@@ -80,16 +80,17 @@ if($xs == "0")
   $users = mysql_query("SELECT * FROM users WHERE sptime < '$time' ORDER BY id LIMIT $start, $eps");
 }
 
-$number = "0";
+$numbers = "0";
 $num = "0";
 while($ur = mysql_fetch_object($users))
 {
   $datum = date("d.m.Y",$ur->reg_dat);
   $website = "";
-  $number++;
+  $ten = "0";
+  $numbers++;
   $ten = $seite - 1;
   $ten = $ten * 10;
-  $number = $number + $ten;
+  $number = $numbers + $ten;
   if($ur->website != "")
   {
     $website = "<a href=http://$ur->website target=_blank><img src=images/hp.png border=0 width=60px height=35px></a>";
@@ -100,7 +101,9 @@ while($ur = mysql_fetch_object($users))
     $num = "-1";
 	$bg = "bgcolor='#F4F4F4'";
   }
-  echo "<tr $bg><td> $number </td><td><a href=profil.php?id=$ur->id>$ur->username</a><br><small>$ur->rang</small></td><td>$ur->posts</td><td>$datum</td><td>$website";
+  echo "<tr $bg><td> $number </td><td><a href=profil.php?id=$ur->id>$ur->username</a><br><small>";
+  show_rang($ur->posts, $ur->rang); 
+  echo "</small></td><td>$ur->posts</td><td>$datum</td><td>$website";
   $config_datas = mysql_query("SELECT * FROM config WHERE erkennungscode LIKE 'f2pnsignfs'");
   $cd = mysql_fetch_object($config_datas);
   if($ur->darf_pn == "0" AND $cd->zahl2 == "1")
