@@ -23,6 +23,9 @@ if(GROUP != "3" AND GROUP != "2")
 <tr><td><a href="?do=ver_user">Benutzer suchen</a></td></tr>
 <tr><td><a href="?do=mail_adr">eMail-Adressen raussuchen</a></td></tr>
 <tr><td class=normal color="snow">
+<b>Foren</b></td></tr>
+<tr><td><a href="?do=ankuendigungen">Ankündigungen</a></td></tr>
+<tr><td class=normal color="snow">
 <b>IP-Adressen</b></td></tr>
 <tr><td><a href="?do=ip_auf">IP-Adresse auflösen</a></td></tr>
 </table>
@@ -183,6 +186,55 @@ switch ($do) {
   echo "<form action=?do=ver_user&id=1 method=post>
   Benutzername: <input type=text name=benu size=40 value='$_GET[name]'><input type=submit value='Exakte Suche'></form>";
   break;
+  
+  case "ankuendigungen":
+  echo "<script>
+  function smilie(sm)
+  {
+    document.feld.feld.value += sm
+  }
+  </script>
+<form action=?do=an_erstell method=post name=feld>
+In Forum:<br><select name=forum>";
+$foren_data = mysql_query("SELECT * FROM foren ORDER BY kate");
+while($fd = mysql_fetch_object($foren_data))
+{
+  echo "<option value=$fd->id>$fd->name</option>";
+}
+echo "</select><br>
+Betreff:<br>
+  <input type=text name=bet><br><br>
+  Nachricht:
+  <table class=editorbgc><tr><td>
+<input type=button class=editorbgco style='font-weight:bold' value=b onclick=\"insert('[b]', '[/b]')\"><input type=button class=editorbgco style=\"text-decoration:underline\" value=u onclick=\"insert('[u]', '[/u]')\"><input type=button class=editorbgco style=\"font-style:italic\" value=k onclick=\"insert('[k]', '[/k]')\">
+<input type=button  class=editorbgco value=Link onclick=\"insert('[url]', '[/url]')\"><input type=button  class=editorbgco value=Code onclick=\"insert('[code]', '[/code]')\"><input type=button class=editorbgco value=Bild onclick=\"insert('[img]', '[/img]')\"><input type=button class=editorbgco value='Zitat' onclick=\"u = prompt('Welchen Benutzer möchtest du zitieren?'); insert('[zitat='+u+']', '[/zitat]')\"><br>
+<textarea cols=70 rows=7 name=feld>
+</textarea><br>
+<input type=submit value=Absenden  class=editorbgco>
+<br><br><fieldset><legend>Moderator-Optionen</legend>
+  <input type=checkbox value=1 name=close> Thema nach abschicken, schließen<br></fieldset>";
+  break;
+  
+  case "an_erstell";
+  $_POST["bet"] = strip_tags($_POST["bet"]);
+  $_POST["bet"] = str_replace("  ","",$_POST["bet"]);
+  if($_POST["bet"] == "" OR $_POST["bet"] == " ")
+  {
+	erzeuge_error("Du musst schon einen Titel angeben.");
+  }
+  $_POST["feld"] = str_replace("  ","",$_POST["feld"]);
+  if($_POST["feld"] == "" OR $_POST["feld"] == " ")
+  {
+	erzeuge_error("Du hast keinen Text angegeben.");
+  }
+    $close = "0"; $imp = "0";
+  	if($_POST["close"] == "1")
+	{ $close = "1"; }
+	$time = time();
+  mysql_query("INSERT INTO thema (tit, text, verfas, last_edit, edit_from, post_when, where_forum, close, last_post_time,  import) VALUES ('$_POST[bet]', '$_POST[feld]', '". USER ."', '', '', '$time', '$_POST[forum]', '$close', '$time', '4')") or die(mysql_error()); //import = 4 = Ankündigung
+  echo "Danke, die Ankündigung wurde erfolgreich erstellt.";
+ break;
+  
 }
 echo "<br><br> $tab";
 page_footer();

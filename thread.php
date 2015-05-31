@@ -156,6 +156,14 @@ if($id != "")
 	  	echo "<script>alert('Das Thema wurde gelöscht! Du wirst zur Forenübersicht weitergeleitet...'); location.href='forum.php?id=$td->where_forum';</script>";
 		page_footer();
 	}
+	if($_GET["action"] == "del_end" AND GROUP == "3")
+	{
+	
+		mysql_query("DELETE FROM thema WHERE id LIKE '$id'");
+		mysql_query("DELETE FROM beitrag WHERE where_forum LIKE '$id'");
+	  	echo "<script>alert('Das Thema wurde endgültig gelöscht! Du wirst zur Forenübersicht weitergeleitet...'); location.href='forum.php?id=$td->where_forum';</script>";
+		page_footer();
+	}
     if($_POST["fu"] == "schieb")
 	{
 	  echo "<fieldset>
@@ -205,6 +213,12 @@ if($id != "")
 	{
 	  echo "<fieldset><legend>Thema löschen</legend>Möchtest du wirklich dieses Thema und alle Beiträge löschen?<br><br>
       <a href=?id=$id&do=change&action=del>Ja, Thema und alle Beiträge löschen</a>  &nbsp;&nbsp;&nbsp;   <a href=?id=$id>Nein, Thema auf keinen Fall löschen</a></fieldset><br><br>";
+	  if(GROUP == "3")
+	  {
+   	    echo "<fieldset><legend>Thema endgültig löschen</legend>Möchtest du wirklich dieses Thema und alle Beiträge <b>endgültig</b> löschen?<br><br>
+        <a href=?id=$id&do=change&action=del_end>Ja, Thema und alle Beiträge endgültig löschen</a></fieldset><br><br>";
+	  }
+ 
 	  page_footer();
 	}
 	if($_POST["fu"] == "wich")

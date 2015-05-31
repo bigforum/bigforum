@@ -10,6 +10,7 @@ if($ac == "send")
   connect_to_database();
   include_once("includes/function_user.php");
   $time = time();
+  $_POST["bet"] = strip_tags($_POST["bet"]);
   $_POST["bet"] = str_replace("  ","",$_POST["bet"]);
   if($_POST["bet"] == "" OR $_POST["bet"] == " ")
   {
@@ -35,7 +36,7 @@ if($ac == "send")
   $eintrag = mysql_query("INSERT INTO thema (tit, text, verfas, last_edit, edit_from, post_when, where_forum, close, last_post_time,  import) VALUES ('$_POST[bet]', '$_POST[feld]', '". USER ."', '', '', '$time', '$_GET[id]', '$close', '$time', '$imp')");
   $fo_da = mysql_query("SELECT * FROM foren WHERE id LIKE '$_GET[id]'");
   $fd = mysql_fetch_object($fo_da);
-  if($da->beitrag_plus == "0")
+  if($fd->beitrag_plus == "0")
   {
     mysql_query("UPDATE users SET posts = posts+1 WHERE username LIKE '". USER ."'");
   }

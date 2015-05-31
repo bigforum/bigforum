@@ -226,7 +226,14 @@ function looking_page($wo)
     $pn_data = mysql_query("SELECT * FROM prna WHERE id LIKE '$_GET[aktion]'");
 	$pd = mysql_fetch_object($pn_data);
     $page = "main.php";
-	$text = "Liest eine Private Nachricht von $pd->abse";
+	/*if(GROUP == "2" OR GROUP == "3")
+	{
+	  $text = "Liest eine Private Nachricht von $pd->abse";
+	}
+	else
+	{*/
+	  $text = "Liest eine Private Nachricht";
+//	}
   }
   if($wo == "look_pn")
   {
@@ -247,7 +254,7 @@ function looking_page($wo)
     $page = "newtopic.php";
 	$text = "Erstellt ein Thema: $fd->name";
   }
-  if($wo == "newtopic")
+  if($wo == "kontakt")
   {
     $foda = mysql_query("SELECT * FROM foren WHERE id LIKE '$_GET[id]'");
 	$fd = mysql_fetch_object($foda);
@@ -314,7 +321,7 @@ function looking_page($wo)
   if($wo == "online_view")
   {
     $page = "online.php";
-	$text = "Betrachtet die Liste, der Benutzer die online sind";
+	$text = "Betrachtet die Liste der Benutzer, die online sind";
   }
   if($wo == "modcp")
   {
