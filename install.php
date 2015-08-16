@@ -43,7 +43,7 @@ switch($do){
     //Auswahl wie man updaten möchte
     echo "Bitte wähle aus, welche Version du hast, also von welcher du auf die neuste Updaten möchtest.<br><br>
 	<form action=?do=update_query method=post>
-	<select name=vers><option value=1>Von 5.3 oder 5.4 auf 5.5 updaten</option></select>
+	<select name=vers><option value=1>Von 5.5 oder 5.6 auf 6.0 </option></select>
 	<br><br>
 	<input type=submit class=install_button value='Forum updaten'><br><br><br>
 	* <b>Wichtig:</b> Bei Sprüngen bei den Updates müssen die Datein hochgeladen werden, die Installation macht lediglich die Eintragungen in die Datenbank. Oder man lädt sich die Komplettversion der aktuellsten Version hoch, ganz wichtig aber, ohne die <i> config.php </i>.
@@ -56,9 +56,20 @@ switch($do){
     $schritte = "0";
     mysql_connect($HOST,$USER,$PW)or die(mysql_error());
     mysql_select_db($DB)or die(mysql_error());
-	mysql_query("INSERT INTO config (erkennungscode, wert1, wert2, zahl1, zahl2) VALUES ('f2usearch2', '', '', '1', '0')");
-	
 
+	  mysql_query("CREATE TABLE IF NOT EXISTS profilnachricht ( 
+      id INT(20) NOT NULL auto_increment,
+      time INT(50) NOT NULL,
+      post_by INT(50) NOT NULL,
+      post_von INT(50) NOT NULL,
+      dele INT(5) NOT NULL,
+	  text varchar(12500) NOT NULL,  
+	  PRIMARY KEY (id)
+	  );
+
+      ")or die(mysql_error()); 
+	  
+	  mysql_query("ALTER table users add erlaube_prona INT(2) NOT NULL");
 	
 	$schritte++;
 	if($schritte == $_POST["vers"])
@@ -183,6 +194,18 @@ switch($do){
       wert2 varchar(1000) NOT NULL,
       zahl1 int(50) NOT NULL,
       zahl2 int(50) NOT NULL
+	  );
+
+      "); 
+	  
+	  mysql_query("CREATE TABLE IF NOT EXISTS profilnachricht ( 
+      id INT(20) NOT NULL auto_increment,
+      time INT(50) NOT NULL,
+      post_by INT(50) NOT NULL,
+      post_von INT(50) NOT NULL,
+      dele INT(5) NOT NULL,
+	  text varchar(12500) NOT NULL,  
+	  PRIMARY KEY (id)
 	  );
 
       "); 
@@ -344,6 +367,7 @@ switch($do){
 	  darf_pn int(5) NOT NULL,
 	  show_mail int(2) NOT NULL,
 	  birthday int(140) NOT NULL,
+	  erlaube_prona int(2) NOT NULL,
       PRIMARY KEY (id) );
 
       ");
@@ -422,7 +446,7 @@ switch($do){
 	  mysql_query("INSERT INTO config (erkennungscode, wert1, wert2, zahl1, zahl2) VALUES ('f2adser2', 'kreis', '', '0', '0')");
 	  mysql_query("INSERT INTO config (erkennungscode, wert1, wert2, zahl1, zahl2) VALUES ('f2mf2', '', '', '1', '0')"); // Für Forenstatistik, und ob das Forum(z1) den eMail-Versand(z2) unterstüzt. 1=Ja 0 = Nein
 	  mysql_query("INSERT INTO config (erkennungscode, wert1, wert2, zahl1, zahl2) VALUES ('f2bl2', '', '', '3', '20')"); // Benutzernamenlänge (w1) = Minimale Länge (w2) Maximale Länge
-	  mysql_query("INSERT INTO config (erkennungscode, wert1, wert2, zahl1, zahl2) VALUES ('f2usearch2', '', '', '1', '0')"); // Zahl1 für Benutzersuche (1=aktiviert) // Zahl2 für RSS
+	  mysql_query("INSERT INTO config (erkennungscode, wert1, wert2, zahl1, zahl2) VALUES ('f2usearch2', '', '', '1', '0')"); //Wert1 Administratoren-Notiz //Zahl1 für Benutzersuche (1=aktiviert) // Zahl2 für RSS
 	  mysql_query("INSERT INTO smilie (packet, images_path, abk1, abk2) VALUES ('1', 'brille.png', '8-)', '8)')");
 	  mysql_query("INSERT INTO smilie (packet, images_path, abk1, abk2) VALUES ('1', 'grine.png', ':)', ':-)')");
 	  mysql_query("INSERT INTO smilie (packet, images_path, abk1, abk2) VALUES ('1', 'lache.png', ':D', ':-D')");

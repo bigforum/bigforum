@@ -1,4 +1,8 @@
 <?php
+if(file_exists("install.php"))
+{
+  header("Location: install.php");
+}
 //Wichtige Angaben für jede Datei!
 include("includes/functions.php");
 page_header();
@@ -210,11 +214,11 @@ $stat_bei = "0";
 $user_data = mysql_query("SELECT * FROM users WHERE username LIKE '". USER ."'") or die(mysql_fehler(mysql_error(), __LINE__, $_SERVER["PHP_SELF"]));;
 $ud = mysql_fetch_object($user_data);
 $foren_data = mysql_query("SELECT * FROM kate ORDER BY ordn") or die(mysql_fehler(mysql_error(), __LINE__, $_SERVER["PHP_SELF"]));
-$ausgabe .= "<table color=snow width=100% class=dark><tr><td width=70%><font color=snow>Name</font></td><td><font color=snow>Letzter Beitrag</font></td><td width=5%><font color=snow>Themen</font></td><td width=5%><font color=snow>Beiträge</font></td></tr></table>";
 
 while($fr = mysql_fetch_object($foren_data))
 {
-  $ausgabe .= "<table color=snow class=hell width=100% style='-moz-border-radius:8px;-khtml-border-radius:8px; text-decoration: none;'><tr width=100%><td width=100%><b><span style=\"cursor: pointer;\" onclick=\"window.location.href='?do=show_one&id=$fr->id'\">$fr->name</span></b><br>$fr->besch</td></tr></table>";
+  $ausgabe .= "<table width=100% class=rand><tr><td><table color=snow width=100% class=dark><tr><td width=70%><font color=snow>Name</font></td><td><font color=snow>Letzter Beitrag</font></td><td width=5%><font color=snow>Themen</font></td><td width=5%><font color=snow>Beiträge</font></td></tr></table>";
+  $ausgabe .= "<table color=snow class=hell width=100%><tr width=100%><td width=100%><b><span style=\"cursor: pointer;\" onclick=\"window.location.href='?do=show_one&id=$fr->id'\">$fr->name</span></b><br>$fr->besch</td></tr></table>";
   $for_date = mysql_query("SELECT * FROM foren WHERE kate = '$fr->id' ORDER BY sort");
   while($fd = mysql_fetch_object($for_date))
   {
@@ -333,10 +337,10 @@ while($fr = mysql_fetch_object($foren_data))
         $ausgabe .= "<table width=100% class='forenbg'><tr><td width=70%><table><tr><td> $forum_stat &nbsp; </td><td><a href=forum.php?id=$fd->id><b>$fd->name</b></a> $bes<br><font size=2px>$fd->besch</font></td></tr></table></td><td>$last_beitrag</td><td width=5%>$zahl_themen</td><td width=5%>$beit</td></tr></table>";
 	  }
 	}
-	
   }
+  $ausgabe .= "</td></tr></table><br>";
 }
-$ausgabe .= "<table width=100% class=navi><tr><td style=font-weight:bold;><center><a href=?do=marks>Alle Themen als gelesen markieren</a> | <a href=member.php?do=groups>Forum-Team</a></center></td></table><br>";
+$ausgabe .= "<table width=100% class=navio><tr><td style=font-weight:bold;><center><a href=?do=marks>Alle Themen als gelesen markieren</a> | <a href=member.php?do=groups>Forum-Team</a></center></td></table><br>";
 
 //Statistiken auf der Startseite
 $tabelle = "onlineuser";

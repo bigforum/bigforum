@@ -153,6 +153,10 @@ if($fd->min_posts != "0")
     erzeuge_error("Dieses Forum existiert nicht, oder du hast keine Rechte!");
   }
 }
+if(!isset($fd->name))
+{
+  erzeuge_error("Dieses Forum existiert nicht, oder du hast keine Rechte!");
+}
 $them_dat = mysql_query("SELECT * FROM thema WHERE where_forum LIKE '".mysql_real_escape_string($_GET["id"])."' AND import != '4' ORDER BY import DESC, last_post_time DESC LIMIT $start, $eps ") or die(mysql_fehler(mysql_error(), __LINE__, $_SERVER["PHP_SELF"]));
 $them_meng = mysql_query("SELECT id FROM thema WHERE where_forum LIKE '$id'");
 $menge = mysql_num_rows($them_meng); 
@@ -493,7 +497,7 @@ $pa = array();
 //
 
 
-echo "<table width=73%><tr><td align=right valign=right><table class=navi><tr><td>";
+echo "<table width=73%><tr><td align=right valign=right><table class=seiten_navi><tr><td>";
 echo "<font color=snow>Seite $seite von $ws &nbsp <a href=?id=$_GET[id]&page=$up><</a>";
 $z = explode(",", $seiten);
 for($a=0; $a < $wieviel; $a++)

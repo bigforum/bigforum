@@ -25,21 +25,39 @@ page_header();
 if($_GET["do"] == "")
 {
 ?>
-<form action="?do=login" method=post>
+<form action="?do=login" method=post name="login">
+<table style="border:solid 1px #914400;" width="70%" cellspacing='0' cellpadding='0'><tr bgcolor="#F5EBC6"><td style="border-bottom:solid 1px #914400;"><center>Anmelden</center></b></td></tr><tr><td>
+<br>Durch eine Anmeldung im unterem Teil, kannst Du das Forum im vollen Umfang zu nutzen.<br> Solltest du hier noch keinen Account haben kannst du dich <a href=reg.php>hier registrieren</a>.<br>
+<?php
+$config_data = mysql_query("SELECT * FROM config WHERE erkennungscode LIKE 'f2mf2'");
+$cd = mysql_fetch_object($config_data);
+if($cd->zahl2 == "1")
+{
+?>
+Solltest du dein <a href="misc.php?aktion=lost_pw">Passwort vergessen</a> haben, kannst du gerne eine neues Anfodern.
+<?php 
+}?>
+<p>
+<hr width="101%" color="#914400">
 <table>
-  <tr>
-    <td>
+<tr><td width=50%>
 	  Benutzername:</td><td><input type=text name=user>
 	</td>
   </tr>
   <tr>
 	<td>
 	  Passwort:</td><td><input type=password name=pw>
-	</td>
+    </td>
   </tr>
 </table>
-<input type=submit value="Einloggen">
-</form>
+<br>
+</td></tr></table>
+<table width="70%"><tr><td align=right>
+<input type=submit value="Login" style="font-weight: bold;font-size: 11px;padding: 0px;background-color:#e3d1a5;border:solid 1px black;height:25px;width:50px;">
+<input type=button onclick="javascript:document.login.user.value=''; document.login.pw.value='';" value="Felder zurücksetzen" style="font-weight: bold;font-size: 11px;padding: 0px;background-color:#e3d1a5;border:solid 1px black;height:25px;width:125px;">
+
+</form></td></tr></table>
+
 	  <br>
 	  <br>
 	  <br>

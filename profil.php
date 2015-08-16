@@ -6,7 +6,18 @@ if($_COOKIE[$_GET["id"]] != $_GET["id"])
   $xx = true;
 }
 setcookie($_GET["id"], $_GET["id"], time()+7200);
+
+
 page_header();
+$user_data = mysql_query("SELECT * FROM users WHERE username LIKE '". USER ."'");
+$ud = mysql_fetch_object($user_data);
+if($_GET["do"] == "profilnachricht" AND $_GET["aktion"] == "send" AND USER != "")
+{
+  $time = time();
+  mysql_query("INSERT INTO profilnachricht (time, post_by, post_von, dele, text) VALUES ('$time', '$_GET[id]', '$ud->id', '0', '$_POST[feld]')")or die(mysql_error());
+  echo "Profilnachricht wurde erstellt.<br><a href=profil.php?id=$_GET[id]> Zurück zum Profil</a>";
+  exit;
+}
 if($xx == true)
 {
   mysql_query("UPDATE users SET provi = provi+1 WHERE id LIKE '$_GET[id]'");
@@ -19,12 +30,17 @@ if($cp->zahl2 != "1")
 }
 include_once("includes/function_user.php");
 
-//Wichtige MySQL Abfrage, da bei manchen Anbietern ansonsten fehler kommen.
-$user_data = mysql_query("SELECT * FROM users WHERE username LIKE '". USER ."'");
-$ud = mysql_fetch_object($user_data);
 
 $ac = $_GET["action"];
 
+
+
+
+if($_GET["id"] != "")
+{
+  $user_data_profile = mysql_query("SELECT * FROM users WHERE id LIKE '$_GET[id]'");
+  $udp = mysql_fetch_object($user_data_profile);
+  check_data($udp->username, "", "Dieses Benutzerprofil exestiert nicht.", "leer");
   // Start Verwarnungen
   if($ac == "no_warn")
   {
@@ -46,12 +62,50 @@ $ac = $_GET["action"];
 	page_footer();
   }
   // Ende
-  if($_GET["id"] != "")
-{
-  $user_data_profile = mysql_query("SELECT * FROM users WHERE id LIKE '$_GET[id]'");
-  $udp = mysql_fetch_object($user_data_profile);
-  check_data($udp->username, "", "Dieses Benutzerprofil exestiert nicht.", "leer");
+
   gruppen_aufteilungen($udp->group_id);
+  
+  if($_GET["do"] == "del_prna" AND (GROUP == 2 OR GROUP == 3 OR $ud->id == $_GET["id"]))
+  {
+	mysql_query("UPDATE profilnachricht SET dele = '1' WHERE id LIKE '$_GET[bid]'") or die(mysql_fehler(mysql_error(), __LINE__, $_SERVER["PHP_SELF"]));
+	echo "Die ausgewählte Profilnachricht wurde gelöscht.<br><a href=profil.php?id=$_GET[id]>Zurück zum Profil</a>";
+    exit;
+  }
+  
+  if($_GET["do"] == "show_all")
+  {
+    echo "<h3>Profilnachrichten von $udp->username<hr color=#825A18></h3>";
+	$seite = $_GET["seite"];
+    if(!isset($seite))
+      $seite = 1;
+    $eintraege_pro_seite = 10;
+    $start = $seite * $eintraege_pro_seite - $eintraege_pro_seite;
+    $abfrage = "SELECT * FROM profilnachricht WHERE post_by LIKE '$_GET[id]' AND dele = '0' ORDER BY id DESC LIMIT $start, $eintraege_pro_seite";
+    $ergebnis = mysql_query($abfrage);
+    while($row = mysql_fetch_object($ergebnis))
+    {
+	  $poster_name = mysql_query("SELECT * FROM users WHERE id LIKE '$row->post_von' LIMIT 1");
+	  $pona = mysql_fetch_object($poster_name);
+	  if($ud->id == $_GET["id"] OR GROUP == "2" OR GROUP == "3")
+	  {
+	    $bet_pro = "<table width=100%><tr><td>". date("d.m.Y - H:i", $row->time) ."</td><td align=right><a href=?id=$_GET[id]&do=del_prna&bid=$row->id><img src=images/del.png width=30% height=50% border=0></a></td></tr></table>";
+	  }
+	  else
+	  {
+	    $bet_pro = date("d.m.Y - H:i", $row->time);
+	  }
+      text_ausgabe($row->text, $bet_pro , $pona->username, 1);
+    }
+    $result = mysql_query("SELECT COUNT(*) FROM profilnachricht WHERE post_by LIKE '$_GET[id]' AND dele = '0'");
+    $menge = mysql_fetch_row($result);
+    $menge = $menge[0];
+    $wieviele_seiten = ceil($menge / $eintraege_pro_seite);
+    echo "<div align=\"center\">";
+    echo "<b>Seite:</b> ";
+    echo blaetterfunktion($seite,  $wieviele_seiten, "?id=$_GET[id]&do=show_all");
+    echo "</div>";
+    exit;
+  }
   if($ac == "warn")
   {
     if((GROUP == "2" OR GROUP == "3") AND $ud->adm_recht >= $udp->adm_recht)
@@ -139,45 +193,111 @@ $ac = $_GET["action"];
     }
   }
   ?>
-  <table width="100%"><tr><td class="bord" width="30%" valign=top style="padding: 5px; -moz-border-radius:15px;-khtml-border-radius:15px;">
-  <b><?php echo $udp->username; echo "</b>  ";
+  <script type="text/javascript">
+  function open_profil(das) {
+   /*if (document.getElementById(das).style.display=='none')
+   {*/
+    if(das == "profilnachricht")
+	{
+      document.getElementById("profilwrite").style.display='none';
+	  document.getElementById("profilnachricht").style.display='block';	
+	}
+    if(das == "eins")
+    {
+      document.getElementById("zwei").style.display='none';
+      document.getElementById("drei").style.display='none';
+	  document.getElementById(das).style.display='block';
+    }
+    if(das == "zwei")
+    {
+      document.getElementById("eins").style.display='none';
+      document.getElementById("drei").style.display='none';
+	  document.getElementById(das).style.display='block';
+    }
+    if(das == "drei")
+    {
+      document.getElementById("zwei").style.display='none';
+      document.getElementById("eins").style.display='none';
+	  document.getElementById(das).style.display='block';
+    }     
+   //}
+  }
+</script>
+  <table width="100%"><tr><td class="bord" width="30%" valign=top style="padding: 5px; -moz-border-radius:15px;-khtml-border-radius:15px; max-height:100px;">
+  <b><?php echo $udp->username; echo "";
   show_online($udp->last_log, $udp->username);
-  ?><br><?php show_rang($udp->posts, $udp->rang); ?><br>
-  <?if($udp->ava_link != "")
+  ?></b><br><small><?php show_rang($udp->posts, $udp->rang); ?></small><br><hr color="#825A18" width="70%"><table class=profil_small>
+  <?php
+  /*
+  if($udp->ava_link != "")
   {
     echo "<img src=$udp->ava_link title=\"$udp->username's Avatar\" width=100 height=100>";
-  }?>
-  
-  <br><br>
-  <?php
+  }
+  */
   if($udp->onlyadm == "2" AND $udp->darf_pn == "0")
   {
     if(GROUP == "2" OR GROUP == "3")
 	{
-	    echo "<a href=\"main.php?do=make_pn&amp;to=$udp->username\"><img src=\"images/pn.png\" border='0' height='16px' width='30px'> Private Nachricht schicken</a>";
+	  echo "<tr><td><a href=\"main.php?do=make_pn&amp;to=$udp->username\"><img src=\"images/pn.png\" border='0' height='16px' width='30px'></a></td><td><a href=\"main.php?do=make_pn&amp;to=$udp->username\">Private Nachricht schicken</a></td></tr>";
 	}
   }
   else
   {
     if($udp->darf_pn == "0")
 	{
-      echo "<a href=\"main.php?do=make_pn&amp;to=$udp->username\"><img src=\"images/pn.png\" border='0' height='16px'  width='30px'> Private Nachricht schicken</a>";
+      echo "<tr><td><a href=\"main.php?do=make_pn&amp;to=$udp->username\"><img src=\"images/pn.png\" border='0' height='16px'  width='30px'></a></td><td><a href=\"main.php?do=make_pn&amp;to=$udp->username\">Private Nachricht schicken</a></td></tr>";
 	}
   }
   if($udp->show_mail == "0")
   {
-    echo "<br><a href=\"mailto:$udp->mail\"><img src=\"images/pn.png\" border='0' height='16px' width='30px'> eMail schreiben</a>";
+    echo "<tr><td><a href=\"mailto:$udp->mail\"><img src=\"images/pn.png\" border='0' height='16px' width='30px'></a></td><td><a href=\"mailto:$udp->mail\">eMail schreiben</a></td></tr>";
+  }
+  ?>
+  <tr><td></td><td><a href="search.php?do=send&us=<?php echo $udp->username; ?>&action=beitrag">Alle Beiträge anzeigen</a></td></tr>
+  <tr><td></td><td><a href="search.php?do=send&us=<?php echo $udp->username; ?>&action=thema">Alle Themen anzeigen</a></td></tr>
+  </table>
+  </td><td valign=top>
+  <table class=profil_buttons width=100%><tr><td><a href="javascript:open_profil('eins');">Profilnachrichten</a><a href="javascript:open_profil('zwei');">Statistiken</a><?php if(GROUP == 2 OR GROUP == 3) {echo "<a href=\"javascript:open_profil('drei');\">Verwarnungen</a>"; } ?><br><hr color=#825A18 width=100%><br></td></tr></table>
+  <?php
+  if($udp->erlaube_prona == "0")
+  {
+  ?>
+  <div style="display: block;" id="eins">
+  <h3>Profilnachricht schreiben <hr color=#825A18 width=40% align=left></h2>
+  <div style="display: block;" id="profilwrite">
+  <a href="javascript:open_profil('profilnachricht');">» <?php echo $udp->username; ?> eine Profilnachricht schreiben</a>
+  </div>
+  <div style="display: none;" id="profilnachricht">
+  <?php editor("sign","","?id=$_GET[id]&do=profilnachricht"); ?>
+  </div>
+  <?php
+  }
+  ?>
+  <h3>Profilnachrichten lesen<hr color=#825A18 width=40% align=left></h3>
+  <?php
+  $pro_na = mysql_query("SELECT * FROM profilnachricht WHERE post_by = '$_GET[id]' AND dele = '0' ORDER BY id DESC LIMIT 5");
+  echo "<small>(<a href=\"profil.php?id=$_GET[id]&do=show_all\">Zeige alle Profilnachrichten</a>)</small>
+
+  ";
+  while($pn = mysql_fetch_object($pro_na))
+  {
+    $poster_name = mysql_query("SELECT * FROM users WHERE id LIKE '$pn->post_von' LIMIT 1");
+	$pona = mysql_fetch_object($poster_name);
+	 if($ud->id == $_GET["id"] OR GROUP == "2" OR GROUP == "3")
+	  {
+	    $bet_pro = "<table width=100%><tr><td>". date("d.m.Y - H:i", $pn->time) ."</td><td align=right><a href=?id=$_GET[id]&do=del_prna&bid=$pn->id><img src=images/del.png width=30% height=50% border=0></a></td></tr></table>";
+	  }
+	  else
+	  {
+	    $bet_pro = date("d.m.Y - H:i", $pn->time);
+	  }
+      text_ausgabe($pn->text, $bet_pro , $pona->username, 1);
   }
   ?>
   <br>
-  <br>
-  <table width="100%" valign="top"><tr><td width="65%">
-   <a href="search.php?do=send&us=<?php echo $udp->username; ?>&action=beitrag">Alle Beiträge</a> <br> <a href="search.php?do=send&us=<?php echo $udp->username; ?>&action=thema">Alle Themen</a>
-  </td>
-  </tr>
-  </table>
-  
-  </td><td><table><tr><td width="45%"><b>Beiträge</b></td></tr>
+  </div>
+  <div style="display: none;" id="zwei">
+  <table><tr><td width="45%"><b>Beiträge</b></td><td><hr></td></tr>
   <tr><td width="40%">Beiträge:</td><td><?php echo $udp->posts; ?></td></tr>
   <tr><td width="40%">&#216; Beiträge/Tag:</td><td><? 
   $tag = time() - $udp->reg_dat;
@@ -189,7 +309,7 @@ $ac = $_GET["action"];
     echo round($bei_tag, 2);
   }
   else { echo "0"; }  ?></td></tr><tr><td>
-  <b>Über <? echo $udp->username; ?></b></td></tr>
+  <b>Über <? echo $udp->username; ?></b></td><td><hr></td></tr>
   <tr><td width="40%">Hobbys:</td><td> <? echo $udp->hob; ?></td></tr>
   <tr><td width="40%">Website:</td><td><a href="<? if(str_replace("http://www.", "www.", $udp->website))echo "http://$udp->website";  else echo $udp->website;?>" target="_blank"><? echo $udp->website; ?></a></td></tr>
   <?php
@@ -198,11 +318,12 @@ $ac = $_GET["action"];
   $age   = intval(($jetzt - $gebur) / (3600 * 24 * 365)); 
   if(date("Y", $udp->birthday) != "2037" AND $udp->birthday != "0")
   {
-	echo "<tr><td>Alter:</td><td>$age</td></tr>";
+	echo "<tr><td>Alter:</td><td>$age</td></tr>
+	      <tr><td>Geburtsdatum:</td><td>". date("d.m.Y", $udp->birthday) ."</td></tr>";
   }
   ?>
   <tr><td>
-  <b>Andere Informationen</b></td></tr>
+  <b>Andere Informationen</b></td><td><hr></td></tr>
     <?php
   $rech = $udp->last_log - time();
   $datum = date("d.m.Y",$udp->last_log);
@@ -264,15 +385,14 @@ $ac = $_GET["action"];
   }
   ?>
   
-  </table><br><br>
-  <br>
-  </td></tr></table>
+  </table></div>
   <?php
 }
 if((GROUP == "2" OR GROUP == "3") AND $ud->adm_recht >= $udp->adm_recht)
 {
 ?><br>
-  <table class="bord" width="100%"><tr class="dark"><td>
+  <div style="display: none;" id="drei">
+  <table width="100%"><tr class="dark"><td>
   <table width=100%><tr><td><b><font color="snow">Verwarnungen</font></b></td><td align=right><a href="profil.php?id=<?php echo $_GET["id"];?>&action=warn"><font color=snow>Benutzer verwarnen</font></a></td></tr></table></td></tr>
   <tr><td>
  <?php
@@ -317,7 +437,8 @@ if((GROUP == "2" OR GROUP == "3") AND $ud->adm_recht >= $udp->adm_recht)
     echo "<table>";
   }
   ?>
-  </table>
+  </table></div>
+  </td></tr></table>
   </td></tr></table>
 <?
 }

@@ -1,10 +1,23 @@
 body {
-background: #8c7847;
-font-family: Arial;
-
+    background: #FBFCD4; /*#e3d1a5 url(../images/farbv.png) top left repeat-x;*/
+    font-family: Arial;
+	margin: 0px 35px 0px 35px;
+}
+.obenbraun
+{
+  margin: 0px 0px 0px 0px;
+  background: #e3d1a5;
+  padding: 5px;
+  -moz-border-radius-bottomright:15px;
+  -moz-border-radius-bottomleft:15px;
+  -khtml-border-radius-bottomright:15px;
+  -khtml-border-radius-bottomleft:15px;
 }
 .bgt{
-background: #e3d1a5 url(../images/farbv.png) top left repeat-x;
+background: #e3d1a5;
+padding: 5px;
+-moz-border-radius:15px;
+-khtml-border-radius:15px;
 text: black;
 
 
@@ -21,30 +34,112 @@ a:hover, a:active
 {
 	color: #FF4400;
 }
+.navioben
+{
+  background: transparent url(../images/navi.png) top left repeat-x;
+  font-size: 15px;
+  margin: 0px 0px 0px 0px;
+  padding: 5px;
+}
+.navio
+{  
+  background: transparent url(../images/navi.png) top left repeat-x;
+  font-size: 15px;
+}
+
+.navio a:link, .navioben a:link
+{
+	color: #FFFFFF;
+	text-decoration: none;
+}
+.navio a:visited, .navioben a:link
+{
+	color: #FFFFFF;
+	text-decoration: none;
+}
+.navio a:hover, a:active
+{
+	color: #FFFFFF;
+	text-decoration: underline;
+}
 .navi
 {
   background: transparent url(../images/navi.png) top left repeat-x;
-  border: 1px solid #005000;
   font-size: 15px;
+
+}
+.seiten_navi
+{
+  background: transparent url(../images/navi.png) top left repeat-x;
+  font-size: 15px;
+
+}
+.seiten_navi a:link, .seiten_navi a:visited
+{
+
+	color: snow;
+	text-decoration: none;
+}
+.seiten_navi a:hover, .seiten_navi a:active
+{
+	color: snow;
+	text-decoration: underline;
 }
 .forenbg
 {
   background: #e3d1a5;
 }
-.navi a:link
+.profil_buttons a:link, .profil_buttons a:visited
 {
+    -moz-border-radius-topright:15px;
+    -moz-border-radius-topleft:15px;
+    -khtml-border-radius-topright:15px;
+    -khtml-border-radius-topleft:15px;
+    display: inline-block;
+    border: 1px solid #522600;
+	margin: 0px;
+	float:left ;
+	padding: 0px;
+    background: #914400;
+    text-decoration:none;
+	font-family: Arial;
+    height: 25px;
+	min-width: 130px;
+	text-align: center; 
 	color: #FFFFFF;
+}
+.profil_buttons a:hover, .profil_buttons a:active
+{
+    background: #C76D1E;
+	color: snow;
 	text-decoration: none;
 }
-.navi a:visited
+div.littlenavi
 {
-	color: #FFFFFF;
-	text-decoration: none;
+  display: inline;
+  margin-left: 4px;
+  font-size: 12px;
 }
-.navi a:hover, a:active
+.navi a:link, .navi a:visited
 {
+    display: inline-block;
+    border: 1px solid #522600;
+	margin: 0px;
+	float:left ;
+	padding: 0px;
+    background: #914400;
+    text-decoration:none;
+	font-family: Arial;
+    height: 25px;
+	min-width: 130px;
+	text-align: center; 
 	color: #FFFFFF;
-	text-decoration: underline;
+}
+.navi a:hover, .navi a:active
+{
+    background: #C76D1E;
+	color: snow;
+	text-decoration: none;
 }
 .tab1
 {
@@ -53,6 +148,10 @@ a:hover, a:active
 border: 1px solid #cbaf7d;
 padding:3px;
     font-size: 15px;
+}
+.profil_small
+{
+  font-size: 12px;
 }
 .titl
 {
@@ -108,12 +207,15 @@ padding:3px;
 background: #ded0b0;
 border: 1px solid #a68d52;
 padding:5px; 
+text-decoration: none;
 }
 .post td {
 border: none;
+text-decoration: none;
 }
 .post hr {
 border:solid #a68d52 1px;
+text-decoration: none;
 }
 .editorbg
 {

@@ -51,6 +51,7 @@ if($di == "ant")
   <input type=text name=bet><br><br>
   Nachricht:";
 }
+
 echo "<table class=editorbgc><tr><td>
 <input type=button class=editorbgco style='font-weight:bold' value=b onclick=\"insert('[b]', '[/b]')\"><input type=button class=editorbgco style=\"text-decoration:underline\" value=u onclick=\"insert('[u]', '[/u]')\"><input type=button class=editorbgco style=\"font-style:italic\" value=k onclick=\"insert('[k]', '[/k]')\">
 <input type=button  class=editorbgco value=Link onclick=\"insert('[url]', '[/url]')\"><input type=button  class=editorbgco value=Code onclick=\"insert('[code]', '[/code]')\"><input type=button class=editorbgco value=Bild onclick=\"insert('[img]', '[/img]')\"><input type=button class=editorbgco value='Zitat' onclick=\"u = prompt('Welchen Benutzer möchtest du zitieren?'); insert('[zitat='+u+']', '[/zitat]')\"><br>
@@ -197,8 +198,13 @@ function user_online($anz)
     echo "<br>Benutzer online: $anzahl";
   }
 }
-function looking_page($wo)
+function looking_page($wo, $wherei="", $pagei="")
 {
+  if($wo == "" OR $wo == "0")
+  {
+    $page = $pagei;
+	$text = $wherei;
+  }
   if($wo == "index")
   {
     $page = "index.php";
@@ -210,6 +216,11 @@ function looking_page($wo)
 	$pi = mysql_fetch_object($proid);
     $page = "profil.php";
 	$text = "Betrachtet das Benutzerprofil von $pi->username";
+  }
+  if($wo == "help")
+  {
+    $page = "help.php";
+	$text = "Betrachtet die Hilfe";
   }
   if($wo == "main")
   {
@@ -506,6 +517,68 @@ function speicherung($wert, $er_text, $fe_text)
   else
     echo $fe_text;
 }
+function blaetterfunktion($seite,$maxseite,$url="",$anzahl=4,$get_name="seite")
+   {
+   if(ereg("\?",$url)) $anhang = "&";
+   else $anhang = "?";
+
+   if(substr($url,-1,1) == "&") {
+      $url = substr_replace($url,"",-1,1);
+      }
+   else if(substr($url,-1,1) == "?") {
+      $anhang = "?";
+      $url = substr_replace($url,"",-1,1);
+      }
+
+   if($anzahl%2 != 0) $anzahl++; //Wenn $anzahl ungeraden, dann $anzahl++
+
+   $a = $seite-($anzahl/2);
+   $b = 0;
+   $blaetter = array();
+   while($b <= $anzahl)
+      {
+      if($a > 0 AND $a <= $maxseite)
+         {
+         $blaetter[] = $a;
+         $b++;
+         }
+      else if($a > $maxseite AND ($a-$anzahl-2)>=0)
+         {
+         $blaetter = array();
+         $a -= ($anzahl+2);
+         $b = 0;
+         }
+      else if($a > $maxseite AND ($a-$anzahl-2)<0)
+         {
+         break;
+         }
+
+      $a++;
+      }
+   $return = "";
+   if(!in_array(1,$blaetter) AND count($blaetter) > 1)
+      {
+      if(!in_array(2,$blaetter)) $return .= "&nbsp;<a href=\"{$url}{$anhang}{$get_name}=1\">1</a>&nbsp;...";
+      else $return .= "&nbsp;<a href=\"{$url}{$anhang}{$get_name}=1\">1</a>&nbsp;";
+      }
+
+   foreach($blaetter AS $blatt)
+      {
+      if($blatt == $seite) $return .= "&nbsp;<b>$blatt</b>&nbsp;";
+      else $return .= "&nbsp;<a href=\"{$url}{$anhang}{$get_name}=$blatt\">$blatt</a>&nbsp;";
+      }
+
+   if(!in_array($maxseite,$blaetter) AND count($blaetter) > 1)
+      {
+      if(!in_array(($maxseite-1),$blaetter)) $return .= "...&nbsp;<a href=\"{$url}{$anhang}{$get_name}=$maxseite\">letzte</a>&nbsp;";
+      else $return .= "&nbsp;<a href=\"{$url}{$anhang}{$get_name}=$maxseite\">$maxseite</a>&nbsp;";
+      }
+
+   if(empty($return))
+      return  "&nbsp;<b>1</b>&nbsp;";
+   else
+      return $return;
+   }    
 function login()
 {
   //Aufruf dieser Funktion, vor dem Aufruf page_header() Ansonsten Design-Fehler
@@ -543,7 +616,7 @@ function show_online($zeit, $user)
     echo " <img src=images/rot.png border=0 title='$user ist offline' height=18px>";
   }
 }
-function text_ausgabe($text, $betreff, $from)
+function text_ausgabe($text, $betreff, $from, $bet_strip_tags=0)
 {
   $from_data = mysql_query("SELECT * FROM users WHERE username LIKE '$from'");
   $fd = mysql_fetch_object($from_data);
@@ -565,7 +638,10 @@ function text_ausgabe($text, $betreff, $from)
   $text = preg_replace("/\[zitat=(.*)\](.*)\[\/zitat\]/Usi", "<small style='display:block;'>Zitat von \\1:</small><table width=80% bgcolor=snow><tr><td>\\2</td></tr></table>", $text);
   $text = str_replace("http://http://" ,"http://", $text);
   $text = str_replace("\n", "<br />", $text);
-  $betreff = strip_tags($betreff);
+  if($bet_strip_tags == "0")
+  {
+    $betreff = strip_tags($betreff);
+  }
   $config_wert = mysql_query("SELECT * FROM config WHERE erkennungscode LIKE 'f2laengfs'");
   $con = mysql_fetch_object($config_wert); 
   $smilie_data = mysql_query("SELECT * FROM smilie WHERE packet = '$con->zahl2'");
@@ -999,6 +1075,6 @@ function show_rang($post, $user_rang)
   }
 }
 // Ende der Funktionen, Abrufe wichtiger Arrays!
-$warn_dauer = Array("86400","172800","432000","604800","864000","1209600","2678400","5097600","15638400","31536000","63072000");
-$warn_text = Array("1 Tag","2 Tage","5 Tage","7 Tage","10 Tage","2 Wochen","1 Monat","2 Monate","6 Monate","1 Jahr","2 Jahre");
+$warn_dauer = Array(-time() + mktime(date("H"),date("i"),0,date("m"),date("d")+1,date("Y")),-time() + mktime(date("H"),date("i"),0,date("m"),date("d")+2,date("Y")),-time() + mktime(date("H"),date("i"),0,date("m"),date("d")+7,date("Y")),-time() + mktime(date("H"),date("i"),0,date("m"),date("d")+10,date("Y")),-time() + mktime(date("H"),date("i"),0,date("m"),date("d")+14,date("Y")),-time() + mktime(date("H"),date("i"),0,date("m")+1,date("d"),date("Y")),-time() + mktime(date("H"),date("i"),0,date("m")+2,date("d"),date("Y")),-time() + mktime(date("H"),date("i"),0,date("m")+6,date("d"),date("Y")),-time() + mktime(date("H"),date("i"),0,date("m"),date("d"),date("Y")+1),-time() + mktime(date("H"),date("i"),0,date("m"),date("d"),date("Y")+2));
+$warn_text = Array("1 Tag","2 Tage","7 Tage","10 Tage","2 Wochen","1 Monat","2 Monate","6 Monate","1 Jahr","2 Jahre");
 ?>

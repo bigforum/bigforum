@@ -28,6 +28,7 @@ if(GROUP != "3" AND GROUP != "2")
 <tr><td class=normal color="snow">
 <b>IP-Adressen</b></td></tr>
 <tr><td><a href="?do=ip_auf">IP-Adresse auflösen</a></td></tr>
+<tr><td><a href="?do=ip_sea">IP-Adresse suchen</a></td></tr>
 </table>
 
 </td>
@@ -39,15 +40,37 @@ switch ($do) {
   user_online(true);
   break;
   
+  case "ip_sea":
+  echo "<form action=?do=sea_ip method=post>Gebe hier die IP-Adresse (oder einen Teil davon) an, nach der Du suchen möchtest.<br>
+  <input type=text name=ip><input type=submit value=Suchen></form>";
+  break;
+  
+  
+  case "sea_ip":
+  $ip_abfrage_eins = mysql_query("SELECT * FROM users WHERE last_ip LIKE '%$_POST[ip]%'");
+  $ip_abfrage_zwei = mysql_query("SELECT * FROM users WHERE reg_ip LIKE '%$_POST[ip]%'");
+  echo "Nach folgender IP-Adresse wurde gesucht: <b>$_POST[ip]</b></b><br><br>Folgende Benutzer hatten diese IP bei ihrem letzten Besuch:<table>";
+  while($iae = mysql_fetch_object($ip_abfrage_eins))
+  {
+    echo "<tr><td>$iae->username</td><td>(". date("d.m.Y - H:i", $iae->last_log) .")</td></tr>";
+  }
+  echo "</table><br>Folgende Benutzer hatten diese IP bei ihrer Registrierung:<table>";
+  while($iaz = mysql_fetch_object($ip_abfrage_zwei))
+  {
+    echo "<tr><td>$iaz->username</td><td>(". date("d.m.Y - H:i", $iaz->reg_dat) .")</td></tr>";
+  }
+  echo "</table>";
+  break;
+  
   
   case "mail_adr":
-  echo "<form action=?do=ma method=post>Gebe hier eine eMail-Adresse ein, und es werden dir alle Benutzer mit dieser eMail angezeigt.<br>
+  echo "<form action=?do=ma method=post>Gebe hier eine eMail-Adresse ein, und es werden dir alle Benutzer mit dieser eMail angezeigt. Es reicht auch wenn du einen Teil der eMail-Adresse angibst.<br>
   <input type=text name=mail><input type=submit value=Prüfen></form>";
   break;
   
   
   case "ma":
-  $maish = mysql_query("SELECT * FROM users WHERE mail LIKE '$_POST[mail]'");
+  $maish = mysql_query("SELECT * FROM users WHERE mail LIKE '%$_POST[mail]%'");
   if(mysql_num_rows($maish) == "0")
   {
     echo "Zur angegebenen eMail Adresse wurde leider kein Treffer gefunden.";
@@ -108,8 +131,7 @@ switch ($do) {
       page_footer();
 	  exit;
 	}
-	$gesp = $time+$_POST["dauer"];
-	$spertime = ceil($gesp/600)*600;  
+	$spertime = $_POST["dauer"];
 	mysql_query("UPDATE users SET gesperrt = '1', sptime = '$spertime' WHERE username LIKE '$_POST[ben]'");
 	echo "$_POST[ben] wurde nun vom Forum ausgeschlossen.";
 	echo "<br> $tab";
@@ -117,14 +139,16 @@ switch ($do) {
 	exit;
   }
 
-  $sperr_data = mysql_query("SELECT * FROM users WHERE gesperrt != '0' OR sptime > '$time'");
+  $sperr_data = mysql_query("SELECT * FROM users WHERE sptime > '$time'");
   $sp = "0";
   echo "<form action=?do=spe_us&action=new method=post><table>
   <tr><td>Benutzername: </td><td><input type=text name=ben></td></tr>
   <tr><td>Dauer:</td><td><select name=dauer>";
   for($v=0;$v<sizeof($warn_text);$v++)
   {
-    echo "<option value=$warn_dauer[$v]>$warn_text[$v]</option>";
+    $sperrtime = time()+$warn_dauer[$v];
+	$st = ceil($sperrtime/600)*600;  
+    echo "<option value=$st>$warn_text[$v] (". date("d.m.Y - H:i", $st) .")</option>";
   }
   echo "</select></td></tr></table><input type=submit value='Benutzer sperren'></form><br><hr>";
   echo "<table>";
@@ -135,7 +159,7 @@ switch ($do) {
 	{
 	  echo "<tr style=font-weight:bold><td>Benutzername</td><td>Läuft bis</td><td>Aktion</td></tr>";
 	}
-	echo "<tr><td>$sd->username</td><td>". date("d.m.Y - h:i", $sd->sptime) ."</td><td><a href=?do=spe_us&action=del&id=$sd->id>[ Sperre aufheben ]</a></td></tr>";
+	echo "<tr><td>$sd->username</td><td>". date("d.m.Y - H:i", $sd->sptime) ."</td><td><a href=?do=spe_us&action=del&id=$sd->id>[ Sperre aufheben ]</a></td></tr>";
   }
   if($sp == "0")
   {

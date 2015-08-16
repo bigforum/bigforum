@@ -138,7 +138,7 @@ if($_GET["do"] == "send")
 echo "<form action=?do=send method=post>
 <fieldset>
 <legend>Suchwörter</legend>
-<table width=100%><tr><td width=50%>Author / Erstellen</td><td width=50%>Schlüßelwort</td></tr>
+<table width=100%><tr><td width=50%>Author / Erstellen</td><td width=50%>Schlüsselwort</td></tr>
 <tr><td><input type=text name=auth></td><td><input type=text name=schlu></td></table></fieldset><br>
 <fieldset>
 <legend>Einstellungen</legend><table width=100%><tr><td width=50%>

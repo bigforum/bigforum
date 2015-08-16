@@ -120,9 +120,9 @@ switch ($do) {
   case "":
     left_table($start);
     admin_recht("1");
-    $adm_notice = file_get_contents("adm_notice.txt");
-	$adm_notice = str_replace("\n","<br>", $adm_notice);
-	$adm_notice = base64_decode($adm_notice);
+	$config_data = mysql_query("SELECT * FROM config WHERE erkennungscode LIKE 'f2usearch2'");
+    $cd = mysql_fetch_object($config_data);
+	$adm_notice = $cd->wert1;
     echo "<table class=braun width=50%><tr class=besch><td><b>Willkommen im Administrator-Kontrollzentrum</b></td></tr><tr><td>
 	Hallo ". USER .",<br>
 	hier im bigforum Admin-Panel kannst du alles mögliche verwalten. <br>Solltest du Hilfe mit dem Suchen bestimmter Funktionen haben,besuche doch mal die <a href=?do=help>kleine Administratoren Hilfe</a>.</td></tr></table><br><br>";
@@ -141,7 +141,7 @@ switch ($do) {
 
 	}
 	echo "<br><br>
-	<table class=braun width=50%><tr class=besch><td><b>Administratoren-Notizen (<a href=?do=change_notice>verändern)</b></td></tr><tr><td>$adm_notice</td></tr></table><br><br>";
+	<table class=braun width=50%><tr class=besch><td><b>Administratoren-Notizen (<a href=?do=change_notice>verändern</a>)</b></td></tr><tr><td>$adm_notice</td></tr></table><br><br>";
 	echo "<table class=braun width=50%><tr class=besch><td><b>Benutzer Statistik / Benutzer die online sind</b></td></tr><tr><td>";
     user_online(true);
 	echo "</td></tr></table></td></tr></table><br><br>
@@ -411,8 +411,9 @@ switch ($do) {
   
 
   case "phpver":
+  left_table($start);
   admin_recht("6");
-  echo "<table class=braun width=50%><tr class=besch><td><b>PHP & MySQL - Informationen</b></td></tr><tr><td>
+  echo "<table class=braun width=50%><tr class=besch><td><b>PHP & MySQL - Versionen</b></td></tr><tr><td>
   
   <table>
   <tr><td><b>PHP-Version:</b></td><td> ". phpversion() ."</td></tr>
@@ -486,6 +487,10 @@ switch ($do) {
 	     $gruppe = "Administrator";
 		 $mod_check = "checked";
 		 $adm_check = "checked";
+		 if($uds->adm_recht == "6")
+		 {
+		   $adm_check = "checked disabled";
+		 }
 	   }
 	   if($uds->group_id == "4")
 	   {
@@ -622,7 +627,7 @@ switch ($do) {
 		echo "<tr><td>$vh->name</td><td>$be</td><td><a href=?do=not_use&action=del&id=$vh->id>Löschen</a></td>";
 	  }
 	  echo "</table></td></tr></table><hr>
-	  <b>Neues Verbot von Benutzernamen / eMail-Adrsse hinzufügen:<br><br>
+	  <b>Neues Verbot von Benutzernamen / eMail-Adresse hinzufügen:<br><br>
 	  <form action=?do=not_use&action=insert method=post><input type=text name=verbo><select name=bemail><option value=1>eMail-Adresse</option><option value=2>Benutzername</option></select><br><input type=submit value=Speichern></form>";
   break;
   
@@ -721,17 +726,15 @@ switch ($do) {
   left_table($start);
   if($_GET["aktion"] == "change")
   {
-    $datei = fopen("adm_notice.txt","w+");
-	$_POST["foren_notice"] = str_replace("<br>","\n", $_POST["foren_notice"]);
-	$_POST["foren_notice"] = base64_encode($_POST["foren_notice"]);
-	fwrite($datei, $_POST["foren_notice"]);
-	echo "Die Administratoren-Notiz wurde erfolgreich geändert.<br><br><a href=?do=>Zurück zur Startseite</a>";
+    mysql_query("UPDATE config SET wert1 = '$_POST[foren_notice]' WHERE erkennungscode LIKE 'f2usearch2'");
+	echo "Die Administratoren-Notiz wurde erfolgreich geändert.<br><br><a href=admin.php>Zurück zur Startseite</a>";
 	insert_log("Administratoren-Notiz wurde geändert.");
 	fclose($datei);
     exit;
   }
-    $adm_notice = file_get_contents("adm_notice.txt");
-	$adm_notice = base64_decode($adm_notice);
+  	$config_data = mysql_query("SELECT * FROM config WHERE erkennungscode LIKE 'f2usearch2'");
+    $cd = mysql_fetch_object($config_data);
+	$adm_notice = $cd->wert1;
   echo "<table class=braun width=80%><tr class=besch><td><b>Administratoren-Notiz ändern</b></td></tr><tr><td>
   <form action=?do=change_notice&aktion=change method=post><textarea maxlength=50000 cols=70 rows=7 name=foren_notice>$adm_notice</textarea><input type=submit value=Speichern></form>
   </td></tr></table>";
@@ -1218,25 +1221,63 @@ switch ($do) {
 	  echo "<b>Information:</b> Dieser Benutzername exestiert nicht!";
 	  exit;
 	}
+	if($_POST["dauer"] == "other")
+	{
+	  insert_log("Ein Benutzer wurde gesperrt");
+	  $dauer = mktime(0,0,0,$_POST["month"],$_POST["tag"],$_POST["year"]);
+	  $spertime = ceil($dauer/600)*600;  
+	  mysql_query("UPDATE users SET gesperrt = '1', sptime = '$spertime' WHERE username LIKE '$_POST[ben]'");
+	  echo "$_POST[ben] wurde nun vom Forum ausgeschlossen. Er ist bis zum ". date("d.m.Y", $spertime) ." gesperrt.";
+	  exit;
+	}
 	insert_log("Ein Benutzer wurde gesperrt");
-	$gesp = $time+$_POST["dauer"];
-	$spertime = ceil($gesp/600)*600;  
+	$spertime = $_POST["dauer"];
 	mysql_query("UPDATE users SET gesperrt = '1', sptime = '$spertime' WHERE username LIKE '$_POST[ben]'");
 	echo "$_POST[ben] wurde nun vom Forum ausgeschlossen.";
 	exit;
   }
 
-  $sperr_data = mysql_query("SELECT * FROM users WHERE gesperrt != '0' OR sptime > '$time'");
+  $sperr_data = mysql_query("SELECT * FROM users WHERE sptime > '$time'");
   $sp = "0";
-  echo "<form action=?do=sper_user&action=new method=post><table>
+  echo "
+  <script>
+	function other(das) {
+    document.getElementById(das).style.display='block';
+    document.getElementById('zwei').style.display='block';
+	}
+	function nother(das) {
+	document.getElementById(das).style.display='none';
+    document.getElementById('zwei').style.display='none';
+	}
+
+	</script>
+  <form action=?do=sper_user&action=new method=post><table>
   <tr><td>Benutzername: </td><td><input type=text name=ben></td></tr>
   <tr><td>Dauer:</td><td><select name=dauer>";
   for($v=0;$v<sizeof($warn_text);$v++)
   {
-    echo "<option value=$warn_dauer[$v]>$warn_text[$v]</option>";
+    $sperrtime = time()+$warn_dauer[$v];
+	$st = ceil($sperrtime/600)*600;  
+    echo "<option value=$st onclick=nother('eins')>$warn_text[$v] (". date("d.m.Y - H:i", $st) .")</option>";
   }
-  echo "</select></td></tr></table><input type=submit value='Benutzer sperren'></form><br><hr>";
-  echo "<table>";
+  echo "<option disabled>------</option><option onclick=other('eins') value=other>Andere Länge</option></select></td></tr>
+  <tr><td>  <div style='display: none;' id='eins'>
+  Eigene Länge: </div></td><td><div style='display: none;' id='zwei'><select name=tag>";
+  for($i=1; $i<32; $i++){
+  echo "<option value=$i>$i</option>";
+  } 
+  echo "</select>.<select name=month>";
+  for($i=1; $i<13; $i++){
+  echo "<option value=$i>$i</option>";
+  } 
+  echo "</select>.<select name=year>";
+  for($i=date("Y"); $i<date("Y")+20; $i++){
+  echo "<option value=$i>$i</option>";
+  } 
+  echo " </select>
+  </div></td></tr></table><input type=submit value='Benutzer sperren'></form><br><hr>
+
+  <table>";
   while($sd = mysql_fetch_object($sperr_data))
   {
     $sp++;
@@ -1244,7 +1285,7 @@ switch ($do) {
 	{
 	  echo "<tr style=font-weight:bold><td>Benutzername</td><td>Läuft bis</td><td>Aktion</td></tr>";
 	}
-	echo "<tr><td>$sd->username</td><td>". date("d.m.Y - h:i", $sd->sptime) ."</td><td><a href=?do=sper_user&action=del&id=$sd->id>[ Sperre aufheben ]</a></td></tr>";
+	echo "<tr><td>$sd->username</td><td>". date("d.m.Y - H:i", $sd->sptime) ."</td><td><a href=?do=sper_user&action=del&id=$sd->id>[ Sperre aufheben ]</a></td></tr>";
   }
   if($sp == "0")
   {
@@ -1485,7 +1526,14 @@ switch ($do) {
 	{
 	  $posts = "0";
 	}
-	$data_hol = mysql_query("SELECT * FROM users WHERE $time < last_log AND posts >= $posts");
+	if($_POST["all"] != "1")
+	{
+	  $data_hol = mysql_query("SELECT * FROM users WHERE $time < last_log AND posts >= $posts");
+	}
+	else
+	{
+	  $data_hol = mysql_query("SELECT * FROM users");
+	}
 	$usernamen = array("");
 	$user_data = mysql_query("SELECT * FROM users WHERE username LIKE '". USER ."'");
     $ud = mysql_fetch_object($user_data);
@@ -1529,7 +1577,16 @@ switch ($do) {
   case "rundbrief":
     left_table($user);
     admin_recht("2");
-	echo "<table class='braun'><tbody><tr class='besch'><td><b>Rundbrief verfassen</b></td></tr><tr><td>
+	echo "<script>
+	function show(das) {
+    document.getElementById(das).style.display='block';
+	}
+	function nshow(das) {
+	document.getElementById(das).style.display='none';
+	}
+
+	</script>
+	<table class='braun'><tbody><tr class='besch'><td><b>Rundbrief verfassen</b></td></tr><tr><td>
 	Mit den folgenden Feldern kannst du einen Rundbrief, also einen Brief an alle aktiven Mitglieder verfassen.<br>Um Datenbank-belastung auszuschließen, werden inaktive Benutzer von der Rundmail ausgeschlossen.<br>
 	<b>Variablen-Ersetzung:</b>
 	<table>
@@ -1538,12 +1595,12 @@ switch ($do) {
 	</table><br><br>
 	<form action=?do=sendbrief method=post>
 	<small>Senden per:</small><br>
-	<select name=send_by><option value=pn>Privaten Nachricht</option>";
+	<select name=send_by><option value=pn onclick=nshow('eins')>Privaten Nachricht</option>";
 	$config_datad = mysql_query("SELECT * FROM config WHERE erkennungscode LIKE 'f2mf2'");
     $cdd = mysql_fetch_object($config_datad);
     if($cdd->zahl2 == "1")
     {
-	  echo "<option value=mail>eMail</option>";
+	  echo "<option value=mail onclick=show('eins')>eMail</option>";
 	}
 	echo "</select><br><small>Titel:</small><br>
 	<input type=text name=tit size=50><br><br>
@@ -1554,7 +1611,11 @@ switch ($do) {
 	<select name=days><option value=172800>2</option><option value=432000>5</option><option value=604800>7</option><option value=864000>10</option><option value=1209600>14</option><option value=1814400>21</option></select>Tagen sein.</td><td>
 	<small>...und muss mindestens</small><br>
 	<input type=text name=posts value=0 size=3 maxlength=6> Beiträge haben.<br>
-	</td></tr></table></fieldset><br><br>
+
+
+	</td></tr></table>	<div style='display: none;' id='eins'>
+    <input type=checkbox name=all value=1> An alle Benutzer schicken (Angaben oben werden ignoriert)
+    </div></fieldset><br><br>
 	<input type=submit value='Nachrichten verschicken'>
 	</form>
 	";
@@ -1648,6 +1709,35 @@ switch ($do) {
 	  echo "Der Rang wurde erfolgreich gelöscht.";
 	  exit;
 	}
+	if($_GET["edit"] != "")
+	{
+	  if($_GET["edit"] == "insert")
+	  {
+	  	if($_POST["name"] != "" AND $_POST["mpz"] != "")
+	    {
+	      mysql_query("UPDATE range SET name = '$_POST[name]', min_post = '$_POST[mpz]' WHERE id LIKE '$_GET[rid]'");
+	      echo "Danke, der Rang wurde geändert.";
+	    }
+	    else
+	    {
+	      echo "Bitte gebe sowohl einen Rangnamen als auch die Mindestpostzahl an.";
+	    }
+	  exit;
+	  }
+	  $rang_data = mysql_query("SELECT * FROM range WHERE id LIKE '$_GET[edit]'");
+	  $rd = mysql_fetch_object($rang_data);
+	  echo "<table class='braun' width=90%><tbody><tr class='besch'><td><b>Rang ändern</b></td></tr><tr><td>
+      Hier kannst Du Ränge hinzufügen, gebe bitte den Rangnamen und die Mindestpostzahl an.<br><br>
+	  <form action=?do=raenge&edit=insert&rid=$rd->id method=post>
+	  <table>
+	  <tr><td>Rangname:</td><td><input type=text name=name value='$rd->name'></td></tr>
+	  <tr><td>Mindestpostzahl:</td><td><input type=text name=mpz value='$rd->min_post'></td></tr>
+	  </table>
+	  <input type=submit value=Ändern>
+	  </form>
+      </td></tr></table>";
+	  exit;
+	}
 	echo "<table class='braun' width=90%><tbody><tr class='besch'><td><b>Rang hinzufügen</b></td></tr><tr><td>
     Hier kannst Du Ränge hinzufügen, gebe bitte den Rangnamen und die Mindestpostzahl an.<br><br>
 	<form action=?do=raenge&aktion=insert method=post>
@@ -1663,7 +1753,7 @@ switch ($do) {
 	$rang_data = mysql_query("SELECT * FROM range ORDER BY min_post");
 	while($rg = mysql_fetch_object($rang_data))
 	{
-	  echo "<tr><td>$rg->name</td><td>$rg->min_post</td><td><a href=?do=raenge&delete=$rg->id><img src=kreuz.gif border=0 title=Löschen></a></td></tr>";
+	  echo "<tr><td>$rg->name</td><td>$rg->min_post</td><td><a href=?do=raenge&delete=$rg->id><img src=kreuz.gif border=0 title=Löschen></a> <a href=?do=raenge&edit=$rg->id><img src=stift.gif border=0 title=Ändern></td></tr>";
 	}
 	echo "</table>
     </td></tr></table>";

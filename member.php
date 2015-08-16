@@ -155,7 +155,7 @@ $pa = array();
 
 
 $z = explode(",", $seiten);
-echo "<table width=80%><tr><td align=right valign=right><table class=navi><tr><td>";
+echo "<table width=80%><tr><td align=right valign=right><table class=seiten_navi><tr><td>";
 echo "<font color=snow>Seite $seite von $ws &nbsp <a href=?page=$up><</a>";
 $wvpe = $wieviel+1;
 for($a=0; $a < $wieviel; $a++)

@@ -285,7 +285,7 @@ if($ws == $seite)
 {
   $down--;
 }
-echo "<table width=80%><tr>$modffunk<td align=right valign=right><table class=navi><tr><td>";
+echo "<table width=80%><tr>$modffunk<td align=right valign=right><table class=seiten_navi><tr><td>";
 echo "<font color=snow>Seite $seite von $ws &nbsp <a href=?id=$_GET[id]&page=$up><</a>";
 //Welche Seiten sollen angezeigt werden?
 $seiten = "0,1,2,3,5,10,25,50,100,150,250,500,750";
@@ -422,7 +422,7 @@ while($bd = mysql_fetch_object($bei_dat))
 }
 if($ws > "1")
 {
-echo "<table width=80%><tr><td align=right valign=right><table class=navi><tr><td>";
+echo "<table width=80%><tr><td align=right valign=right><table class=seiten_navi><tr><td>";
 echo "<font color=snow>Seite $seite von $ws &nbsp <a href=?id=$_GET[id]&page=$up><</a>";
 $wvpe = $wieviel+1;
 for($a=0; $a < $wieviel; $a++)

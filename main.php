@@ -236,7 +236,7 @@ if($do == "set")
 	  {
 	    $eintrag = mysql_query("UPDATE users SET pn_weiter = '0', onlyadm = '$_POST[am]' WHERE username LIKE '". USER ."'");
 	  }
-	  $eintrag = mysql_query("UPDATE users SET style = '$_POST[sty]' WHERE username LIKE '". USER ."'");
+	  $eintrag = mysql_query("UPDATE users SET style = '$_POST[sty]', erlaube_prona = '$_POST[prona]' WHERE username LIKE '". USER ."'");
 	  speicherung($eintrag, "Deine Einstellungen wurden überarbeitet.", "<b>Fehler:</b> Es gab einen Fehler bei der Speicherung der Einstellungen.<br> <a href=javascript:history.back()>Zurück</a>");
       page_close_table();
 	}
@@ -300,8 +300,18 @@ if($do == "set")
 	  	echo "<option value='$sd->sname'>$sd->sname</option>";
 	  }
 	}
+	if($ud->erlaube_prona == "0")
+	{
+	  $profil_nachrichten = "<input type=radio name=prona value=0 checked>Ja <input type=radio name=prona value=1>Nein";
+	}
+	if($ud->erlaube_prona == "1")
+	{
+	  $profil_nachrichten = "<input type=radio name=prona value=0>Ja <input type=radio name=prona value=1 checked>Nein";
+	}
 	echo "</select></td></tr></table></fieldset>
-	<br>";
+	<br>
+	<fieldset><legend>Profilnachrichten</legend>
+	<table><tr><td>Erlaube Profilnachrichten:</td><td>$profil_nachrichten</td></tr></table></fieldset>";
 	if($ud->notice != "" AND $ud->notice != "0")
 	{
 	  ?>

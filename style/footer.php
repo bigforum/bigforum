@@ -7,7 +7,7 @@ if($_SERVER['PHP_SELF'] == "modcp.php" OR $_SERVER['PHP_SELF'] == "/modcp.php")
   echo "</td></tr></table>";
 }
 ?><br>
-<center>&copy; by <a href="http://www.bfs.kilu.de" target="_blank">Bigforum-Team</a>
+<center>&copy; by <a href="http://www.bigforum-support.de" target="_blank">Bigforum-Team</a>
 (Version: <?php echo VERSION; ?> )<br>
 2008 - <?php echo date("Y", time()); ?></center>
 </body>
