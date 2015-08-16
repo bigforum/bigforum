@@ -36,6 +36,10 @@ if($_GET["do"] == "groups")
   echo "</table>";
   page_footer();
 }
+if($_GET["username"] != "")
+{
+  check_data($_GET["username"], "3", "Bitte gebe mehr als drei Buchstaben an.", "laenge");
+}
 $id = $_GET["id"];
 $seite = $_GET["page"];
 if(!isset($seite) OR $seite == "0")
@@ -50,36 +54,57 @@ $menge = mysql_num_rows($cou);
 $wieviel = $menge / $eps;
 $ws = ceil($wieviel);
 looking_page("list_member");
+$config_wertt = mysql_query("SELECT * FROM config WHERE erkennungscode LIKE 'f2usearch2'");
+$cont = mysql_fetch_object($config_wertt); 
+if($cont->zahl1 == "1")
+{
+?>
+<form action="member.php">
+<table width="90%"><tr><td align=right>Benutzernamensuche: <input type=text name=username size=20></td></tr></table>
+</form><br>
+<?php
+}
 ?>
 <table width="100%">
 <tr class=dark color=snow>
 <td color=snow>
 <b><font color="snow">Benutzerliste - Die Benutzer des Forums</font></b>
 </td></tr></table><table width="100%" class=bord>
+<?php
+if($_GET["username"] == "")
+{
+?>
 <tr bgcolor="#E1E4F9" style="font-weight: bold;"><td> # </td><td><a href="?ord=user&page=<?php echo $seite;?>">Benutzername</a></td><td><a href="?ord=posts&page=<?php echo $seite;?>">Beiträge</a></td><td><a href="?ord=reg&page=<?php echo $seite;?>">Registrierungsdatum</a></td><td>Sonstiges</td></tr>
 <?php
+}
+else
+{
+?>
+<tr bgcolor="#E1E4F9" style="font-weight: bold;"><td> # </td><td><a href="?ord=user&page=<?php echo $seite;?>&username=<?php echo $_GET["username"]; ?>">Benutzername</a></td><td><a href="?ord=posts&page=<?php echo $seite;?>&username=<?php echo $_GET["username"]; ?>">Beiträge</a></td><td><a href="?ord=reg&page=<?php echo $seite;?>&username=<?php echo $_GET["username"]; ?>">Registrierungsdatum</a></td><td>Sonstiges</td></tr>
+
+<?php
+}
 $ord = $_GET["ord"];
 $xs = "0";
 if($ord == "posts")
 {
   $xs = "1";
-  $users = mysql_query("SELECT * FROM users WHERE sptime < '$time' ORDER BY posts DESC LIMIT $start, $eps");
+  $users = mysql_query("SELECT * FROM users WHERE sptime < '$time' AND username LIKE '%$_GET[username]%' ORDER BY posts DESC LIMIT $start, $eps");
 }
 if($ord == "reg")
 {
   $xs = "1";
-  $users = mysql_query("SELECT * FROM users WHERE sptime < '$time' ORDER BY reg_dat LIMIT $start, $eps");
+  $users = mysql_query("SELECT * FROM users WHERE sptime < '$time' AND username LIKE '%$_GET[username]%' ORDER BY reg_dat LIMIT $start, $eps");
 }
 if($ord == "user")
 {
   $xs = "1";
-  $users = mysql_query("SELECT * FROM users WHERE sptime < '$time' ORDER BY username LIMIT $start, $eps");
+  $users = mysql_query("SELECT * FROM users WHERE sptime < '$time' AND username LIKE '%$_GET[username]%' ORDER BY username LIMIT $start, $eps");
 }
 if($xs == "0")
 {
-  $users = mysql_query("SELECT * FROM users WHERE sptime < '$time' ORDER BY id LIMIT $start, $eps");
+  $users = mysql_query("SELECT * FROM users WHERE sptime < '$time' AND username LIKE '%$_GET[username]%' ORDER BY id LIMIT $start, $eps");
 }
-
 $numbers = "0";
 $num = "0";
 while($ur = mysql_fetch_object($users))

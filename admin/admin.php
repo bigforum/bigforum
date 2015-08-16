@@ -793,6 +793,8 @@ switch ($do) {
     mysql_query("UPDATE config SET wert1 = '$_POST[bfav]', wert2 = '$_POST[styl]', zahl1 = '7', zahl2 = '$_POST[smilie]' WHERE erkennungscode LIKE 'f2laengfs'");   
     mysql_query("UPDATE config SET wert1 = '$_POST[st]', zahl2 = '$_POST[pro]' WHERE erkennungscode LIKE 'f2profs'");   
 	mysql_query("UPDATE config SET zahl1 = '$_POST[bmin]', zahl2 = '$_POST[bmax]' WHERE erkennungscode LIKE 'f2bl2'");   //Benutzername (minimal/maximal)
+	mysql_query("UPDATE config SET zahl1 = '$_POST[bensuch]' WHERE erkennungscode LIKE 'f2usearch2'");   //Benutzersuche aktivieren
+
 	echo "Danke, die Foreneinstellungen wurden geändert!";
 	insert_log("Die Foreneinstellungen wurden überarbeitet.");
 	exit;
@@ -942,11 +944,23 @@ switch ($do) {
   {
     $email = "<input type=radio name=email value=1>Ja <input type=radio name=email value=0 checked>Nein ";
   }
+  $config_wert = mysql_query("SELECT * FROM config WHERE erkennungscode LIKE 'f2usearch2'");
+  $con = mysql_fetch_object($config_wert); 
+  if($con->zahl1 == "1")
+  {
+    $besu = "<input type=radio name=bensuch value=1 checked>Ja <input type=radio name=bensuch value=0>Nein ";
+  }
+  else
+  {
+    $besu = "<input type=radio name=bensuch value=1>Ja <input type=radio name=bensuch value=0 checked>Nein ";
+  }
   $config_wert = mysql_query("SELECT * FROM config WHERE erkennungscode LIKE 'f2bl2'");
   $con = mysql_fetch_object($config_wert); 
   echo "
   <tr><td>Gäste dürfen Profile sehen?</td><td>$prof_pack</td></tr>
   <tr><td>Zeige erweiterte Statistik auf der Startseite?</td><td>$st</td></tr>
+  <tr><td> &nbsp; </td><td> &nbsp </td></tr>
+  <tr><td>Benutzersuche aktivieren (Mitgliederliste)?</td><td>$besu</td></tr>
   <tr><td> &nbsp; </td><td> &nbsp </td></tr>
   <tr><td> Minimale Benutzernamenlänge </td><td> <input type=text name=bmin value='$con->zahl1'> </td></tr>
   <tr><td> Maximale Benutzernamenlänge </td><td> <input type=text name=bmax value='$con->zahl2'> </td></tr>

@@ -43,7 +43,7 @@ switch($do){
     //Auswahl wie man updaten möchte
     echo "Bitte wähle aus, welche Version du hast, also von welcher du auf die neuste Updaten möchtest.<br><br>
 	<form action=?do=update_query method=post>
-	<select name=vers><option value=2>Von 5.0 auf 5.3 updaten*</option><option value=1>Von 5.2 auf 5.3 updaten</option></select>
+	<select name=vers><option value=1>Von 5.3 oder 5.4 auf 5.5 updaten</option></select>
 	<br><br>
 	<input type=submit class=install_button value='Forum updaten'><br><br><br>
 	* <b>Wichtig:</b> Bei Sprüngen bei den Updates müssen die Datein hochgeladen werden, die Installation macht lediglich die Eintragungen in die Datenbank. Oder man lädt sich die Komplettversion der aktuellsten Version hoch, ganz wichtig aber, ohne die <i> config.php </i>.
@@ -56,30 +56,7 @@ switch($do){
     $schritte = "0";
     mysql_connect($HOST,$USER,$PW)or die(mysql_error());
     mysql_select_db($DB)or die(mysql_error());
-	if($_POST["vers"] == "2")
-	{
-      // Updates für die aktuellste
-	  mysql_query("CREATE TABLE IF NOT EXISTS range ( 
-      id INT(20) NOT NULL auto_increment,
-      name varchar(300) NOT NULL,
-      min_post INT(20) NOT NULL,
-	  PRIMARY KEY (id)
-	  );
-
-      "); 
-	  mysql_query("INSERT INTO range (name, min_post) VALUES ('Benutzer', '0')");
-	}
-	  mysql_query("CREATE TABLE IF NOT EXISTS report_pn (
-	  id INT(20) NOT NULL auto_increment,
-	  pn_id INT(20) NOT NULL,
-	  report_from varchar(500) NOT NULL,
-	  report_time INT(20) NOT NULL,
-	  grund varchar(2000) NOT NULL,
-	  erledigt INT(3) NOT NULL,
-	  PRIMARY KEY (id)
-	  );
-	  
-	  ");
+	mysql_query("INSERT INTO config (erkennungscode, wert1, wert2, zahl1, zahl2) VALUES ('f2usearch2', '', '', '1', '0')");
 	
 
 	
@@ -87,7 +64,8 @@ switch($do){
 	if($schritte == $_POST["vers"])
 	{
       echo "Danke, du hast das Forum erfolgreich geupdatet..<br><br>
-	  Sollten Fragen und/oder Probleme auftreten, bitte im <a href=www.bfs.kilu.de>Support-Forum</a> nachfragen.";
+	  Sollten Fragen und/oder Probleme auftreten, bitte im <a href=www.bigforum-support.de>Support-Forum</a> nachfragen.<br><br>Die Installations-Datei wurde gelöscht.";
+	  unlink("install.php");
 	}
 	else
 	{
@@ -432,6 +410,7 @@ switch($do){
 	  mysql_query("INSERT INTO config (erkennungscode, wert1, wert2, zahl1, zahl2) VALUES ('f2adser2', 'kreis', '', '0', '0')");
 	  mysql_query("INSERT INTO config (erkennungscode, wert1, wert2, zahl1, zahl2) VALUES ('f2mf2', '', '', '1', '0')"); // Für Forenstatistik, und ob das Forum(z1) den eMail-Versand(z2) unterstüzt. 1=Ja 0 = Nein
 	  mysql_query("INSERT INTO config (erkennungscode, wert1, wert2, zahl1, zahl2) VALUES ('f2bl2', '', '', '3', '20')"); // Benutzernamenlänge (w1) = Minimale Länge (w2) Maximale Länge
+	  mysql_query("INSERT INTO config (erkennungscode, wert1, wert2, zahl1, zahl2) VALUES ('f2usearch2', '', '', '1', '0')"); // Zahl1 für Benutzersuche (1=aktiviert)
 	  mysql_query("INSERT INTO smilie (packet, images_path, abk1, abk2) VALUES ('1', 'brille.png', '8-)', '8)')");
 	  mysql_query("INSERT INTO smilie (packet, images_path, abk1, abk2) VALUES ('1', 'grine.png', ':)', ':-)')");
 	  mysql_query("INSERT INTO smilie (packet, images_path, abk1, abk2) VALUES ('1', 'lache.png', ':D', ':-D')");
