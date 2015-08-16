@@ -373,6 +373,20 @@ function erzeuge_error($text)
   echo "</td></tr></table></center><br><br>";
   page_footer();
 }
+function erzeuge_error_safe()
+{
+  echo "<center><table class=bord width=50% height=50%>  
+  <tr class=normal><td><font color=snow><b>". SITENAME ." - Fehlermeldung</b></td></tr>
+  <tr><td align=center>Aufgrund von Sicherheitstechnischen Gründen konnte diese Aktion nicht durchgeführt werden.";
+  $config_data = mysql_query("SELECT * FROM config WHERE erkennungscode LIKE 'f2mf2'");
+  $cd = mysql_fetch_object($config_data);
+  if($cd->zahl2 == "1")
+  {
+    echo "<br><br>Sollte es sich um einen Fehler dabei handeln, <a href=kontakt.php>kontaktiere einen Administrator</a>.";
+  }
+  echo "</td></tr></table></center><br><br>";
+  page_footer();
+}
 function erzeuge_mysql_error($text)
 {
   echo "<center><table class=bord width=50% height=50%>  
@@ -624,6 +638,8 @@ function mysql_fehler($fehler, $line, $datei)
   [FEHLER]
 	  
   Der Fehler befindet sich in der Zeile [LINE] und in der Datei [DATEI].
+  
+  Der Absender der Nachricht hat folgende IP: [IP]
 	  
   Dieses ist eine automatische Private Nachricht, welche vom Forum aus verschickt wurde.';
   
@@ -637,6 +653,7 @@ function mysql_fehler($fehler, $line, $datei)
     $err = str_replace('[LINE]',$line,$err);
     $err = str_replace('[DATEI]',$datei,$err);
     $err = str_replace('[FEHLER]',$error,$err);
+	$err = str_replace('[IP]',$_SERVER["REMOTE_ADDR"],$err);
 	$err = str_replace('_u_',' ',$err);
     $time = time();
     mysql_query("INSERT INTO prna (abse, emp, dat, betreff, mes, gel) VALUES ('$_COOKIE[username]', '$dh->username', '$time', 'Datenbank-Fehlermeldung', '$err', '0')");

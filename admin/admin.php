@@ -100,8 +100,7 @@ document.onkeypress=support;
 <?php } ?>
 </script>
 <?php
-echo "<div align='left'><img src='http://future-addons.kilu.de/style/images/banner/1.png' alt=''></div>
-<div align='right'>
+echo "<div align='right'>
 <b><font size=5>Administratoren-Kontrollzentrum</font></b><br>
 <p><a href=?do=log_out>Aus Admin-Bereich ausloggen</a> | <a href='../index.php' target='_blank'>Foren-Übersicht</a></p>
 </div>

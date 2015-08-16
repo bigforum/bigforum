@@ -131,8 +131,8 @@ if($do == "ava"){
 if($ac == "send")
 {
 $dateityp = GetImageSize($_FILES['datei']['tmp_name']);
-if($dateityp[3] != 0)   {
-     echo "Bitte verwende ein anderes Format, dein Format ist nicht erlaubt";
+if(str_replace(".php","", $_FILES['datei']['name']) AND str_replace(".html","", $_FILES['datei']['name']))   {
+     echo "Bitte verwende ein anderes Format, dein Format ist nicht erlaubt.";
 	 page_close_table();
 	}
    if($_FILES['datei']['size'] <  102400)
@@ -168,6 +168,15 @@ page_close_table();
 
 if($do == "friends")
 {
+  if($_GET["action"] == "del" AND is_numeric($_GET["id"]))
+  {
+    mysql_query("DELETE FROM kontakt WHERE user_id = '$ud->id' AND friend_id = '$_GET[id]'");
+	echo "Der Kontakt wurde erfolgreich gelöscht.";
+  }
+  elseif(!is_numeric($_GET["id"]) AND $_GET["action"] == "del")
+  {
+    erzeuge_error_safe();
+  }
   if($_GET["action"] == "add")
   {
     $fr_da = mysql_query("SELECT * FROM users WHERE username LIKE '$_POST[user]'");
@@ -189,7 +198,7 @@ if($do == "friends")
   }
   else
   {
-    echo "<table><tr><td><b>Username</b></td><td><b>Kontakt</b></td></tr>";
+    echo "<table><tr><td><b>Username</b></td><td><b>Kontakt</b></td><td><b>Aktion</b></td><td><b>Status</b></tr>";
 	while($fh = mysql_fetch_object($friends_hol))
 	{
 	  $users_ids = mysql_query("SELECT * FROM users WHERE id LIKE '$fh->friend_id'");
@@ -199,8 +208,14 @@ if($do == "friends")
       $cd = mysql_fetch_object($config_datas);
       if($usi->darf_pn == "0" AND $cd->zahl2 == "1")
       {
-        echo "<a href=main.php?do=make_pn&to=$usi->username><img src=images/pn.png border=0 width=60px height=32px alt=\"$usi->username eine Private Nachricht schreiben\"></a>";
+        echo "<a href=main.php?do=make_pn&to=$usi->username><img src=images/pn.png border=0 width=60px height=32px alt=\"$usi->username eine Private Nachricht schreiben\"></a></td><td>";
       }
+	  else
+	  {
+	    echo "</td><td>";
+	  }
+	  echo "<a href=?do=friends&action=del&id=$usi->id>Löschen</a></td><td>";
+	  show_online($usi->last_log, $usi->username);
 	  echo "</td></tr>";
 	}
     echo "</table>";

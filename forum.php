@@ -115,8 +115,14 @@ if($_GET["do"] == "change")
 	}
   }
 }
-
-$for_dat = mysql_query("SELECT * FROM foren WHERE id LIKE '$id'") or die(mysql_fehler(mysql_error(), __LINE__, $_SERVER["PHP_SELF"]));
+if(ctype_digit($id))
+{
+  $for_dat = mysql_query("SELECT * FROM foren WHERE id LIKE '$id'") or die(mysql_fehler(mysql_error(), __LINE__, $_SERVER["PHP_SELF"]));
+}
+else
+{
+  erzeuge_error_safe();
+}
 $fd = mysql_fetch_object($for_dat);
 if($fd->guest_see == "1")
 {
