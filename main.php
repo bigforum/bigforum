@@ -269,10 +269,10 @@ if($do == "set")
 	<tr><td>Automatische Weiterleitung zu dem Posteingang, beim Mauskontakt, des blinkenden Textes \"Neue Nachrichten\" oben über deiner Navigationsliste.</td><td width=40%>
 	<input type=checkbox name=pn_weiter value=1 $checked></td></tr>
 	<tr><td>Private Nachrichten nur von Administratoren und Moderatoren empfangen?</td><td><input type=radio name=am value=2 $pnj>Ja <input type=radio name=am value=5 $pnn>Nein</td></tr>
-	</table>    <input type=submit value=Speichern></fieldset><br>
+	</table> </fieldset><br>
 	<fieldset><legend>Design</legend>
 	<table><tr><td>
-    Welche Farbe soll dieses Forum haben?</td><td><select name=sty>";
+    Wähle bitte das Design vom Forum aus:</td><td><select name=sty>";
 	$style_data = mysql_query("SELECT * FROM style_all");
 	while($sd = mysql_fetch_object($style_data))
 	{
