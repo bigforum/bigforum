@@ -144,47 +144,58 @@ function mysqlVersion() {
 } 
 function user_online($anz)
 {
-$time_as_useris_online = "900";
-$dtime = time() - $time_as_useris_online;
-$x = "0";
-$anzahl = "0";
-$mos_dat = mysql_query("SELECT * FROM config WHERE erkennungscode LIKE 'f2name2'");
-$md = mysql_fetch_object($mos_dat);
-$online_data = mysql_query("SELECT * FROM users WHERE last_log > '$dtime' ORDER BY username");
-$meno = mysql_num_rows($online_data);
-$result = mysql_query("SELECT ip FROM onlineuser"); 
-$user_online = mysql_num_rows($result);
-$meno = $user_online;
-if($meno > $md->zahl1)
-{
-  $time = time();
-  mysql_query("UPDATE config SET zahl1 = '$meno', zahl2 = '$time' WHERE erkennungscode LIKE 'f2name2'");
-}
-echo "<table width=100% class=forenbg><tr><td>";
-echo "<small>Der Besucherrekord liegt bei $md->zahl1 Besuchern, die Gleichzeitig am ". date("d.m.Y", $md->zahl2) ." um ". date("H:i", $md->zahl2) ." online waren.</small><br>";
-while($ond = mysql_fetch_object($online_data))
-{
- $link = "profil.php?id=$ond->id";
+  $time_as_useris_online = "900";
+  $dtime = time() - $time_as_useris_online;
+  $x = "0";
+  $anzahl = "0";
+  $mos_dat = mysql_query("SELECT * FROM config WHERE erkennungscode LIKE 'f2name2'");
+  $md = mysql_fetch_object($mos_dat);
+  $online_data = mysql_query("SELECT * FROM users WHERE last_log > '$dtime' ORDER BY username");
+  $meno = mysql_num_rows($online_data);
+  $result = mysql_query("SELECT ip FROM onlineuser"); 
+  $user_online = mysql_num_rows($result);
+  $meno = $user_online;
+  if($meno > $md->zahl1)
+  {
+    $time = time();
+    mysql_query("UPDATE config SET zahl1 = '$meno', zahl2 = '$time' WHERE erkennungscode LIKE 'f2name2'");
+  }
+  echo "<table width=100% class=forenbg><tr><td>";
+  echo "<small>Der Besucherrekord liegt bei $md->zahl1 Besuchern, die Gleichzeitig am ". date("d.m.Y", $md->zahl2) ." um ". date("H:i", $md->zahl2) ." online waren.</small><br>";
+  while($ond = mysql_fetch_object($online_data))
+  {
+    $link = "profil.php?id=$ond->id";
+    if($anz == true)
+    {
+      $link = "?do=ver_user&name=$ond->username";
+    } 
+   $anzahl++;
+   $x++;
+   if($x != "1")
+   {
+     echo ", ";
+   }
+   $user_data = mysql_query("SELECT * FROM users WHERE username LIKE '". USER ."'");
+   $ud = mysql_fetch_object($user_data);
+   $friends_hol = mysql_query("SELECT * FROM kontakt WHERE user_id LIKE '$ud->id' AND friend_id LIKE '$ond->id'");
+   $fh = mysql_fetch_object($friends_hol);
+   if(mysql_num_rows($friends_hol) == "0")
+   {
+     echo "<a href=$link>$ond->username</a>";
+   }
+   else
+   {
+     echo "<a href=$link>$ond->username</a>+";
+   }
+   if($anz == true)
+   {
+     echo " (". date("H:i", $ond->last_log) .")";
+   }
+  }
   if($anz == true)
   {
-  $link = "?do=ver_user&name=$ond->username";
-  } 
- $anzahl++;
- $x++;
- if($x != "1")
- {
-   echo ", ";
- }
- echo "<a href=$link>$ond->username</a>";
- if($anz == true)
- {
-   echo " (". date("H:i", $ond->last_log) .")";
- }
-}
-if($anz == true)
-{
-  echo "<br>Benutzer online: $anzahl";
-}
+    echo "<br>Benutzer online: $anzahl";
+  }
 }
 function looking_page($wo)
 {
