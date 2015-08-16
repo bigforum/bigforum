@@ -5,13 +5,19 @@ page_header();
 looking_page("online_view");
 include("includes/function_forum.php");
 include_once("includes/function_user.php");
-$order = $_GET["ord"];
-
+if(isset($_GET["ord"]))
+{
+  $order = "";
+}
+else
+{
+  $order = "username";
+}
 if($order == "")
 {
   $order = "username";
 }
-if($_GET["ip"] != "" AND (GROUP == "2" OR GROUP == "3"))
+if(isset($_GET["ip"]) AND (GROUP == "2" OR GROUP == "3"))
 {
   $ip = $_GET["ip"];
     $ip_auf = gethostbyaddr($ip);

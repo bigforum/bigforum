@@ -1,6 +1,6 @@
 <?php
 //Wichtige Angaben für jede Datei!
-include_once("includes/functions.php");
+include("includes/functions.php");
 login();
 page_header();
 if($_GET["do"] == "groups")

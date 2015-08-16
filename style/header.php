@@ -141,7 +141,10 @@ $da = $_SERVER["SCRIPT_NAME"];
 $da = preg_replace ('#\/.*?\/#m' , '' , $da);  
 $da =  "/$da";
 $da = str_replace("//","/", $da);
-$id = $_GET["id"];
+if(isset($_GET["id"]))
+{
+  $id = $_GET["id"];
+}
 //Aufenthalt ermitteln
 $seite = array(
   "/index.php"     => "Startseite",

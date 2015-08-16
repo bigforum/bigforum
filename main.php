@@ -1,7 +1,6 @@
 <?php
 //Wichtige Angaben für jede Datei!
 include_once("includes/functions.php");
-
 page_header();
 login();
 looking_page("main");
@@ -460,6 +459,41 @@ echo " <a href=?do=pn_ein&page=$down>></a></td></tr></table></td></tr></table>";
 }
 page_close_table();
 }
+if($do == "report_pn")
+{
+  if($_GET["aktion"] == "insert")
+  {
+    $config_data = mysql_query("SELECT * FROM config WHERE erkennungscode LIKE 'f2mf2'");
+    $cd = mysql_fetch_object($config_data);
+    if($cd->zahl2 == "1")
+    {
+    $admin_data = mysql_query("SELECT * FROM users WHERE group_id = '3'");
+    while($ad = mysql_fetch_object($admin_data))
+    {
+      $mail_empfaenger= $ad->mail;
+      $mail_absender= $ud->mail;
+      $betreff= "Gemeldete Private Nachricht";
+      $header  = "MIME-Version: 1.0\r\n";
+      $header .= "Content-type: text/html; charset=iso-8859-1\r\n";
+      $header .= "From: $mail_absender\r\n";
+      $header .= "Reply-To: $mail_empfaenger\r\n";
+      $text= "Hallo $ad->username,<br>im Forum wurde eine Private Nachricht gemeldet.<br><br>Du kannst diese Private Nachricht inkl. dem Grund im Administratoren-Kontrollzentrum einsehen.<br><br>";
+      mail($mail_empfaenger, $betreff, $text, $header);
+    }	
+	}
+    $time = time();
+    mysql_query("INSERT INTO report_pn (pn_id, report_from, report_time, grund) VALUES ('$_GET[id]', '". USER ."', '$time', '$_POST[grund]')");
+    echo "Danke, Private Nachricht wurde erfolgreich gemeldet.";
+    exit;
+  }
+  echo "<fieldset><legend>Private Nachricht melden</legend>
+  <form action=?do=report_pn&id=$_GET[id]&aktion=insert method=post>
+  Bitte gebe den Grund dafür an, warum Du diese Nachricht melden möchtest. Dieser Grund sollte exakt und möglichst sehr zutreffend sein.<br>
+  Grund: <input type=text name=grund size=40><input type=submit value='Nachricht melden'>
+  </form>
+  </fieldset>";
+  exit;
+}
 if($do == "read_pn" AND $ac != "")
 {
   if($pn_deakt == true)
@@ -483,7 +517,7 @@ if($do == "read_pn" AND $ac != "")
   $from = $pr->abse;
   $datum = date("d.m.Y",$pr->dat);
   $uhrzeit = date("H:i",$pr->dat);
-  echo "<table width=81%><tr class=normal><td><font color=snow>$datum, $uhrzeit</font></td></tr></table>";
+  echo "<table width=81%><tr class=normal><td><font color=snow>$datum, $uhrzeit (<a href=?do=report_pn&id=$pr->id><font color=snow>Nachricht melden</font></a>)</font></td></tr></table>";
   text_ausgabe($text, $betreff, $from);
   $betreff = str_replace(" ", "_", $betreff);
   $betreff = str_replace("AW:_","", $betreff);

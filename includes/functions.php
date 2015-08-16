@@ -1,4 +1,5 @@
 <?php
+error_reporting(0);
 function can_view_admincp()
 {
   if(GROUP != "3")
@@ -10,14 +11,7 @@ function can_view_admincp()
 function page_header()
 {
   config("f2name2", true, "function_define");
-  if(str_replace("kilu", "", $HTTP_REFERER))
-  {
-    include("includes/function_user.php");
-  }
-  else
-  {
-    include_once("includes/function_user.php"); 
-  }
+  include_once("includes/function_user.php");
   include("style/header.php");   
 }
 function page_close_table()
@@ -265,23 +259,32 @@ function looking_page($wo)
   {
     $them_dat = mysql_query("SELECT * FROM thema WHERE id LIKE '$_GET[id]'");
 	$td = mysql_fetch_object($them_dat);
-	if($td->guest_see == "1")
-    {
-      if(USER == "")
-      {
-        $page = "thread.php";
-	    $text = "Liest ein Thema";
-      }
-    }
-	if($fd->guest_see == "2")
-    {
-        $page = "thread.php";
-	    $text = "Liest ein Thema";
-    }
-	if($td->dele == "")
+	if(isset($td->guest_see))
 	{
-      $page = "thread.php";
-	  $text = "Liest ein Thema: $td->tit";
+	  if($td->guest_see == "1")
+      {
+        if(USER == "")
+        {
+          $page = "thread.php";
+	      $text = "Liest ein Thema";
+        }
+      }
+	}
+	if(isset($fd->guest_see))
+	{
+	  if($fd->guest_see == "2")
+      {
+          $page = "thread.php";
+	      $text = "Liest ein Thema";
+      }
+	}
+	if(isset($td->dele))
+	{
+	  if($td->dele == "")
+	  {
+        $page = "thread.php";
+	    $text = "Liest ein Thema: $td->tit";
+	  }
 	}
   }
   if($wo == "newreply")
@@ -293,10 +296,21 @@ function looking_page($wo)
   }
   if($wo == "onekat")
   {
-    $them_dat = mysql_query("SELECT * FROM kate WHERE id LIKE '$_GET[id]'");
+    if(isset($_GET["do"]))
+	{
+      $get_id = $_GET["id"];
+	}
+	else
+	{
+	  $get_id = "";
+	}
+    $them_dat = mysql_query("SELECT * FROM kate WHERE id LIKE '$get_id'");
 	$td = mysql_fetch_object($them_dat);
-    $page = "index.php?do=show_one&id=$td->id";
-	$text = "Betrachtet die Foren einer Kategorie $td->name";
+	if(!empty($td->id) AND !empty($td->name))
+	{
+      $page = "index.php?do=show_one&id=$td->id";
+	  $text = "Betrachtet die Foren einer Kategorie $td->name";
+	}
   }
   if($wo == "foren_helfer")
   {
@@ -338,7 +352,10 @@ function looking_page($wo)
     if($wo != ""){
       $time = time();
 	  $ip = $_SERVER["REMOTE_ADDR"];
-      mysql_query("UPDATE users SET last_site = '$text', last_log = '$time', last_ip = '$ip' WHERE username LIKE '$_COOKIE[username]'");
+	  if(isset($text))
+	  {
+        mysql_query("UPDATE users SET last_site = '$text', last_log = '$time', last_ip = '$ip' WHERE username LIKE '$_COOKIE[username]'");
+	  }
 	}
   }
 }
@@ -477,11 +494,7 @@ function login()
 }
 function error()
 {
-  //Zeige Administratoren, in bestimmeten Datein alle Fehler
-  if($ud->group_id == "3")
-  {
-    error_reporting(E_ALL);
-  }
+
 }
 function show_online($zeit, $user)
 {

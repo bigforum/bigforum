@@ -14,36 +14,41 @@ else{
 }
 function pn_zahl($where)
 {
-  if(USER != "Gast")
+  if(!empty($_COOKIE["username"])) // USER != GAST
   {
     $postein = "0";
 	$postaus = "0";
 	$gele = "0";
-    $pn_zahl = mysql_query("SELECT * FROM prna WHERE abse LIKE '". USER . "'");
+    $pn_zahl = mysql_query("SELECT * FROM prna WHERE abse LIKE '$_COOKIE[username]'");
 	while($zahle = mysql_fetch_object($pn_zahl))
 	{
 	  $dd = explode("|", $zahle->abse);
+/*if(isset($dd[1])) {
 	  if($dd[1] != "del")
-	  {
-	    if($zahle->emp != USER)
+	  {*/
+	    if($zahle->emp != $_COOKIE["username"])
 	    {
 	      $postaus++;	  
 	    }
-	  }
-	}
-	$pn_zahls = mysql_query("SELECT * FROM prna WHERE emp LIKE '". USER . "'");
+	//  }
+	//}
+}
+	$pn_zahls = mysql_query("SELECT * FROM prna WHERE emp LIKE '$_COOKIE[username]'");
 	while($zahles = mysql_fetch_object($pn_zahls))
 	{
+
 	  $d = explode("|", $zahles->emp);
+/*if(isset($d[1])) {
 	  if($d[1] != "del")
-	  {
+	  {*/
 	    $postein++;	
         if($zahles->gel == "0")
         {  
 	      $gele++;
         }	  
-	  }
-	}
+	  //}
+	//}
+}
 	if($where == "header")
 	{
 	  //Nochmal eine MySQL - Abfrage, um sicherzugehen, das der Benutzer auch wirklich eine Nachricht hat

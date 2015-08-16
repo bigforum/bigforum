@@ -1,5 +1,6 @@
 <?php
 session_start();
+error_reporting(0);
 include("../includes/functions.php");
 include("admin_functions.php");
 config("f2name2", false, "function_define");
@@ -112,7 +113,7 @@ if(mysql_num_rows($add_data) != "0")
 }
 $sons = array("?do=settings|Foren-Einstellungen","?do=settings_admincp|Kontrollzentrum-Einstellungen","?do=raenge|Ränge-Einstellungen","?do=look_logs|Log-Einträge","?do=mods|Mods/Addons Verwaltung","?do=new_warn|Verwarnungsgründe","?do=adser|Adserver","?do=not_use|Benutzernamen / eMail-Adressen verbieten", "?do=rundbrief| Rundbrief schreiben");
 $for = array("?do=new_foren|Neues Forum","?do=ver_foren|Verwalte Foren");
-$user = array("?do=sper_user|Gesperrte","?do=ver_user|Benutzer suchen","?do=recht| Administratoren-Rechte","?do=zuruck|Rechte zurücksetzen");
+$user = array("?do=sper_user|Gesperrte","?do=ver_user|Benutzer suchen","?do=inaktiv|Inaktive Benutzer","?do=recht| Administratoren-Rechte","?do=zuruck|Rechte zurücksetzen");
 $start = array("admin.php|Start","?do=ver_check|Version-Check","?do=settings|Foren-Einstellungen","?do=look_logs|Log-Einträge ansehen","?do=new_foren|Neues Forum erstellen","?do=ver_user|Benutzer verwalten");
 $design = array("?do=styles|Styles","?do=insert_style|Style hinzufügen","?do=design|Header-Einstellungen");
 switch ($do) {
@@ -131,12 +132,77 @@ switch ($do) {
 	Die Datei install.php exestiert noch. Bitte lösche diese Datei.<br> Ansonsten kann jeder andere dieses Forum manipulieren!</td></tr></table><br><br>";
 
 	}
+	$pn_data = mysql_query("SELECT * FROM report_pn WHERE erledigt = '0'");
+	$panzahl = mysql_num_rows($pn_data);
+	if($panzahl != "0")
+	{
+	  	echo "<table class=braun width=50%><tr class=besch><td><b>Gemeldete Private Nachrichten</b></td></tr><tr><td>
+	    Es wurden <a href=?do=reports_pn><b>$panzahl</b> Private Nachrichten</a> gemeldet, welche noch nicht kontrolliert wurden.</td></tr></table><br><br>";
+
+	}
 	echo "<br><br>
 	<table class=braun width=50%><tr class=besch><td><b>Administratoren-Notizen (<a href=?do=change_notice>verändern)</b></td></tr><tr><td>$adm_notice</td></tr></table><br><br>";
 	echo "<table class=braun width=50%><tr class=besch><td><b>Benutzer Statistik / Benutzer die online sind</b></td></tr><tr><td>";
     user_online(true);
 	echo "</td></tr></table></td></tr></table><br><br>
 	<table class=braun width=50%><tr class=besch><td><b>Detailsbeschreibung</b></td></tr><tr><td> <table><tr><td><b>Foren-Version:</b></td><td>". VERSION ."</td></tr><tr><td><b>Forenentwickler:</b></td><td><a href=http://www.potterfreaks.de>Potterfans</a></td></tr></table> </td></tr></table>";
+  break;
+  
+  
+  case "reports_pn":
+    left_table($start);
+	if(isset($_GET["id"]))
+	{
+	  mysql_query("UPDATE report_pn SET erledigt = '1' WHERE id LIKE '$_GET[id]'");
+	  echo "Danke, die Meldung wurde nun gelöscht.";
+	  exit;
+	}
+	$pn_data = mysql_query("SELECT * FROM report_pn WHERE erledigt = '0'");
+	while($pd = mysql_fetch_object($pn_data))
+	{
+	  $pn_aus = mysql_query("SELECT * FROM prna WHERE id LIKE '$pd->pn_id'");
+      $pr = mysql_fetch_object($pn_aus);
+	  echo "<fieldset><legend>Informationen zur gemeldeten Nachricht <a href=?do=reports_pn&id=$pd->id>(erledigt)</a></legend>
+	  <table><tr><td width=35%>
+	  Absender: <a href=?do=ver_user&name=$pr->abse>$pr->abse</a><br>
+	  Empfänger: <a href=?do=ver_user&name=$pr->emp>$pr->emp</a><br>
+	  Uhrzeit: ". date("d.m.Y - h:i", $pr->dat) ."<br><br>
+	  <b>Betreff:</b> $pr->betreff
+	  </td><td valign=top>
+	  Gemeldet von: <a href=?do=ver_user&name=$pd->report_from>$pd->report_from</a><br>
+	  Meldungsdatum: ". date("d.m.Y - h:i", $pd->report_time) ." <br>
+	  Grund: $pd->grund
+	  
+	  </td></tr></table><br><br>$pr->mes
+	  </fieldset><br><br>";
+	}
+  break;
+  
+  
+  case "inaktiv":
+    left_table($user);
+	echo "<table class=braun width=50%><tr class=besch><td><b>Inaktive Benutzer (Letzter Login vor mehr als 30 Tagen)</b></td></tr><tr><td>
+	    <table>
+		<tr><td><b>Benutzername</b></td><td><b>Beiträge</b></td><td>Letzter Login</td></tr>";
+		$time = time() - 2678400;
+		$user_data1 = mysql_query("SELECT * FROM users WHERE last_log < $time");
+		while($ud1 = mysql_fetch_object($user_data1))
+		{
+		  echo "<tr><td>$ud1->username</td><td>$ud1->posts</td><td>". date("d.m.Y - h:i", $ud1->last_log) ."</td></tr>";
+		}
+		echo "</table>
+		</td></tr></table><br><br>
+		<br><br>
+		<table class=braun width=50%><tr class=besch><td><b>Inaktive Benutzer (Nullposter und letzter Login vor mehr als 2 Tagen)</b></td></tr><tr><td>
+		<table>
+		<tr><td><b>Benutzername</b></td><td><b>Beiträge</b></td><td>Letzter Login</td></tr>";
+		$time = time() - 172800;
+		$user_data1 = mysql_query("SELECT * FROM users WHERE last_log < $time AND posts = 0");
+		while($ud1 = mysql_fetch_object($user_data1))
+		{
+		  echo "<tr><td>$ud1->username</td><td>$ud1->posts</td><td>". date("d.m.Y - h:i", $ud1->last_log) ."</td></tr>";
+		}
+	    echo "</td></tr></table><br><br>";
   break;
   
   

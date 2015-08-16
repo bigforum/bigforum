@@ -6,6 +6,8 @@ $userdata = mysql_query("SELECT * FROM users WHERE username LIKE '". USER ."'") 
 $ud = mysql_fetch_object($userdata);
 $ausgabe = "";
 looking_page("onekat");
+if(isset($_GET["do"]))
+{
 if($_GET["do"] == "show_one")
 {
 //Nur eine Kategorie
@@ -140,7 +142,7 @@ page_footer();
 exit;
 //Nur eine Kategorie!
 }
-
+}
 looking_page("index"); //Ausgabe wo man sich befindet
 
 if(USER != "")
@@ -191,13 +193,16 @@ xmlhttp.send(null);
 
 </script>
 <?php
-if($_GET["do"] == "ss")
+if(isset($_GET["do"]))
 {
-  mysql_query("UPDATE users SET statshow = '0' WHERE username LIKE '". USER ."'");
-}
-if($_GET["do"] == "ds")
-{
-  mysql_query("UPDATE users SET statshow = '1' WHERE username LIKE '". USER ."'");
+  if($_GET["do"] == "ss")
+  {
+    mysql_query("UPDATE users SET statshow = '0' WHERE username LIKE '". USER ."'");
+  }
+  if($_GET["do"] == "ds")
+  {
+    mysql_query("UPDATE users SET statshow = '1' WHERE username LIKE '". USER ."'");
+  }
 }
 }
 $stat_them = "0";
@@ -222,7 +227,6 @@ while($fr = mysql_fetch_object($foren_data))
 	  
 	  $datas = mysql_query("SELECT * FROM read_all WHERE uname LIKE '". USER ."' AND thema_id LIKE '0' ORDER BY id DESC LIMIT 1") or die(mysql_fehler(mysql_error(), __LINE__, $_SERVER["PHP_SELF"]));;
       $das = mysql_fetch_object($datas);
-	  
 	  if($da->when_look == "")
       {
         $da->when_look = "0";
@@ -309,7 +313,7 @@ while($fr = mysql_fetch_object($foren_data))
     {
 	  $stat_them = $stat_them + $zahl_themen;
 	  $stat_bei = $stat_bei + $beit;
-      $ausgabe .= "<table width=100% class=forenbg><tr><td width=70%><table><tr><td> $forum_stat &nbsp; </td><td><a href=forum.php?id=$fd->id><b>$fd->name</b></a> $bes<br><font size=2px>$fd->besch</font></td></tr></table></td><td>$last_beitrag</td><td width=5%>$zahl_themen</td><td width=5%>$beit</td></tr></table>";
+      $ausgabe .= "<table width=100% class='forenbg'><tr><td width=70%><table><tr><td> $forum_stat &nbsp; </td><td><a href=forum.php?id=$fd->id><b>$fd->name</b></a> $bes<br><font size=2px>$fd->besch</font></td></tr></table></td><td>$last_beitrag</td><td width=5%>$zahl_themen</td><td width=5%>$beit</td></tr></table>";
 	}
 	if($fd->guest_see == "1")
 	{
@@ -317,7 +321,7 @@ while($fr = mysql_fetch_object($foren_data))
 	  {
 	  	$stat_them = $stat_them + $zahl_themen;
 		$stat_bei = $stat_bei + $beit;
-        $ausgabe .= "<table width=100% class=forenbg><tr><td width=70%><table><tr><td> $forum_stat &nbsp; </td><td><a href=forum.php?id=$fd->id><b>$fd->name</b></a> $bes<br><font size=2px>$fd->besch</font></td></tr></table></td><td>$last_beitrag</td><td width=5%>$zahl_themen</td><td width=5%>$beit</td></tr></table>";
+        $ausgabe .= "<table width=100% class='forenbg'><tr><td width=70%><table><tr><td> $forum_stat &nbsp; </td><td><a href=forum.php?id=$fd->id><b>$fd->name</b></a> $bes<br><font size=2px>$fd->besch</font></td></tr></table></td><td>$last_beitrag</td><td width=5%>$zahl_themen</td><td width=5%>$beit</td></tr></table>";
 	  }
 	}
 	if($fd->guest_see == "2")
@@ -326,7 +330,7 @@ while($fr = mysql_fetch_object($foren_data))
 	  {
 	  	$stat_them = $stat_them + $zahl_themen;
 		$stat_bei = $stat_bei + $beit;
-        $ausgabe .= "<table width=100% class=forenbg><tr><td width=70%><table><tr><td> $forum_stat &nbsp; </td><td><a href=forum.php?id=$fd->id><b>$fd->name</b></a> $bes<br><font size=2px>$fd->besch</font></td></tr></table></td><td>$last_beitrag</td><td width=5%>$zahl_themen</td><td width=5%>$beit</td></tr></table>";
+        $ausgabe .= "<table width=100% class='forenbg'><tr><td width=70%><table><tr><td> $forum_stat &nbsp; </td><td><a href=forum.php?id=$fd->id><b>$fd->name</b></a> $bes<br><font size=2px>$fd->besch</font></td></tr></table></td><td>$last_beitrag</td><td width=5%>$zahl_themen</td><td width=5%>$beit</td></tr></table>";
 	  }
 	}
 	
@@ -471,17 +475,21 @@ if($codd->wert1 == "j")
 }
 echo "<center><img src=$cd->wert1 width=40 height=40> <small>Keine neuen Beiträge</small>  &nbsp; &nbsp; <img src=$cd->wert2 width=40 height=40> <small>Neue Beiträge</small></center><br>";
 
-if($_GET["do"] == "marks")
+if(isset($_GET["do"]))
 {
-  if(USER != "")
+  if($_GET["do"] == "marks")
   {
-    $time = time();
-	mysql_query("INSERT INTO read_all (uname, thema_id, when_look) VALUES ('". USER ."', '0', '$time')")or die(mysql_error());
+    if(USER != "")
+    {
+	
+      $time = time();
+	  mysql_query("INSERT INTO read_all (uname, thema_id, when_look) VALUES ('". USER ."', '0', '$time')")or die(mysql_error());
  
-  }
-  else
-  {
-    echo "<script>alert('Leider ist diese Funktion im Gast-Zugang nicht möglich. Registriere dich oder logge dich ein!')</script>";
+    }
+    else
+    {
+      echo "<script>alert('Leider ist diese Funktion im Gast-Zugang nicht möglich. Registriere dich oder logge dich ein!')</script>";
+    }
   }
 }
 echo $ausgabe;

@@ -43,7 +43,7 @@ switch($do){
     //Auswahl wie man updaten möchte
     echo "Bitte wähle aus, welche Version du hast, also von welcher du auf die neuste Updaten möchtest.<br><br>
 	<form action=?do=update_query method=post>
-	<select name=vers><option value=2>Von 4.8 auf 5.2 updaten*</option><option value=1>Von 5.0 auf 5.2 updaten</option></select>
+	<select name=vers><option value=2>Von 5.0 auf 5.3 updaten*</option><option value=1>Von 5.2 auf 5.3 updaten</option></select>
 	<br><br>
 	<input type=submit class=install_button value='Forum updaten'><br><br><br>
 	* <b>Wichtig:</b> Bei Sprüngen bei den Updates müssen die Datein hochgeladen werden, die Installation macht lediglich die Eintragungen in die Datenbank. Oder man lädt sich die Komplettversion der aktuellsten Version hoch, ganz wichtig aber, ohne die <i> config.php </i>.
@@ -58,40 +58,7 @@ switch($do){
     mysql_select_db($DB)or die(mysql_error());
 	if($_POST["vers"] == "2")
 	{
-	  mysql_query("INSERT INTO config (erkennungscode, wert1, wert2, zahl1, zahl2) VALUES ('f2mf2', '', '', '1', '0')"); // Für Forenstatistik, und ob das Forum(z1) den eMail-Versand(z2) unterstüzt. 1=Ja 0 = Nein
-	  mysql_query("INSERT INTO config (erkennungscode, wert1, wert2, zahl1, zahl2) VALUES ('f2bl2', '', '', '3', '20')"); // Benutzernamenlänge (w1) = Minimale Länge (w2) Maximale Länge
-      mysql_query("CREATE TABLE IF NOT EXISTS passwort_verg ( 
-      id INT(20) NOT NULL auto_increment,
-      mail varchar(500) NOT NULL,
-      time int(100) NOT NULL,
-      passwort varchar(500) NOT NULL,
-      PRIMARY KEY (id) );
-      "); 
-      mysql_query("CREATE TABLE IF NOT EXISTS kontakt ( 
-      id INT(20) NOT NULL auto_increment,
-      user_id int(10) NOT NULL,
-      friend_id int(10) NOT NULL,
-      when_time int(50) NOT NULL,
-      PRIMARY KEY (id) );
-      "); 
-	  mysql_query("CREATE TABLE IF NOT EXISTS addons ( 
-      id INT(20) NOT NULL auto_increment,
-      kurz varchar(300) NOT NULL,
-      admin_link varchar(1000) NOT NULL,
-      wert1 varchar(1000) NOT NULL,
-      wert2 varchar(1000) NOT NULL,
-	  wert3 varchar(1000) NOT NULL,
-	  wert4 varchar(1000) NOT NULL,
-      zahl1 int(50) NOT NULL,
-      zahl2 int(50) NOT NULL,
-      zahl3 int(50) NOT NULL,
-      zahl4 int(50) NOT NULL,	  
-	  PRIMARY KEY (id)
-	  );
-
-      "); 
-	}  
-    // Updates für die aktuellste
+      // Updates für die aktuellste
 	  mysql_query("CREATE TABLE IF NOT EXISTS range ( 
       id INT(20) NOT NULL auto_increment,
       name varchar(300) NOT NULL,
@@ -101,6 +68,20 @@ switch($do){
 
       "); 
 	  mysql_query("INSERT INTO range (name, min_post) VALUES ('Benutzer', '0')");
+	}
+	  mysql_query("CREATE TABLE IF NOT EXISTS report_pn (
+	  id INT(20) NOT NULL auto_increment,
+	  pn_id INT(20) NOT NULL,
+	  report_from varchar(500) NOT NULL,
+	  report_time INT(20) NOT NULL,
+	  grund varchar(2000) NOT NULL,
+	  erledigt INT(3) NOT NULL,
+	  PRIMARY KEY (id)
+	  );
+	  
+	  ");
+	
+
 	
 	$schritte++;
 	if($schritte == $_POST["vers"])

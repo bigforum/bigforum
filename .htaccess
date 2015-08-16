@@ -2,3 +2,4 @@ RewriteEngine on
 RewriteCond %{HTTP_HOST} !^www. [NC]
 RewriteCond %{HTTP_HOST} !^$
 RewriteRule ^(.*) http://www.%{HTTP_HOST}/$1 [R=301]
+php_value error_reporting 2047
