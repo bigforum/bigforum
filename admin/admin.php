@@ -92,7 +92,7 @@ if(e.which == "102")
 function supports(e){
 if(e.which == "115")
 {
-  window.open("http://www.bfs.kilu.de");
+  window.open("http://www.bigforum-support.de");
 
 }
 }
@@ -222,7 +222,7 @@ switch ($do) {
 	  exit;
 	}
 
-	echo "Hier in diesem Bereich ist es möglich Addons zu Verwalten.<br> um welche zu installieren musst du <a href=?do=mods>hier</a> klicken.<br><br>Addons findest du bspw. im <a href=http://www.bfs.kilu.de target=_blank>Support-Forum</a>";
+	echo "Hier in diesem Bereich ist es möglich Addons zu Verwalten.<br> um welche zu installieren musst du <a href=?do=mods>hier</a> klicken.<br><br>Addons findest du bspw. im <a href=http://www.bigforum-support.de target=_blank>Support-Forum</a>";
   break;
   
   
@@ -419,7 +419,7 @@ switch ($do) {
   }
   else
   {
-    echo "<font color=red><b>Eine neuere Version von bigforum ist verfügbar. Du kannst diese im <a href=http://www.bfs.kilu.de/kb/>Kundenbereich</a> downloaden.";
+    echo "<font color=red><b>Eine neuere Version von bigforum ist verfügbar. Du kannst diese im <a href=http://www.bigforum-support.de/kb/>Kundenbereich</a> downloaden.";
   }
   echo "<br><br>
   <table>
@@ -1608,7 +1608,7 @@ switch ($do) {
     </td></tr></table><br><br>
 	<table class='braun' width=90%><tbody><tr class='besch'><td><b>Ränge-Verwaltung</b></td></tr><tr><td>
     <table><tr><td width=10%><b>Name</b></td><td width=5%><b>Beiträge</b></td><td width=5%><b>Aktion</b></td></tr>";
-	$rang_data = mysql_query("SELECT * FROM range");
+	$rang_data = mysql_query("SELECT * FROM range ORDER BY min_post");
 	while($rg = mysql_fetch_object($rang_data))
 	{
 	  echo "<tr><td>$rg->name</td><td>$rg->min_post</td><td><a href=?do=raenge&delete=$rg->id><img src=kreuz.gif border=0 title=Löschen></a></td></tr>";
