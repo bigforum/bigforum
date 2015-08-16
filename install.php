@@ -391,6 +391,17 @@ switch($do){
       PRIMARY KEY (id) );
 
       "); 
+	  
+	  
+	  mysql_query("CREATE TABLE IF NOT EXISTS range ( 
+      id INT(20) NOT NULL auto_increment,
+      name varchar(300) NOT NULL,
+      min_post INT(20) NOT NULL,
+	  PRIMARY KEY (id)
+	  );
+
+      "); 
+
 
 	//Ende
 	  
@@ -400,6 +411,7 @@ switch($do){
 	  mysql_query("INSERT INTO style_all (sname, link_style) VALUES ('green', 'greenstyle.css')");
 	  mysql_query("INSERT INTO style_all (sname, link_style) VALUES ('blue', 'bluestyle.css')");
 	  mysql_query("INSERT INTO style_all (sname, link_style) VALUES ('red', 'redstyle.css')");
+	  mysql_query("INSERT INTO range (name, min_post) VALUES ('Benutzer', '0')");
 	  mysql_query("INSERT INTO config (erkennungscode, wert1, wert2, zahl1, zahl2) VALUES ('f2profs', 'j', '', '0', '1')");
 	  mysql_query("INSERT INTO config (erkennungscode, wert1, wert2, zahl1, zahl2) VALUES ('f2name2', 'Bigforum', 'Das Forum', '0', '0')");
 	  mysql_query("INSERT INTO config (erkennungscode, wert1, wert2, zahl1, zahl2) VALUES ('f2admin2', '', '', '0', '0')");
@@ -410,7 +422,7 @@ switch($do){
 	  mysql_query("INSERT INTO config (erkennungscode, wert1, wert2, zahl1, zahl2) VALUES ('f2adser2', 'kreis', '', '0', '0')");
 	  mysql_query("INSERT INTO config (erkennungscode, wert1, wert2, zahl1, zahl2) VALUES ('f2mf2', '', '', '1', '0')"); // Für Forenstatistik, und ob das Forum(z1) den eMail-Versand(z2) unterstüzt. 1=Ja 0 = Nein
 	  mysql_query("INSERT INTO config (erkennungscode, wert1, wert2, zahl1, zahl2) VALUES ('f2bl2', '', '', '3', '20')"); // Benutzernamenlänge (w1) = Minimale Länge (w2) Maximale Länge
-	  mysql_query("INSERT INTO config (erkennungscode, wert1, wert2, zahl1, zahl2) VALUES ('f2usearch2', '', '', '1', '0')"); // Zahl1 für Benutzersuche (1=aktiviert)
+	  mysql_query("INSERT INTO config (erkennungscode, wert1, wert2, zahl1, zahl2) VALUES ('f2usearch2', '', '', '1', '0')"); // Zahl1 für Benutzersuche (1=aktiviert) // Zahl2 für RSS
 	  mysql_query("INSERT INTO smilie (packet, images_path, abk1, abk2) VALUES ('1', 'brille.png', '8-)', '8)')");
 	  mysql_query("INSERT INTO smilie (packet, images_path, abk1, abk2) VALUES ('1', 'grine.png', ':)', ':-)')");
 	  mysql_query("INSERT INTO smilie (packet, images_path, abk1, abk2) VALUES ('1', 'lache.png', ':D', ':-D')");

@@ -6,6 +6,16 @@
 <meta name="description" content="<?php echo SITENAME. " - ". BESCHREIBUNG; 
 $config_datas = mysql_query("SELECT * FROM config WHERE erkennungscode LIKE 'f2laengfs'"); $cd = mysql_fetch_object($config_datas);?>" />
 <link rel="shortcut icon" href="<?php echo $cd->wert1;?>" type="image/x-icon">
+<?php
+$ccd = mysql_query("SELECT * FROM config WHERE erkennungscode LIKE 'f2usearch2'");
+$ccr = mysql_fetch_object($ccd);
+if($ccr->zahl2 == "1")
+{
+?>
+<link rel="alternate" type="application/rss+xml" title="<?php echo SITENAME. "- Feed";?>" href="rss.php" />
+<?php
+}
+?>
 <link rel="stylesheet" type="text/css" href="style/<?php
 $user_data = mysql_query("SELECT * FROM users WHERE username LIKE '". USER ."'");
 $ud = mysql_fetch_object($user_data);

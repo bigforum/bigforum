@@ -521,6 +521,16 @@ function error()
 {
 
 }
+function shorter ($string, $string_max_laenge = 150)
+{
+    $string_laenge = strlen($string);
+    if ($string_laenge >= $string_max_laenge)
+	{
+      $string = preg_replace("/[^ ]*$/", '', substr($string, 0, $string_max_laenge));
+      $string .= ' ...';
+    }
+    return ($string);
+}
 function show_online($zeit, $user)
 {
   $rech = $zeit - time();
@@ -617,6 +627,8 @@ if($fd->sign != "" AND $cd->zahl1 == "1")
   $text = preg_replace('/\[u\](.*?)\[\/u\]/s', '<u>$1</u>', $text);  
   $text = eregi_replace("\[url\]([^\[]+)\[/url\]","<a href=\"http://\\1\" target=\"_blank\">\\1</a>",$text);
   $text = preg_replace('/\[url=([^ ]+).*\](.*)\[\/url\]/', '<a href="http://$1" target=\"_blank\">$2</a>', $text);  
+  $text = preg_replace("/\[color=(.*)\](.*)\[\/color\]/Usi", "<font color=\"\\1\">\\2</font>", $text); 
+  $text = preg_replace("/\[size=(.*)\](.*)\[\/size\]/Usi", "<font size=\"\\1\">\\2</font>", $text); 
   $text = str_replace("\n", "<br />", $text);
   $text = str_replace("http://http://" ,"http://", $text);
   $config_wert = mysql_query("SELECT * FROM config WHERE erkennungscode LIKE 'f2laengfs'");

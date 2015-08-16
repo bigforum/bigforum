@@ -181,26 +181,50 @@ switch ($do) {
   
   case "inaktiv":
     left_table($user);
+	if($_GET["aktion"] == "errinerung")
+	{
+	  $user_datasz = mysql_query("SELECT * FROM users WHERE username = '". USER ."'");
+	  $udsz = mysql_fetch_object($user_datasz);
+	  $user_datas = mysql_query("SELECT * FROM users WHERE id = '$_GET[id]'");
+	  $uds = mysql_fetch_object($user_datas);
+	  $mail = "Hallo $uds->username, <br>
+	  du bist im Forum (<a href=$_SERVER[HTTP_HOST]>$_SERVER[HTTP_HOST]</a>) angemeldet.<br>
+	  Leider warst du seit längerer Zeit nicht mehr aktiv.<br><br>
+	  Das Foren-Team würde sich freuen wenn du dem Forum mal wieder ein Besuch abstatten würdest.<br><br>
+	  Die Foren-Administration";
+	  if($_GET["send"] == "true")
+	  {
+	    $from = "From: $udsz->mail\n";
+        $from .= "Reply-To: $udsz->mail\n";
+        $from .= "Content-Type: text/html\n";
+
+	    mail($uds->mail, "Inaktivität im Forum", $mail,$from);
+	    echo "Der Benutzer erhält nun eine Erinnerungsmail-eMail.";
+	    exit;
+	  }
+	  echo "Möchtest du folgende Mail an den $uds->username ($uds->mail) schicken?<br><br>$mail<br><br><a href=?do=inaktiv&aktion=errinerung&id=$_GET[id]&send=true>Ja, Mail so an den Benutzer schicken</a>";
+	  exit;
+	}
 	echo "<table class=braun width=50%><tr class=besch><td><b>Inaktive Benutzer (Letzter Login vor mehr als 30 Tagen)</b></td></tr><tr><td>
 	    <table>
-		<tr><td><b>Benutzername</b></td><td><b>Beiträge</b></td><td>Letzter Login</td></tr>";
+		<tr><td><b>Benutzername</b></td><td><b>Beiträge</b></td><td><b>Letzter Login</b></td><td><b>Aktion</b></td></tr>";
 		$time = time() - 2678400;
 		$user_data1 = mysql_query("SELECT * FROM users WHERE last_log < $time");
 		while($ud1 = mysql_fetch_object($user_data1))
 		{
-		  echo "<tr><td>$ud1->username</td><td>$ud1->posts</td><td>". date("d.m.Y - h:i", $ud1->last_log) ."</td></tr>";
+		  echo "<tr><td>$ud1->username</td><td>$ud1->posts</td><td>". date("d.m.Y - h:i", $ud1->last_log) ."</td><td><a href=?do=inaktiv&aktion=errinerung&id=$ud1->id>Erinnerungsmail schicken</a></td></tr>";
 		}
 		echo "</table>
 		</td></tr></table><br><br>
 		<br><br>
 		<table class=braun width=50%><tr class=besch><td><b>Inaktive Benutzer (Nullposter und letzter Login vor mehr als 2 Tagen)</b></td></tr><tr><td>
 		<table>
-		<tr><td><b>Benutzername</b></td><td><b>Beiträge</b></td><td>Letzter Login</td></tr>";
+		<tr><td><b>Benutzername</b></td><td><b>Beiträge</b></td><td><b>Letzter Login</b></td><td><b>Aktion</b></td></tr>";
 		$time = time() - 172800;
 		$user_data1 = mysql_query("SELECT * FROM users WHERE last_log < $time AND posts = 0");
 		while($ud1 = mysql_fetch_object($user_data1))
 		{
-		  echo "<tr><td>$ud1->username</td><td>$ud1->posts</td><td>". date("d.m.Y - h:i", $ud1->last_log) ."</td></tr>";
+		  echo "<tr><td>$ud1->username</td><td>$ud1->posts</td><td>". date("d.m.Y - h:i", $ud1->last_log) ."</td><td><a href=?do=inaktiv&aktion=errinerung&id=$ud1->id>Erinnerungsmail schicken</a></td></tr>";
 		}
 	    echo "</td></tr></table><br><br>";
   break;
@@ -501,6 +525,7 @@ switch ($do) {
 	   <tr><td><b>Hobbys:</b></td><td><input type=text name=hob value='$uds->hob'></td></tr>
 	   <tr><td> &nbsp; </td><td>&nbsp;</td></tr><tr><td>
 	   <b>Beiträge:</b> </td><td> <input type=text name=bei value=$uds->posts></td></tr><tr><td>
+	   <b>eMail:</b> </td><td> <input type=text name=emai value=$uds->mail></td></tr><tr><td>
 	   <b>Registriert seit (UNIX!):</b> </td><td> <input type=text name=reg value=$uds->reg_dat> (". date("d.m.Y", $uds->reg_dat).")</td></tr>
 	   <tr><td><b>Angezeigte Notiz:</b></td><td> <input type=text name=unot value='$uds->notice' </td></tr></table></td></tr></table>
 	   </td><td><table class=braun width=100%><tr class=besch><td><b>Benutzerrechte - $uds->username</b></td></tr><tr><td>
@@ -624,6 +649,7 @@ switch ($do) {
 			group_id  = '$_POST[grup]',
 			notice    = '$_POST[unot]',
 			sign      = '$_POST[sign]',
+			mail      = '$_POST[emai]',
 			website   = '$_POST[web]',
 			hob       = '$_POST[hob]',
 			editrech  = '$_POST[editrech]',
@@ -793,7 +819,7 @@ switch ($do) {
     mysql_query("UPDATE config SET wert1 = '$_POST[bfav]', wert2 = '$_POST[styl]', zahl1 = '7', zahl2 = '$_POST[smilie]' WHERE erkennungscode LIKE 'f2laengfs'");   
     mysql_query("UPDATE config SET wert1 = '$_POST[st]', zahl2 = '$_POST[pro]' WHERE erkennungscode LIKE 'f2profs'");   
 	mysql_query("UPDATE config SET zahl1 = '$_POST[bmin]', zahl2 = '$_POST[bmax]' WHERE erkennungscode LIKE 'f2bl2'");   //Benutzername (minimal/maximal)
-	mysql_query("UPDATE config SET zahl1 = '$_POST[bensuch]' WHERE erkennungscode LIKE 'f2usearch2'");   //Benutzersuche aktivieren
+	mysql_query("UPDATE config SET zahl1 = '$_POST[bensuch]', zahl2 = '$_POST[rss]' WHERE erkennungscode LIKE 'f2usearch2'");   //Benutzersuche aktivieren
 
 	echo "Danke, die Foreneinstellungen wurden geändert!";
 	insert_log("Die Foreneinstellungen wurden überarbeitet.");
@@ -954,6 +980,14 @@ switch ($do) {
   {
     $besu = "<input type=radio name=bensuch value=1>Ja <input type=radio name=bensuch value=0 checked>Nein ";
   }
+  if($con->zahl2 == "1")
+  {
+    $rss = "<input type=radio name=rss value=1 checked>Ja <input type=radio name=rss value=0>Nein ";
+  }
+  else
+  {
+    $rss = "<input type=radio name=rss value=1>Ja <input type=radio name=rss value=0 checked>Nein ";
+  }
   $config_wert = mysql_query("SELECT * FROM config WHERE erkennungscode LIKE 'f2bl2'");
   $con = mysql_fetch_object($config_wert); 
   echo "
@@ -961,6 +995,8 @@ switch ($do) {
   <tr><td>Zeige erweiterte Statistik auf der Startseite?</td><td>$st</td></tr>
   <tr><td> &nbsp; </td><td> &nbsp </td></tr>
   <tr><td>Benutzersuche aktivieren (Mitgliederliste)?</td><td>$besu</td></tr>
+  <tr><td> &nbsp; </td><td> &nbsp </td></tr>
+  <tr><td>Aktiviere RSS-Feed</td><td>$rss</td></tr>
   <tr><td> &nbsp; </td><td> &nbsp </td></tr>
   <tr><td> Minimale Benutzernamenlänge </td><td> <input type=text name=bmin value='$con->zahl1'> </td></tr>
   <tr><td> Maximale Benutzernamenlänge </td><td> <input type=text name=bmax value='$con->zahl2'> </td></tr>
